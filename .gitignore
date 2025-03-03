@@ -68,7 +68,7 @@ htmlcov/
 # Fichiers de déploiement
 *.dump
 *.dump.*
-*.sql
+.sql
 *.sql.*
 
 # Fichiers temporaires
