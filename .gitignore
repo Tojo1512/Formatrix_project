@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django
+*.log
+*.pot
+*.pyc
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media
+
+# Environnements virtuels
+venv/
+ENV/
+env/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Fichiers de migration
+# Vous pouvez décommenter cette ligne si vous ne voulez pas versionner les migrations
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Fichiers statiques collectés
+staticfiles/
+static_root/
+
+# Fichiers de configuration sensibles
+.env
+formatrix/formatrix/.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Fichiers de cache
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Fichiers de déploiement
+*.dump
+*.dump.*
+*.sql
+*.sql.*
+
+# Fichiers temporaires
+tmp/
+temp/

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - Formatrix{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Bienvenue sur Formatrix</h1>
+    
+    {% if user.is_authenticated %}
+      <div class="alert alert-success">
+        <p>Bonjour {{ user.username }} ! Vous êtes connecté.</p>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-primary">Se déconnecter</button>
+        </form>
+      </div>
+    {% else %}
+      <div class="alert alert-info">
+        <p>Vous n'êtes pas connecté.</p>
+        <p>
+          <a href="{% url 'login' %}" class="btn btn-primary">Se connecter</a>
+          <a href="{% url 'register' %}" class="btn btn-success">S'inscrire</a>
+          <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary">Mot de passe oublié ?</a>
+        </p>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %} 

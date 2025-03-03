@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription - Formatrix{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">Inscription</h4>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label for="id_username" class="form-label">Nom d'utilisateur</label>
+              <input type="text" name="username" id="id_username" class="form-control" required autofocus>
+              {% if form.username.errors %}
+                <div class="text-danger">
+                  {% for error in form.username.errors %}
+                    <small>{{ error }}</small>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="mb-3">
+              <label for="id_password1" class="form-label">Mot de passe</label>
+              <input type="password" name="password1" id="id_password1" class="form-control" required>
+              {% if form.password1.errors %}
+                <div class="text-danger">
+                  {% for error in form.password1.errors %}
+                    <small>{{ error }}</small>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <small class="form-text text-muted">
+                <ul>
+                  <li>Votre mot de passe ne peut pas être trop similaire à vos autres informations personnelles.</li>
+                  <li>Votre mot de passe doit contenir au moins 8 caractères.</li>
+                  <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
+                  <li>Votre mot de passe ne peut pas être entièrement numérique.</li>
+                </ul>
+              </small>
+            </div>
+            
+            <div class="mb-3">
+              <label for="id_password2" class="form-label">Confirmation du mot de passe</label>
+              <input type="password" name="password2" id="id_password2" class="form-control" required>
+              {% if form.password2.errors %}
+                <div class="text-danger">
+                  {% for error in form.password2.errors %}
+                    <small>{{ error }}</small>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              <small class="form-text text-muted">Entrez le même mot de passe que précédemment, pour vérification.</small>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success">S'inscrire</button>
+            </div>
+          </form>
+          
+          <div class="mt-3 text-center">
+            <p>Vous avez déjà un compte ? <a href="{% url 'login' %}">Se connecter</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
