@@ -16,4 +16,4 @@ def register_view(request):
             return redirect('home')
     else:
         form = UserCreationForm()
-    return render(request, 'registration/register.html', {'form': form}) 
+    return render(request, 'auth/register.html', {'form': form}) 

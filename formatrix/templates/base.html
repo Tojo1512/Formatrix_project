@@ -10,7 +10,7 @@
 </head>
 <body>
   {% block splash_content %}
-    {% if show_splash %}
+    {% if show_splash and not user.is_authenticated %}
     <!-- Splashscreen -->
     <div class="splash-screen">
       <div class="splash-content">

@@ -4,11 +4,13 @@
 {% block title %}Accueil - Formatrix{% endblock %}
 
 {% block splash %}
+{% if not user.is_authenticated %}
 <link rel="stylesheet" href="{% static 'css/splashscreen.css' %}">
+{% endif %}
 {% endblock %}
 
 {% block splash_content %}
-{% with show_splash=false %}
+{% with show_splash=True %}
   {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -25,11 +27,26 @@
       {% if user.is_authenticated %}
         <div class="card bg-dark text-light border-0 shadow-sm mb-4">
           <div class="card-body">
-            <h4 class="card-title mb-3">
-              <i class="fas fa-user-circle text-primary me-2"></i>
-              Bonjour {{ user.username }} !
-            </h4>
-            <p class="card-text mb-4">Vous êtes connecté à votre espace de gestion.</p>
+            <div class="d-flex align-items-center justify-content-center mb-3">
+              <i class="fas fa-user-circle text-primary me-2 fa-2x"></i>
+              <div>
+                <h4 class="card-title mb-1">{{ user.username }}</h4>
+                <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} mb-2">
+                  {% if user.is_staff %}
+                    <i class="fas fa-user-shield me-1"></i>Administrateur
+                  {% else %}
+                    <i class="fas fa-chalkboard-teacher me-1"></i>Formateur
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+            <p class="card-text mb-4">
+              {% if user.is_staff %}
+                Vous avez accès à toutes les fonctionnalités d'administration.
+              {% else %}
+                Vous avez accès aux fonctionnalités de gestion des formations.
+              {% endif %}
+            </p>
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
               <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
@@ -43,33 +60,65 @@
 
         <!-- Quick Actions -->
         <div class="row g-4 mt-2">
-          <div class="col-md-4">
-            <div class="card bg-dark text-light border-0 shadow-sm h-100">
-              <div class="card-body">
-                <i class="fas fa-chalkboard-teacher text-primary fa-2x mb-3"></i>
-                <h5 class="card-title">Formations</h5>
-                <p class="card-text">Gérez vos formations et programmes</p>
+          {% if user.is_staff %}
+            <!-- Actions Administrateur -->
+            <div class="col-md-4">
+              <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <i class="fas fa-users-cog text-primary fa-2x mb-3"></i>
+                  <h5 class="card-title">Gestion des Utilisateurs</h5>
+                  <p class="card-text">Gérez les formateurs et les accès</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card bg-dark text-light border-0 shadow-sm h-100">
-              <div class="card-body">
-                <i class="fas fa-users text-primary fa-2x mb-3"></i>
-                <h5 class="card-title">Apprenants</h5>
-                <p class="card-text">Suivez vos apprenants</p>
+            <div class="col-md-4">
+              <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <i class="fas fa-chart-pie text-primary fa-2x mb-3"></i>
+                  <h5 class="card-title">Statistiques Globales</h5>
+                  <p class="card-text">Analysez les performances</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card bg-dark text-light border-0 shadow-sm h-100">
-              <div class="card-body">
-                <i class="fas fa-chart-line text-primary fa-2x mb-3"></i>
-                <h5 class="card-title">Rapports</h5>
-                <p class="card-text">Consultez les statistiques</p>
+            <div class="col-md-4">
+              <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <i class="fas fa-cogs text-primary fa-2x mb-3"></i>
+                  <h5 class="card-title">Configuration</h5>
+                  <p class="card-text">Paramètres du système</p>
+                </div>
               </div>
             </div>
-          </div>
+          {% else %}
+            <!-- Actions Formateur -->
+            <div class="col-md-4">
+              <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <i class="fas fa-chalkboard-teacher text-primary fa-2x mb-3"></i>
+                  <h5 class="card-title">Mes Formations</h5>
+                  <p class="card-text">Gérez vos sessions de formation</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <i class="fas fa-user-graduate text-primary fa-2x mb-3"></i>
+                  <h5 class="card-title">Mes Apprenants</h5>
+                  <p class="card-text">Suivez vos apprenants</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-dark text-light border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <i class="fas fa-chart-line text-primary fa-2x mb-3"></i>
+                  <h5 class="card-title">Mes Rapports</h5>
+                  <p class="card-text">Consultez vos statistiques</p>
+                </div>
+              </div>
+            </div>
+          {% endif %}
         </div>
       {% else %}
         <div class="card bg-dark text-light border-0 shadow-sm">
