@@ -1,28 +1,95 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Accueil - Formatrix{% endblock %}
 
+{% block splash %}
+<link rel="stylesheet" href="{% static 'css/splashscreen.css' %}">
+{% endblock %}
+
+{% block splash_content %}
+{% with show_splash=false %}
+  {{ block.super }}
+{% endwith %}
+{% endblock %}
+
 {% block content %}
-  <div class="container mt-5">
-    <h1 class="text-center mb-4">Bienvenue sur Formatrix</h1>
-    
-    {% if user.is_authenticated %}
-      <div class="alert alert-success">
-        <p>Bonjour {{ user.username }} ! Vous êtes connecté.</p>
-        <form method="post" action="{% url 'logout' %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-outline-primary">Se déconnecter</button>
-        </form>
-      </div>
-    {% else %}
-      <div class="alert alert-info">
-        <p>Vous n'êtes pas connecté.</p>
-        <p>
-          <a href="{% url 'login' %}" class="btn btn-primary">Se connecter</a>
-          <a href="{% url 'register' %}" class="btn btn-success">S'inscrire</a>
-          <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary">Mot de passe oublié ?</a>
-        </p>
-      </div>
-    {% endif %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <h1 class="display-4 mb-4 fw-bold">
+        <i class="fas fa-graduation-cap text-primary me-3"></i>
+        Bienvenue sur Formatrix
+      </h1>
+      
+      {% if user.is_authenticated %}
+        <div class="card bg-dark text-light border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h4 class="card-title mb-3">
+              <i class="fas fa-user-circle text-primary me-2"></i>
+              Bonjour {{ user.username }} !
+            </h4>
+            <p class="card-text mb-4">Vous êtes connecté à votre espace de gestion.</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger">
+                  <i class="fas fa-sign-out-alt me-2"></i>Se déconnecter
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row g-4 mt-2">
+          <div class="col-md-4">
+            <div class="card bg-dark text-light border-0 shadow-sm h-100">
+              <div class="card-body">
+                <i class="fas fa-chalkboard-teacher text-primary fa-2x mb-3"></i>
+                <h5 class="card-title">Formations</h5>
+                <p class="card-text">Gérez vos formations et programmes</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card bg-dark text-light border-0 shadow-sm h-100">
+              <div class="card-body">
+                <i class="fas fa-users text-primary fa-2x mb-3"></i>
+                <h5 class="card-title">Apprenants</h5>
+                <p class="card-text">Suivez vos apprenants</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card bg-dark text-light border-0 shadow-sm h-100">
+              <div class="card-body">
+                <i class="fas fa-chart-line text-primary fa-2x mb-3"></i>
+                <h5 class="card-title">Rapports</h5>
+                <p class="card-text">Consultez les statistiques</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="card bg-dark text-light border-0 shadow-sm">
+          <div class="card-body py-5">
+            <h4 class="card-title mb-4">Connectez-vous pour accéder à votre espace</h4>
+            <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+              <a href="{% url 'login' %}" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+              </a>
+              <a href="{% url 'register' %}" class="btn btn-outline-light">
+                <i class="fas fa-user-plus me-2"></i>S'inscrire
+              </a>
+              <a href="{% url 'password_reset' %}" class="btn btn-link text-light">
+                <i class="fas fa-key me-2"></i>Mot de passe oublié ?
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
   </div>
+</div>
 {% endblock %} 

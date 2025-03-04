@@ -3,75 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% block splash %}{% endblock %}
   <title>{% block title %}Formatrix{% endblock %}</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Custom CSS -->
-  <style>
-    body {
-      padding-top: 20px;
-      background-color: #f8f9fa;
-    }
-    .navbar {
-      margin-bottom: 20px;
-    }
-    .nav-logout-form {
-      display: inline;
-    }
-    .nav-logout-btn {
-      background: none;
-      border: none;
-      color: rgba(0,0,0,.55);
-      padding: 8px;
-      cursor: pointer;
-    }
-    .nav-logout-btn:hover {
-      color: rgba(0,0,0,.7);
-    }
-  </style>
 </head>
 <body>
+  {% block splash_content %}
+    {% if show_splash %}
+    <!-- Splashscreen -->
+    <div class="splash-screen">
+      <div class="splash-content">
+        <div class="splash-logo">Formatrix</div>
+        <div class="splash-tagline">Votre plateforme de gestion de formation</div>
+        <div class="splash-description">
+          Simplifiez la gestion de vos formations et le suivi de vos apprenants avec notre solution intuitive et professionnelle.
+        </div>
+        <div class="splash-features">
+          <div class="splash-feature">
+            <i class="splash-feature-icon">📚</i>
+            <div>Gestion des formations</div>
+          </div>
+          <div class="splash-feature">
+            <i class="splash-feature-icon">👥</i>
+            <div>Suivi des apprenants</div>
+          </div>
+          <div class="splash-feature">
+            <i class="splash-feature-icon">📊</i>
+            <div>Rapports détaillés</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endblock %}
+
   <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light rounded">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'home' %}">Formatrix</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'home' %}">Accueil</a>
-            </li>
-          </ul>
-          <ul class="navbar-nav">
-            {% if user.is_authenticated %}
-              <li class="nav-item">
-                <span class="nav-link">{{ user.username }}</span>
-              </li>
-              <li class="nav-item">
-                <form method="post" action="{% url 'logout' %}" class="nav-logout-form">
-                  {% csrf_token %}
-                  <button type="submit" class="nav-link nav-logout-btn">Déconnexion</button>
-                </form>
-              </li>
-            {% else %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Connexion</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'register' %}">Inscription</a>
-              </li>
-            {% endif %}
-          </ul>
+    <nav class="navbar">
+      <div class="navbar-content">
+        <a href="{% url 'home' %}" class="brand">Formatrix</a>
+        <div class="nav-links">
+          <a href="{% url 'home' %}" class="nav-link">Accueil</a>
+          {% if user.is_authenticated %}
+            <span class="nav-link">{{ user.username }}</span>
+            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{% url 'home' %}">
+              <button type="submit" class="btn btn-outline">Déconnexion</button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}" class="nav-link">Connexion</a>
+            <a href="{% url 'register' %}" class="nav-link">Inscription</a>
+          {% endif %}
         </div>
       </div>
     </nav>
 
-    {% block content %}{% endblock %}
+    <main class="fade-in">
+      {% block content %}{% endblock %}
+    </main>
   </div>
 
-  <!-- Bootstrap JS Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 Formatrix. Tous droits réservés.</p>
+    </div>
+  </footer>
 </body>
 </html> 
