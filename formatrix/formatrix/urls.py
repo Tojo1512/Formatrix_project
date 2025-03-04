@@ -16,13 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic.base import TemplateView
+from django.views.generic import TemplateView
 from .views import register_view
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('formatrix/admin/', admin.site.urls),
+    path('api/cours/', include('cours.urls')),
+    path('api/modules/', include('modules.urls')),
+    path('api/documents/', include('documents.urls')),
+    path('api/renouvellements/', include('renouvellements.urls')),
+    path('api/seances/', include('seances.urls')),
+    path('api/clients/', include('clients.urls')),
+    path('api/lieux/', include('lieux.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('register/', register_view, name='register'),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
