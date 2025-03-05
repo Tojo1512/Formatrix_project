@@ -1,0 +1,25 @@
+-- Se connecter à PostgreSQL en tant que postgres
+psql -U postgres
+
+-- Créer la base de données
+CREATE DATABASE formatrix;
+
+-- Créer l'utilisateur
+CREATE USER formatrix WITH PASSWORD 'formatrix';
+
+-- Donner les privilèges à l'utilisateur
+ALTER DATABASE formatrix OWNER TO formatrix;
+GRANT ALL PRIVILEGES ON DATABASE formatrix TO formatrix;
+
+-- Se connecter à la base de données formatrix
+\c formatrix
+
+-- Donner les privilèges sur le schéma public
+GRANT ALL ON SCHEMA public TO formatrix;
+
+
+python manage.py makemigrations
+
+python manage.py migrate
+
+python manage.py runserver

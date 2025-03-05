@@ -57,6 +57,9 @@ INSTALLED_APPS = [
     'seances',
     'clients',
     'lieux',
+    'apprenants',
+    'inscriptions',
+    'evaluations',
 ]
 
 MIDDLEWARE = [
