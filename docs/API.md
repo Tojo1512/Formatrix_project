@@ -409,18 +409,18 @@ GET /api/apprenants/evaluations/statistiques/
 
 ### Liste des présences
 ```http
-GET /api/evaluations/presences/
+GET /api/presences/
 ```
-[Tester dans le navigateur](http://localhost:8000/api/evaluations/presences/)
+[Tester dans le navigateur](http://localhost:8000/api/presences/)
 
 ### Détails d'une présence
 ```http
-GET /api/evaluations/presences/{presence_id}/
+GET /api/presences/{presence_id}/
 ```
 
 ### Créer une présence
 ```http
-POST /api/evaluations/presences/
+POST /api/presences/
 ```
 
 Exemple de requête :
@@ -437,7 +437,7 @@ Exemple de requête :
 
 ### Statistiques des présences
 ```http
-GET /api/evaluations/presences/statistiques/
+GET /api/presences/statistiques/
 ```
 
 Retourne :
@@ -448,7 +448,7 @@ Retourne :
 
 ### Présences par séance
 ```http
-GET /api/evaluations/presences/par_seance/?seance_id=1
+GET /api/presences/par_seance/?seance_id=1
 ```
 
 ### Résultats
