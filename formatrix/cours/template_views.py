@@ -8,8 +8,9 @@ from django.utils import timezone
 from django.views import View
 from .models import Cours
 from .forms import CoursForm
+from .mixins import CoursFilterMixin
 
-class CoursListView(LoginRequiredMixin, ListView):
+class CoursListView(LoginRequiredMixin, CoursFilterMixin, ListView):
     model = Cours
     template_name = 'cours/cours_list.html'
     context_object_name = 'cours_list'

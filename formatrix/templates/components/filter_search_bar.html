@@ -1,0 +1,289 @@
+{% comment %}
+  Composant réutilisable pour les filtres et la recherche
+  
+  Paramètres attendus dans le contexte:
+  - form_action: URL de l'action du formulaire
+  - search_query: Valeur actuelle de la recherche
+  - filters: Liste de dictionnaires contenant les filtres à afficher
+    Chaque filtre doit avoir:
+    - id: ID du champ
+    - name: Nom du champ dans le formulaire
+    - label: Libellé à afficher
+    - choices: Liste de tuples (value, label) pour les options
+    - selected: Valeur actuellement sélectionnée
+  - show_reset: Booléen pour afficher ou non le bouton de réinitialisation (défaut: True)
+  - reset_url: URL pour le bouton de réinitialisation
+  
+  Exemple d'utilisation:
+  {% include "components/filter_search_bar.html" with 
+    form_action=request.path 
+    search_query=search_query 
+    filters=filters_list
+    reset_url=request.path 
+  %}
+{% endcomment %}
+
+<form method="get" action="{{ form_action }}" id="searchFilterForm" class="search-filter-form">
+  <!-- Barre de recherche toujours visible -->
+  <div class="search-bar mb-4">
+    <div class="search-input-wrapper">
+      <input type="text" id="search" name="search" class="form-control" 
+             placeholder="{{ search_placeholder|default:'Rechercher...' }}" 
+             value="{{ search_query }}">
+      <button type="submit" class="search-btn">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Bouton et section de filtres -->
+  <div class="mb-4 d-flex justify-content-between align-items-start">
+    {% if show_create_button %}
+      <a href="{{ create_url }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i>
+        {{ create_button_text|default:"Créer" }}
+      </a>
+    {% endif %}
+    
+    <button type="button" id="toggle-filters" class="btn btn-outline">
+      <i class="fas fa-filter"></i>
+      Filtres
+      {% if has_active_filters %}
+      <span class="filter-badge">{{ active_filters_count }}</span>
+      {% endif %}
+    </button>
+  </div>
+
+  <!-- Section de filtres -->
+  <div id="filters-section" class="filters-section mb-4 {% if has_active_filters %}active{% endif %}">
+    <div class="filter-row">
+      {% for filter in filters %}
+        <div class="filter-group">
+          <label for="{{ filter.id }}" class="filter-label">{{ filter.label }}</label>
+          <select id="{{ filter.id }}" name="{{ filter.name }}" class="form-control filter-select">
+            <option value="">{{ filter.all_option_text|default:"Tous" }}</option>
+            {% for value, label in filter.choices %}
+              <option value="{{ value }}" {% if filter.selected == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endfor %}
+    </div>
+    
+    <div class="filter-actions">
+      <button type="submit" class="btn btn-primary btn-sm">
+        <i class="fas fa-filter"></i>
+        Appliquer les filtres
+      </button>
+      {% if show_reset|default:True %}
+        <a href="{{ reset_url }}" class="btn btn-outline btn-sm">
+          <i class="fas fa-times"></i>
+          Réinitialiser
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</form>
+
+<style>
+  .search-filter-form {
+    width: 100%;
+  }
+
+  .d-flex {
+    display: flex !important;
+  }
+
+  .justify-content-between {
+    justify-content: space-between !important;
+  }
+
+  .align-items-start {
+    align-items: flex-start !important;
+  }
+
+  .mb-4 {
+    margin-bottom: 1rem !important;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+  }
+
+  .filters-section {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--elevation-1);
+    transition: all 0.3s ease;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0 1.5rem;
+  }
+  
+  .filters-section.active {
+    max-height: 500px;
+    opacity: 1;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .filter-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .filter-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+  
+  .search-input-wrapper {
+    position: relative;
+    max-width: 500px;
+  }
+  
+  .search-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s;
+  }
+  
+  .search-btn:hover {
+    color: var(--primary-color);
+  }
+  
+  .filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  
+  .filter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+  }
+
+  .search-bar {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Fix pour les icônes Font Awesome */
+  .fas {
+    margin-right: 0.5rem;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('searchFilterForm');
+    const toggleFiltersBtn = document.getElementById('toggle-filters');
+    const filtersSection = document.getElementById('filters-section');
+    
+    if (toggleFiltersBtn && filtersSection) {
+      toggleFiltersBtn.addEventListener('click', function() {
+        filtersSection.classList.toggle('active');
+      });
+      
+      // Soumission automatique du formulaire lors du changement de select
+      const filterSelects = document.querySelectorAll('.filter-select');
+      filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+          form.submit();
+        });
+      });
+
+      // Empêcher la soumission du formulaire lors du clic sur le bouton toggle
+      toggleFiltersBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+      });
+    }
+
+    // Gérer la soumission du formulaire
+    form.addEventListener('submit', function(e) {
+      // Supprimer les paramètres vides
+      const formData = new FormData(form);
+      const searchParams = new URLSearchParams();
+      
+      for (let [key, value] of formData.entries()) {
+        if (value) {
+          searchParams.append(key, value);
+        }
+      }
+      
+      // Mettre à jour l'URL du formulaire avec les paramètres non vides
+      const newUrl = `${form.action}?${searchParams.toString()}`;
+      window.location.href = newUrl;
+      
+      e.preventDefault();
+    });
+  });
+</script>

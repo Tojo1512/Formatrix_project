@@ -7,9 +7,7 @@
 <div class="card">
     <h2 class="mb-4">Liste des Cours</h2>
     
-    <div class="mb-4">
-      <a href="{% url 'cours-create' %}" class="btn btn-primary">Créer un nouveau cours</a>
-    </div>
+    {% include "components/filter_search_bar.html" %}
 
     {% if cours_list %}
       <div class="table-responsive">
@@ -89,6 +87,24 @@
 
 {% block extra_css %}
 <style>
+  .form-control:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(212, 43, 30, 0.1);
+  }
+  
+  .d-flex {
+    display: flex;
+  }
+  
+  .justify-content-between {
+    justify-content: space-between;
+  }
+  
+  .align-items-start {
+    align-items: flex-start;
+  }
+  
   .table {
     width: 100%;
     border-collapse: collapse;
@@ -193,5 +209,37 @@
     overflow-x: auto;
   }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toggle des filtres
+    const toggleFiltersBtn = document.getElementById('toggle-filters');
+    const filtersSection = document.getElementById('filters-section');
+    
+    // Vérifier si des filtres sont actifs pour afficher automatiquement la section
+    const hasActiveFilters = 
+      '{{ search_query }}' !== '' || 
+      '{{ status_filter }}' !== '' || 
+      '{{ type_filter }}' !== '';
+    
+    if (hasActiveFilters) {
+      filtersSection.classList.add('active');
+    }
+    
+    toggleFiltersBtn.addEventListener('click', function() {
+      filtersSection.classList.toggle('active');
+    });
+    
+    // Soumission automatique du formulaire lors du changement de select
+    const filterSelects = document.querySelectorAll('select.form-control');
+    filterSelects.forEach(select => {
+      select.addEventListener('change', function() {
+        document.querySelector('.filter-form').submit();
+      });
+    });
+  });
+</script>
 {% endblock %}
 {% endblock %}
