@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import Resultat
+from .models import Presence
 from apprenants.models import Apprenant
 from seances.models import Seance
 from apprenants.serializers import ApprenantSerializer
 from seances.serializers import SeanceSerializer
 
-class ResultatSerializer(serializers.ModelSerializer):
+class PresenceSerializer(serializers.ModelSerializer):
     apprenant = ApprenantSerializer(read_only=True)
     seance = SeanceSerializer(read_only=True)
     apprenant_id = serializers.PrimaryKeyRelatedField(
@@ -20,5 +20,5 @@ class ResultatSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Resultat
+        model = Presence
         fields = '__all__'

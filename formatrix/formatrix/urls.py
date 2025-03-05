@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/apprenants/', include('apprenants.urls')),
     path('api/inscriptions/', include('inscriptions.urls')),
     path('api/evaluations/', include('evaluations.urls')),
+    path('api/presences/', include('presences.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('register/', register_view, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='auth/login.html'), name='login'),
