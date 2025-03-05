@@ -20,6 +20,19 @@
   --success-bg: #D1FAE5;
   --success-bg-light: rgba(209, 250, 229, 0.3);
   
+  --warning-color: #D97706;
+  --warning-bg: #FEF3C7;
+  --warning-bg-light: rgba(254, 243, 199, 0.3);
+  
+  --info-color: #0284C7;
+  --info-bg: #E0F2FE;
+  --info-bg-light: rgba(224, 242, 254, 0.3);
+  
+  --danger: #DC2626;
+  --success: #059669;
+  --warning: #D97706;
+  --info: #0284C7;
+  
   --text-primary: #1F2937;
   --text-secondary: #4B5563;
   

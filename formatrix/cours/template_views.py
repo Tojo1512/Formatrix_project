@@ -1,9 +1,11 @@
-from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
+from django.http import HttpResponseRedirect
 from django.utils import timezone
+from django.views import View
 from .models import Cours
 from .forms import CoursForm
 
@@ -80,4 +82,53 @@ class CoursUpdateView(LoginRequiredMixin, UpdateView):
             for error in form.non_field_errors():
                 messages.error(self.request, error)
         return super().form_invalid(form)
-        return super().form_invalid(form)
+
+
+class CoursDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Cours
+    template_name = 'cours/cours_confirm_delete.html'
+    success_url = reverse_lazy('cours-list')
+    login_url = '/login/'
+    
+    def test_func(self):
+        # Seuls les administrateurs peuvent supprimer un cours
+        return self.request.user.is_staff
+    
+    def delete(self, request, *args, **kwargs):
+        cours = self.get_object()
+        messages.success(request, f'Le cours "{cours.nom_cours}" a été supprimé avec succès!')
+        return super().delete(request, *args, **kwargs)
+
+
+class CoursApprouverView(LoginRequiredMixin, UserPassesTestMixin, View):
+    login_url = '/login/'
+    
+    def test_func(self):
+        # Seuls les administrateurs peuvent approuver un cours
+        return self.request.user.is_staff
+    
+    def get(self, request, pk):
+        cours = get_object_or_404(Cours, pk=pk)
+        cours.statut_approbation = 'approuve'
+        cours.date_approbation = timezone.now().date()
+        # La date d'expiration sera automatiquement calculée dans la méthode save() du modèle
+        cours.save()
+        messages.success(request, f'Le cours "{cours.nom_cours}" a été approuvé avec succès!')
+        return HttpResponseRedirect(reverse_lazy('cours-list'))
+
+
+class CoursRefuserView(LoginRequiredMixin, UserPassesTestMixin, View):
+    login_url = '/login/'
+    
+    def test_func(self):
+        # Seuls les administrateurs peuvent refuser un cours
+        return self.request.user.is_staff
+    
+    def get(self, request, pk):
+        cours = get_object_or_404(Cours, pk=pk)
+        cours.statut_approbation = 'refuse'
+        cours.date_approbation = None
+        cours.date_expiration_validite = None
+        cours.save()
+        messages.success(request, f'Le cours "{cours.nom_cours}" a été refusé!')
+        return HttpResponseRedirect(reverse_lazy('cours-list'))
