@@ -272,4 +272,76 @@ body {
   padding: 0 1.5rem;
   text-align: center;
   color: var(--text-secondary);
-} 
+}
+
+/* Messages d'erreur */
+span.error-text {
+  color: var(--danger) !important;
+  font-size: 0.875rem !important;
+  margin-top: 0.5rem !important;
+  display: block !important;
+  font-weight: 500 !important;
+}
+
+.form-error input,
+.form-error select {
+  border-color: var(--danger) !important;
+}
+
+.form-error .form-label {
+  color: var(--danger) !important;
+}
+
+.alert-danger {
+  background-color: rgba(227, 30, 38, 0.1) !important;
+  color: var(--danger) !important;
+  border: 1px solid var(--danger) !important;
+}
+
+/* Texte d'aide */
+.form-text.text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* Messages d'erreur et formulaires d'authentification */
+.auth-card .error-text {
+  color: #e31e26;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  display: block;
+  font-weight: 500;
+}
+
+.auth-card .form-error input,
+.auth-card .form-error select {
+  border-color: #e31e26;
+  background-color: rgba(227, 30, 38, 0.02);
+}
+
+.auth-card .form-error .form-label {
+  color: #e31e26;
+}
+
+.auth-card .alert-danger {
+  background-color: rgba(227, 30, 38, 0.1);
+  color: #e31e26;
+  border: 1px solid #e31e26;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.auth-card .form-text.text-muted {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Spécifique aux messages d'erreur de validation */
+.auth-card .form-group span.error-text {
+  color: #e31e26;
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+}
+

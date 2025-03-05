@@ -35,7 +35,11 @@ class Cours(models.Model):
     prerequis = models.TextField(null=True)
     materiel_requis = models.TextField(null=True)
     horaire = models.CharField(max_length=50, choices=HORAIRE_CHOICES)
-    statut_approbation = models.CharField(max_length=50, choices=STATUT_APPROBATION_CHOICES)
+    statut_approbation = models.CharField(
+        max_length=50,
+        choices=STATUT_APPROBATION_CHOICES,
+        default='en_attente'
+    )
     date_approbation = models.DateField(null=True)
     date_expiration_validite = models.DateField(null=True)
     version = models.IntegerField(default=1)

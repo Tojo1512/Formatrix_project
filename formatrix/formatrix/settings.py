@@ -152,5 +152,16 @@ EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.conso
 # Authentication settings
 LOGIN_REDIRECT_URL = os.environ.get('LOGIN_REDIRECT_URL', 'home')
 LOGOUT_REDIRECT_URL = os.environ.get('LOGOUT_REDIRECT_URL', '/')
+LOGIN_URL = 'login'
+
+# Template settings for authentication
+AUTH_TEMPLATES = {
+    'login': 'auth/login.html',
+    'logout': 'auth/logged_out.html',
+    'password_reset': 'auth/password_reset.html',
+    'password_reset_done': 'auth/password_reset_done.html',
+    'password_reset_confirm': 'auth/password_reset_confirm.html',
+    'password_reset_complete': 'auth/password_reset_complete.html',
+}
 
 CORS_ALLOW_ALL_ORIGINS = True  # Pour le développement seulement

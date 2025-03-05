@@ -1,63 +1,176 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Inscription - Formatrix{% endblock %}
 
 {% block content %}
-<div class="flex justify-center">
-  <div class="card" style="max-width: 400px; width: 100%;">
+<div class="auth-container" style="max-width: 400px; margin: 2rem auto;">
+  <div class="card auth-card">
     <h2 class="text-center mb-4">Inscription</h2>
 
-    {% if form.errors %}
-      <div class="card mb-4" style="background-color: var(--danger); padding: 1rem;">
-        {% for field in form %}
-          {% for error in field.errors %}
-            <p>{{ error }}</p>
-          {% endfor %}
-        {% endfor %}
-              </div>
-          {% endif %}
-
-          <form method="post">
-            {% csrf_token %}
-            
-      <div class="form-group">
-        <label class="form-label" for="id_username">Nom d'utilisateur</label>
-        <input type="text" name="username" id="id_username" class="form-input" required>
-        {% if form.username.help_text %}
-          <small style="color: var(--text-muted);">{{ form.username.help_text }}</small>
-              {% endif %}
-            </div>
-            
-      <div class="form-group">
-        <label class="form-label" for="id_email">Email</label>
-        <input type="email" name="email" id="id_email" class="form-input" required>
-                </div>
-
-      <div class="form-group">
-        <label class="form-label" for="id_password1">Mot de passe</label>
-        <input type="password" name="password1" id="id_password1" class="form-input" required>
-        {% if form.password1.help_text %}
-          <small style="color: var(--text-muted);">{{ form.password1.help_text }}</small>
-              {% endif %}
-            </div>
-            
-      <div class="form-group">
-        <label class="form-label" for="id_password2">Confirmation du mot de passe</label>
-        <input type="password" name="password2" id="id_password2" class="form-input" required>
-        {% if form.password2.help_text %}
-          <small style="color: var(--text-muted);">{{ form.password2.help_text }}</small>
-              {% endif %}
-            </div>
-            
-      <div class="flex justify-center gap-2 mb-4">
-        <button type="submit" class="btn btn-primary">S'inscrire</button>
-        <a href="{% url 'login' %}" class="btn btn-outline">Retour</a>
-            </div>
-          </form>
-          
-    <div class="text-center" style="color: var(--text-secondary);">
-      <p>Déjà inscrit ? <a href="{% url 'login' %}" style="color: var(--accent-primary); text-decoration: none;">Connectez-vous</a></p>
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger mb-4" style="color: #e31e26 !important;">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
     </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="form-group {% if form.username.errors %}form-error{% endif %}">
+        <label class="form-label" for="id_username">Nom d'utilisateur</label>
+        <input type="text" name="username" id="id_username" class="form-input" value="{{ form.username.value|default:'' }}" required>
+        {% if form.username.errors %}
+          {% for error in form.username.errors %}
+            <span class="error-text" style="color: #e31e26 !important;">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="form-group {% if form.email.errors %}form-error{% endif %}">
+        <label class="form-label" for="id_email">Email</label>
+        <input type="email" name="email" id="id_email" class="form-input" value="{{ form.email.value|default:'' }}" required>
+        {% if form.email.errors %}
+          {% for error in form.email.errors %}
+            <span class="error-text" style="color: #e31e26 !important;">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="form-group {% if form.password1.errors %}form-error{% endif %}">
+        <label class="form-label" for="id_password1">Mot de passe</label>
+        <div class="password-input-container">
+          <input type="password" name="password1" id="id_password1" class="form-input" required>
+          <button type="button" class="toggle-password" data-target="id_password1" style="background-color: #f0f0f0; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        {% if form.password1.errors %}
+          {% for error in form.password1.errors %}
+            <span class="error-text" style="color: #e31e26 !important;">{{ error }}</span>
+          {% endfor %}
+        {% else %}
+          <small class="form-text text-muted">
+            Le mot de passe doit contenir au moins 8 caractères.
+          </small>
+        {% endif %}
+      </div>
+
+      <div class="form-group {% if form.password2.errors %}form-error{% endif %}">
+        <label class="form-label" for="id_password2">Confirmer le mot de passe</label>
+        <div class="password-input-container">
+          <input type="password" name="password2" id="id_password2" class="form-input" required>
+          <button type="button" class="toggle-password" data-target="id_password2" style="background-color: #f0f0f0; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        {% if form.password2.errors %}
+          {% for error in form.password2.errors %}
+            <span class="error-text" style="color: #e31e26 !important;">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="form-group {% if form.role.errors %}form-error{% endif %}">
+        <label class="form-label" for="id_role">Rôle</label>
+        <select name="role" id="id_role" class="form-input" required>
+          <option value="formateur" {% if form.role.value == 'formateur' %}selected{% endif %}>Formateur</option>
+          <option value="admin" {% if form.role.value == 'admin' %}selected{% endif %}>Administrateur</option>
+        </select>
+        {% if form.role.errors %}
+          {% for error in form.role.errors %}
+            <span class="error-text" style="color: #e31e26 !important;">{{ error }}</span>
+          {% endfor %}
+        {% else %}
+          <small class="form-text text-muted">
+            Les administrateurs ont accès à toutes les fonctionnalités de gestion.
+          </small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+      </div>
+
+      <div class="text-center mt-4">
+        <p>
+          Déjà inscrit ? 
+          <a href="{% url 'login' %}" class="text-accent">Se connecter</a>
+        </p>
+      </div>
+    </form>
   </div>
 </div>
-{% endblock %} 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sélectionner tous les boutons de basculement de visibilité du mot de passe
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    
+    // Ajouter un écouteur d'événement à chaque bouton
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Obtenir l'ID du champ de mot de passe cible
+        const targetId = this.getAttribute('data-target');
+        const passwordInput = document.getElementById(targetId);
+        
+        // Basculer le type du champ entre 'password' et 'text'
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+          passwordInput.type = 'password';
+          this.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+        
+        // S'assurer que le style du bouton est préservé
+        this.style.backgroundColor = '#f0f0f0';
+        this.style.borderRadius = '50%';
+        this.style.width = '30px';
+        this.style.height = '30px';
+        this.style.display = 'flex';
+        this.style.alignItems = 'center';
+        this.style.justifyContent = 'center';
+      });
+    });
+  });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  .password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #475569; /* Couleur fixe au lieu de var */
+    padding: 5px;
+    font-size: 1.1rem;
+    z-index: 10;
+  }
+  
+  .toggle-password:hover {
+    color: #e31e26; /* Rouge Caritas */
+  }
+  
+  .form-input {
+    padding-right: 40px !important; /* Espace pour le bouton */
+    width: 100% !important;
+  }
+</style>
+{% endblock %}

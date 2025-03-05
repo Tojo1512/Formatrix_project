@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if object.cours_id %}Modifier{% else %}Créer{% endif %} un Cours - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/cours_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="course-form-container">
+  <div class="course-form-header">
+    <h2 class="course-form-title">
+      <i class="fas {% if object.cours_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+      {% if object.cours_id %}Modifier{% else %}Créer{% endif %} un Cours
+    </h2>
+    <a href="{% url 'cours-list' %}" class="btn btn-outline">
+      <i class="fas fa-arrow-left"></i>
+      Retour
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="course-form-grid">
+      <!-- Informations essentielles -->
+      <div class="course-form-section">
+        <h3 class="section-title">
+          <i class="fas fa-info-circle"></i>
+          Informations essentielles
+        </h3>
+        
+        <div class="form-group {% if form.nom_cours.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.nom_cours.id_for_label }}">
+            <i class="fas fa-heading"></i>
+            Nom du cours
+          </label>
+          {{ form.nom_cours }}
+          {% include "includes/field_errors.html" with field=form.nom_cours %}
+        </div>
+
+        <div class="form-row">
+          <div class="form-group {% if form.type_cours.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.type_cours.id_for_label }}">
+              <i class="fas fa-tag"></i>
+              Type
+            </label>
+            {{ form.type_cours }}
+            {% include "includes/field_errors.html" with field=form.type_cours %}
+          </div>
+
+          <div class="form-group {% if form.niveau.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.niveau.id_for_label }}">
+              <i class="fas fa-layer-group"></i>
+              Niveau
+            </label>
+            {{ form.niveau }}
+            {% include "includes/field_errors.html" with field=form.niveau %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group {% if form.duree_heures.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.duree_heures.id_for_label }}">
+              <i class="fas fa-clock"></i>
+              Durée (heures)
+            </label>
+            {{ form.duree_heures }}
+            {% include "includes/field_errors.html" with field=form.duree_heures %}
+          </div>
+
+          <div class="form-group {% if form.frais_par_participant.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.frais_par_participant.id_for_label }}">
+              <i class="fas fa-coins"></i>
+              Frais par participant (Ar)
+            </label>
+            {{ form.frais_par_participant }}
+            {% include "includes/field_errors.html" with field=form.frais_par_participant %}
+          </div>
+
+          <div class="form-group {% if form.periode_mois.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.periode_mois.id_for_label }}">
+              <i class="fas fa-calendar-alt"></i>
+              Période (mois)
+            </label>
+            {{ form.periode_mois }}
+            {% include "includes/field_errors.html" with field=form.periode_mois %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenu pédagogique -->
+      <div class="course-form-section">
+        <h3 class="section-title">
+          <i class="fas fa-book"></i>
+          Contenu pédagogique
+        </h3>
+        
+        <div class="form-group {% if form.description.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.description.id_for_label }}">
+            <i class="fas fa-align-left"></i>
+            Description
+          </label>
+          {{ form.description }}
+          {% include "includes/field_errors.html" with field=form.description %}
+        </div>
+
+        <div class="form-group {% if form.objectifs.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.objectifs.id_for_label }}">
+            <i class="fas fa-bullseye"></i>
+            Objectifs
+          </label>
+          {{ form.objectifs }}
+          {% include "includes/field_errors.html" with field=form.objectifs %}
+        </div>
+      </div>
+
+      <!-- Prérequis et matériel -->
+      <div class="course-form-section">
+        <h3 class="section-title">
+          <i class="fas fa-clipboard-list"></i>
+          Prérequis et matériel
+        </h3>
+        
+        <div class="form-group {% if form.prerequis.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.prerequis.id_for_label }}">
+            <i class="fas fa-check-square"></i>
+            Prérequis
+          </label>
+          {{ form.prerequis }}
+          {% include "includes/field_errors.html" with field=form.prerequis %}
+        </div>
+
+        <div class="form-group {% if form.materiel_requis.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.materiel_requis.id_for_label }}">
+            <i class="fas fa-tools"></i>
+            Matériel requis
+          </label>
+          {{ form.materiel_requis }}
+          {% include "includes/field_errors.html" with field=form.materiel_requis %}
+        </div>
+      </div>
+
+      <!-- Horaires -->
+      <div class="course-form-section">
+        <h3 class="section-title">
+          <i class="fas fa-clock"></i>
+          Horaires
+        </h3>
+        
+        <div class="form-group {% if form.horaire.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.horaire.id_for_label }}">
+            <i class="fas fa-calendar-alt"></i>
+            Horaire
+          </label>
+          {{ form.horaire }}
+          {% include "includes/field_errors.html" with field=form.horaire %}
+        </div>
+        <input type="hidden" name="statut_approbation" value="en_attente">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'cours-list' %}" class="btn btn-outline">
+        <i class="fas fa-times"></i>
+        Annuler
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas {% if object.cours_id %}fa-save{% else %}fa-plus{% endif %}"></i>
+        {% if object.cours_id %}Enregistrer{% else %}Valider{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock content %}

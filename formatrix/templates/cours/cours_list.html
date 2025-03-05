@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liste des Cours - Formatrix{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 class="mb-4">Liste des Cours</h2>
+    
+    <div class="mb-4">
+      <a href="{% url 'cours-create' %}" class="btn btn-primary">Créer un nouveau cours</a>
+    </div>
+
+    {% if cours_list %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nom du cours</th>
+              <th>Type</th>
+              <th>Durée (heures)</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cours in cours_list %}
+              <tr>
+                <td>{{ cours.nom_cours }}</td>
+                <td>{{ cours.get_type_cours_display }}</td>
+                <td>{{ cours.duree_heures }}</td>
+                <td>
+                  <span class="badge {% if cours.statut_approbation == 'approuve' %}badge-success{% elif cours.statut_approbation == 'en_attente' %}badge-warning{% elif cours.statut_approbation == 'refuse' %}badge-danger{% else %}badge-secondary{% endif %}">
+                    {{ cours.get_statut_approbation_display }}
+                  </span>
+                  {% if cours.alerte_expiration %}
+                    <span class="badge badge-warning">Expire bientôt</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{% url 'cours-detail' cours.cours_id %}" class="btn btn-sm btn-outline">Voir</a>
+                  <a href="{% url 'cours-update' cours.cours_id %}" class="btn btn-sm btn-outline">Modifier</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="alert alert-info">
+        Aucun cours n'a été trouvé. <a href="{% url 'cours-create' %}">Créer un cours</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% block extra_css %}
+<style>
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th, .table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  
+  .table tbody tr:hover {
+    background-color: var(--bg-secondary);
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .badge-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+  
+  .badge-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+  
+  .badge-danger {
+    background-color: rgba(227, 30, 38, 0.1);
+    color: var(--danger);
+  }
+  
+  .badge-secondary {
+    background-color: rgba(100, 116, 139, 0.1);
+    color: var(--text-secondary);
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+</style>
+{% endblock %}
+{% endblock %}
