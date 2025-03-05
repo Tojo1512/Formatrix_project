@@ -8,13 +8,60 @@ from django.utils import timezone
 from django.views import View
 from .models import Cours
 from .forms import CoursForm
-from .mixins import CoursFilterMixin
 
-class CoursListView(LoginRequiredMixin, CoursFilterMixin, ListView):
+class CoursListView(LoginRequiredMixin, ListView):
     model = Cours
     template_name = 'cours/cours_list.html'
     context_object_name = 'cours_list'
     login_url = '/login/'
+    ordering = ['-created_at']  # Tri par défaut
+    paginate_by = 10  # Nombre d'éléments par page
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        # Récupération des paramètres de l'API
+        search = self.request.GET.get('search', '')
+        ordering = self.request.GET.get('ordering', '-created_at')
+        statut = self.request.GET.get('statut', '')
+        type_cours = self.request.GET.get('type', '')
+        
+        # Application des filtres de l'API
+        if search:
+            queryset = queryset.filter(nom_cours__icontains=search)
+            
+        if statut:
+            queryset = queryset.filter(statut_approbation=statut)
+            
+        if type_cours:
+            queryset = queryset.filter(type_cours=type_cours)
+            
+        # Application du tri
+        queryset = queryset.order_by(ordering)
+            
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Paramètres de l'API pour le template
+        context.update({
+            'search_query': self.request.GET.get('search', ''),
+            'ordering': self.request.GET.get('ordering', '-created_at'),
+            'statut_filter': self.request.GET.get('statut', ''),
+            'type_filter': self.request.GET.get('type', ''),
+            'show_create_button': True,
+            'create_url': reverse_lazy('cours-create'),
+            'create_button_text': 'Créer un cours',
+            'form_action': self.request.path,
+            'reset_url': self.request.path,
+            'has_active_filters': bool(
+                self.request.GET.get('search', '') or 
+                self.request.GET.get('statut', '') or 
+                self.request.GET.get('type', '')
+            )
+        })
+        return context
 
 class CoursCreateView(LoginRequiredMixin, CreateView):
     model = Cours
