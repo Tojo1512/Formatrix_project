@@ -35,6 +35,11 @@ urlpatterns = [
     path('api/inscriptions/', include('inscriptions.urls')),
     path('api/evaluations/', include('evaluations.urls')),
     path('api/presences/', include('presences.urls')),
+    
+    # Template-based views
+    path('cours/', include('cours.template_urls')),
+    path('apprenants/', include('apprenants.template_urls')),
+    
     path('accounts/', include('django.contrib.auth.urls')),
     path('register/', register_view, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='auth/login.html'), name='login'),

@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ apprenant.nom_apprenant }} - Détails de l'apprenant - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+  <div class="detail-header">
+    <div class="detail-header-content">
+      <h2 class="detail-title">
+        <i class="fas fa-user-graduate"></i>
+        {{ apprenant.nom_apprenant }}
+        {% if apprenant.autres_nom %}
+          <span class="detail-subtitle">{{ apprenant.autres_nom }}</span>
+        {% endif %}
+      </h2>
+      
+      <div class="detail-badges">
+        <span class="badge badge-primary">
+          <i class="fas fa-venus-mars"></i>
+          {% for code, label in sexe_choices %}
+            {% if code == apprenant.sexe %}{{ label }}{% endif %}
+          {% endfor %}
+        </span>
+        
+        <span class="badge badge-info">
+          <i class="fas fa-birthday-cake"></i>
+          {% for code, label in age_choices %}
+            {% if code == apprenant.categorie_age %}{{ label }}{% endif %}
+          {% endfor %}
+        </span>
+        
+        <span class="badge badge-secondary">
+          <i class="fas fa-graduation-cap"></i>
+          {% for code, label in niveau_choices %}
+            {% if code == apprenant.niveau_academique %}{{ label }}{% endif %}
+          {% endfor %}
+        </span>
+      </div>
+    </div>
+    
+    <div class="detail-actions">
+      <a href="{% url 'apprenant-list' %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i>
+        Retour
+      </a>
+      
+      {% if user.is_staff %}
+      <a href="{% url 'apprenant-update' apprenant.apprenant_id %}" class="btn btn-warning">
+        <i class="fas fa-edit"></i>
+        Modifier
+      </a>
+      
+      <a href="{% url 'apprenant-delete' apprenant.apprenant_id %}" class="btn btn-danger">
+        <i class="fas fa-trash"></i>
+        Supprimer
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="detail-content">
+    <div class="detail-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Informations personnelles
+      </h3>
+      
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="fas fa-id-card"></i>
+            CIN
+          </div>
+          <div class="detail-value">{{ apprenant.cin|default:"Non spécifié" }}</div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="fas fa-calendar-alt"></i>
+            Date de naissance
+          </div>
+          <div class="detail-value">{{ apprenant.date_naissance|date:"d/m/Y"|default:"Non spécifiée" }}</div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="fas fa-user-tag"></i>
+            Type d'apprenant
+          </div>
+          <div class="detail-value">{{ apprenant.type_apprenant|default:"Non spécifié" }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="detail-section">
+      <h3 class="section-title">
+        <i class="fas fa-map-marker-alt"></i>
+        Adresse
+      </h3>
+      
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="fas fa-road"></i>
+            Adresse
+          </div>
+          <div class="detail-value">{{ apprenant.adresse_rue|default:"Non spécifiée" }}</div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="fas fa-map"></i>
+            Localité
+          </div>
+          <div class="detail-value">{{ apprenant.localite|default:"Non spécifiée" }}</div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="fas fa-city"></i>
+            Ville
+          </div>
+          <div class="detail-value">{{ apprenant.ville|default:"Non spécifiée" }}</div>
+        </div>
+      </div>
+    </div>
+    
+    {% if apprenant.besoins_speciaux %}
+    <div class="detail-section">
+      <h3 class="section-title">
+        <i class="fas fa-hand-holding-heart"></i>
+        Besoins spéciaux
+      </h3>
+      
+      <div class="detail-text">
+        {{ apprenant.besoins_speciaux }}
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="detail-section">
+      <h3 class="section-title">
+        <i class="fas fa-phone-alt"></i>
+        Contact d'urgence
+      </h3>
+      
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="fas fa-user-friends"></i>
+            Personne à contacter
+          </div>
+          <div class="detail-value">{{ apprenant.contact_urgence|default:"Non spécifié" }}</div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-label">
+            <i class="fas fa-phone"></i>
+            Téléphone
+          </div>
+          <div class="detail-value">{{ apprenant.telephone_urgence|default:"Non spécifié" }}</div>
+        </div>
+      </div>
+    </div>
+    
+    {% if formations %}
+    <div class="detail-section">
+      <h3 class="section-title">
+        <i class="fas fa-book"></i>
+        Formations suivies
+      </h3>
+      
+      <div class="formations-list">
+        {% for formation in formations %}
+        <div class="formation-card">
+          <div class="formation-title">{{ formation.titre }}</div>
+          <div class="formation-dates">
+            <i class="fas fa-calendar"></i>
+            {{ formation.date_debut|date:"d/m/Y" }} - {{ formation.date_fin|date:"d/m/Y" }}
+          </div>
+          <a href="{% url 'cours-detail' formation.cours_id %}" class="btn btn-sm btn-outline">
+            <i class="fas fa-eye"></i>
+            Voir la formation
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
