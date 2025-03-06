@@ -17,7 +17,7 @@ class Client(models.Model):
     clientid = models.AutoField(primary_key=True)
     nomclient = models.CharField(max_length=100)
     autresnom = models.CharField(max_length=100, null=True)
-    email = models.CharField(max_length=100, null=True)
+    email = models.EmailField(max_length=100, null=True, blank=True)
     localite = models.CharField(max_length=100, null=True)
     ville = models.CharField(max_length=100, null=True)
     numero_immatriculation = models.CharField(max_length=50, null=True)

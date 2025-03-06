@@ -50,4 +50,7 @@ urlpatterns = [
     
     # URLs pour les templates de clients
     path('clients/', include('clients.urls')),
+    
+    # URLs pour les templates d'apprenants
+    path('apprenants/', include('apprenants.template_urls')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
