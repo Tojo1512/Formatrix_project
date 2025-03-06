@@ -1,133 +1,105 @@
 /* Splashscreen */
 .splash-screen {
-  min-height: calc(100vh - 64px);
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 2rem;
-  color: white;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeSplash 1.5s ease-out forwards;
+  animation-delay: 2.5s;
 }
 
 .splash-content {
-  max-width: 800px;
   text-align: center;
+  max-width: 600px;
+  padding: 2rem;
 }
 
-.splash-content h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  line-height: 1.2;
+.splash-logo {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: slideUp 0.8s ease-out forwards;
 }
 
-.splash-content p {
+.splash-tagline {
   font-size: 1.5rem;
-  opacity: 0.9;
-  margin-bottom: 3rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: slideUp 0.8s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+.splash-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: slideUp 0.8s ease-out forwards;
+  animation-delay: 0.6s;
 }
 
 .splash-features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  justify-content: center;
   gap: 2rem;
-  margin-bottom: 3rem;
+  margin-top: 2rem;
+  opacity: 0;
+  animation: slideUp 0.8s ease-out forwards;
+  animation-delay: 0.9s;
 }
 
-.feature {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+.splash-feature {
+  text-align: center;
+  flex: 1;
 }
 
-.feature i {
-  font-size: 2.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-  transition: all 0.3s ease;
+.splash-feature-icon {
+  font-size: 2rem;
+  color: var(--btn-secondary);
+  margin-bottom: 0.5rem;
 }
 
-.feature:hover i {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-5px);
+@keyframes fadeSplash {
+  from { opacity: 1; visibility: visible; }
+  to { opacity: 0; visibility: hidden; }
 }
 
-.feature span {
-  font-size: 1.125rem;
-  font-weight: 500;
-}
-
-.splash-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 2rem;
-  border-radius: 8px;
-  font-size: 1.125rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background-color: white;
-  color: #2563eb;
-}
-
-.btn-primary:hover {
-  background-color: #f8fafc;
-  transform: translateY(-2px);
-}
-
-.btn-outline {
-  background-color: transparent;
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-}
-
-.btn-outline:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: white;
-  transform: translateY(-2px);
-}
-
-@media (max-width: 768px) {
-  .splash-content h1 {
-    font-size: 2rem;
+@keyframes slideUp {
+  from { 
+    transform: translateY(20px);
+    opacity: 0;
   }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
-  .splash-content p {
-    font-size: 1.125rem;
+/* Responsive Design pour le Splashscreen */
+@media (max-width: 768px) {
+  .splash-content {
+    padding: 1rem;
   }
 
   .splash-features {
-    gap: 1.5rem;
-  }
-
-  .feature i {
-    width: 60px;
-    height: 60px;
-    font-size: 1.75rem;
-  }
-
-  .splash-actions {
     flex-direction: column;
+    gap: 1rem;
   }
 
-  .btn {
-    width: 100%;
-    justify-content: center;
+  .splash-logo {
+    font-size: 2.5rem;
+  }
+
+  .splash-tagline {
+    font-size: 1.25rem;
   }
 } 
