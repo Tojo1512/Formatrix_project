@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liste des Clients - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <h2 class="table-title">Liste des Clients</h2>
+        
+        <div class="table-actions">
+            <div class="search-and-filters">
+                <form method="get" class="search-form">
+                    <input type="text" name="search" class="search-input" placeholder="Rechercher un client..." value="{{ search_query }}">
+                    <select name="type" class="filter-select">
+                        <option value="">Tous les types</option>
+                        <option value="Entreprise" {% if type_filter == 'Entreprise' %}selected{% endif %}>Entreprise</option>
+                        <option value="Particulier" {% if type_filter == 'Particulier' %}selected{% endif %}>Particulier</option>
+                        <option value="Institution" {% if type_filter == 'Institution' %}selected{% endif %}>Institution</option>
+                    </select>
+
+                    <select name="ville" class="filter-select">
+                        <option value="">Toutes les villes</option>
+                        <option value="Antananarivo" {% if ville_filter == 'Antananarivo' %}selected{% endif %}>Antananarivo</option>
+                        <option value="Toamasina" {% if ville_filter == 'Toamasina' %}selected{% endif %}>Toamasina</option>
+                        <option value="Antsirabe" {% if ville_filter == 'Antsirabe' %}selected{% endif %}>Antsirabe</option>
+                        <option value="Fianarantsoa" {% if ville_filter == 'Fianarantsoa' %}selected{% endif %}>Fianarantsoa</option>
+                        <option value="Mahajanga" {% if ville_filter == 'Mahajanga' %}selected{% endif %}>Mahajanga</option>
+                    </select>
+
+                    <button type="submit" class="search-button">
+                        Rechercher
+                    </button>
+                </form>
+            </div>
+
+            {% if show_create_button %}
+            <a href="{{ create_url }}" class="create-button">
+                <i class="fas fa-plus"></i>
+                Créer un client
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        {% if client_list %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="?{% if ordering == 'nomclient' %}-{% endif %}nomclient{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}" class="sort-link {% if 'nomclient' in ordering %}active{% endif %}">
+                            Nom du client
+                            <i class="fas fa-sort{% if ordering == 'nomclient' %}-up{% elif ordering == '-nomclient' %}-down{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>Type</th>
+                    <th>
+                        <a href="?{% if ordering == 'ville' %}-{% endif %}ville{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}" class="sort-link {% if 'ville' in ordering %}active{% endif %}">
+                            Ville
+                            <i class="fas fa-sort{% if ordering == 'ville' %}-up{% elif ordering == '-ville' %}-down{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?{% if ordering == 'email' %}-{% endif %}email{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}" class="sort-link {% if 'email' in ordering %}active{% endif %}">
+                            Email
+                            <i class="fas fa-sort{% if ordering == 'email' %}-up{% elif ordering == '-email' %}-down{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>Téléphone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in client_list %}
+                <tr>
+                    <td>{{ client.nomclient }}</td>
+                    <td>
+                        <span class="badge badge-secondary">{{ client.typeclientid.typeclient }}</span>
+                    </td>
+                    <td>{{ client.ville }}</td>
+                    <td>{{ client.email }}</td>
+                    <td>{{ client.telephone }}</td>
+                    <td class="actions-column">
+                        <a href="{% url 'client-detail' client.clientid %}" class="btn btn-sm btn-info" title="Voir">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'client-update' client.clientid %}" class="btn btn-sm btn-warning" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'client-delete' client.clientid %}" class="btn btn-sm btn-danger" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if is_paginated %}
+            <tfoot>
+                <tr>
+                    <td colspan="6">
+                        <div class="table-pagination">
+                            <div class="pagination-info">
+                                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                            </div>
+                            <div class="pagination-controls">
+                                {% if page_obj.has_previous %}
+                                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" class="btn btn-sm btn-outline">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Précédent
+                                    </a>
+                                {% endif %}
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" class="btn btn-sm btn-outline">
+                                        Suivant
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <p class="empty-state-text">Aucun client trouvé</p>
+            {% if has_active_filters %}
+            <a href="{{ reset_url }}" class="btn btn-secondary">Réinitialiser les filtres</a>
+            {% else %}
+            <a href="{{ create_url }}" class="btn btn-primary">{{ create_button_text }}</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

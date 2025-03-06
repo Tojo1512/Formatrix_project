@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirmer la suppression - {{ client.nomclient }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<link rel="stylesheet" href="{% static 'css/delete.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+  <div class="delete-card">
+    <div class="delete-header">
+      <h2 class="delete-title">
+        <i class="fas fa-exclamation-triangle"></i>
+        Confirmer la suppression
+      </h2>
+    </div>
+
+    <div class="delete-content">
+      <p class="delete-message">
+        Êtes-vous sûr de vouloir supprimer le client <strong>"{{ client.nomclient }}"</strong> ?
+      </p>
+      <p class="delete-warning">
+        Cette action est irréversible et supprimera toutes les données associées à ce client.
+      </p>
+
+      <div class="client-info">
+        <div class="info-item">
+          <span class="info-label">Nom:</span>
+          <span class="info-value">{{ client.nomclient }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Type:</span>
+          <span class="info-value">{{ client.typeclientid.typeclient }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Email:</span>
+          <span class="info-value">{{ client.email|default:"Non spécifié" }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Ville:</span>
+          <span class="info-value">{{ client.ville|default:"Non spécifié" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="delete-actions">
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+          <i class="fas fa-trash"></i>
+          Confirmer la suppression
+        </button>
+        <a href="{% url 'client-detail' client.clientid %}" class="btn btn-secondary">
+          <i class="fas fa-times"></i>
+          Annuler
+        </a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
