@@ -24,8 +24,8 @@ class ApprenantListView(LoginRequiredMixin, ListView):
         # Récupération des paramètres de filtrage
         search = self.request.GET.get('search', '')
         sexe = self.request.GET.get('sexe', '')
-        niveau = self.request.GET.get('niveau', '')
-        age = self.request.GET.get('age', '')
+        niveau_academique = self.request.GET.get('niveau_academique', '')
+        categorie_age = self.request.GET.get('categorie_age', '')
         ville = self.request.GET.get('ville', '')
         ordering = self.request.GET.get('ordering', '-created_at')
         
@@ -40,11 +40,11 @@ class ApprenantListView(LoginRequiredMixin, ListView):
         if sexe:
             queryset = queryset.filter(sexe=sexe)
             
-        if niveau:
-            queryset = queryset.filter(niveau_academique=niveau)
+        if niveau_academique:
+            queryset = queryset.filter(niveau_academique=niveau_academique)
             
-        if age:
-            queryset = queryset.filter(categorie_age=age)
+        if categorie_age:
+            queryset = queryset.filter(categorie_age=categorie_age)
             
         if ville:
             queryset = queryset.filter(ville__icontains=ville)
@@ -61,8 +61,8 @@ class ApprenantListView(LoginRequiredMixin, ListView):
         context.update({
             'search_query': self.request.GET.get('search', ''),
             'sexe_filter': self.request.GET.get('sexe', ''),
-            'niveau_filter': self.request.GET.get('niveau', ''),
-            'age_filter': self.request.GET.get('age', ''),
+            'niveau_filter': self.request.GET.get('niveau_academique', ''),
+            'age_filter': self.request.GET.get('categorie_age', ''),
             'ville_filter': self.request.GET.get('ville', ''),
             'ordering': self.request.GET.get('ordering', '-created_at'),
             'show_create_button': True,
@@ -73,8 +73,8 @@ class ApprenantListView(LoginRequiredMixin, ListView):
             'has_active_filters': bool(
                 self.request.GET.get('search', '') or 
                 self.request.GET.get('sexe', '') or 
-                self.request.GET.get('niveau', '') or
-                self.request.GET.get('age', '') or
+                self.request.GET.get('niveau_academique', '') or
+                self.request.GET.get('categorie_age', '') or
                 self.request.GET.get('ville', '')
             ),
             'sexe_choices': Apprenant.GENRE_CHOICES,
@@ -116,8 +116,12 @@ class ApprenantDetailView(LoginRequiredMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Vous pouvez ajouter des informations supplémentaires ici
-        # Par exemple, les inscriptions de l'apprenant
+        # Ajout des choix pour l'affichage des libellés
+        context.update({
+            'sexe_choices': Apprenant.GENRE_CHOICES,
+            'niveau_choices': Apprenant.NIVEAU_ACADEMIQUE_CHOICES,
+            'age_choices': Apprenant.CATEGORIE_AGE_CHOICES
+        })
         return context
 
 class ApprenantUpdateView(LoginRequiredMixin, UpdateView):
