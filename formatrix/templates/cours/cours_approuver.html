@@ -1,132 +1,49 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Approuver le cours - Formatrix{% endblock %}
+{% block title %}Approve Course - {{ cours.nom_cours }}{% endblock %}
 
 {% block content %}
-<div class="card">
-  <h2 class="mb-4">Approuver le cours</h2>
-  
-  <div class="alert alert-info">
-    <i class="fas fa-info-circle"></i>
-    Vous êtes sur le point d'approuver le cours "{{ object.nom_cours }}".
-  </div>
-  
-  <div class="course-info mb-4">
-    <div class="info-row">
-      <div class="info-label">Nom du cours :</div>
-      <div class="info-value">{{ object.nom_cours }}</div>
+<div class="approval-container">
+    <div class="approval-card">
+        <div class="approval-header">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Approve Course</h2>
+            <p>Please confirm that you want to approve this course.</p>
+        </div>
+
+        <div class="course-info">
+            <h3>{{ cours.nom_cours }}</h3>
+            <div class="info-details">
+                <p><i class="fas fa-clock"></i> {{ cours.duree }} hours</p>
+                <p><i class="fas fa-chalkboard-teacher"></i> {{ cours.get_type_cours_display }}</p>
+            </div>
+        </div>
+
+        <form method="post" class="approval-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="commentaire">Approval Comments (optional)</label>
+                <textarea name="commentaire" id="commentaire" rows="4" class="form-control" placeholder="Add any comments about your approval decision..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'cours-detail' cours.id %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-check"></i>
+                    Confirm Approval
+                </button>
+            </div>
+        </form>
     </div>
-    <div class="info-row">
-      <div class="info-label">Type de cours :</div>
-      <div class="info-value">{{ object.get_type_cours_display }}</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Durée :</div>
-      <div class="info-value">{{ object.duree_heures }} heures</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Statut actuel :</div>
-      <div class="info-value">
-        <span class="badge {% if object.statut_approbation == 'approuve' %}badge-success{% elif object.statut_approbation == 'en_attente' %}badge-warning{% elif object.statut_approbation == 'refuse' %}badge-danger{% else %}badge-secondary{% endif %}">
-          {{ object.get_statut_approbation_display }}
-        </span>
-      </div>
-    </div>
-  </div>
-  
-  <form method="post">
-    {% csrf_token %}
-    <div class="form-group mb-4">
-      <label for="commentaire" class="form-label">Commentaire (optionnel) :</label>
-      <textarea id="commentaire" name="commentaire" class="form-control" rows="3" placeholder="Ajouter un commentaire concernant l'approbation..."></textarea>
-    </div>
-    
-    <div class="form-actions">
-      <a href="{% url 'cours-list' %}" class="btn btn-outline">
-        <i class="fas fa-arrow-left"></i>
-        Annuler
-      </a>
-      <button type="submit" class="btn btn-success">
-        <i class="fas fa-check"></i>
-        Confirmer l'approbation
-      </button>
-    </div>
-  </form>
 </div>
+{% endblock %}
 
 {% block extra_css %}
-<style>
-  .alert-info {
-    background-color: var(--info-bg);
-    color: var(--info-color);
-    padding: 1rem;
-    border-radius: var(--radius-md);
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    border-left: 4px solid var(--info-color);
-  }
-  
-  .course-info {
-    background-color: var(--bg-secondary);
-    padding: 1.5rem;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-  }
-  
-  .info-row {
-    display: flex;
-    margin-bottom: 0.75rem;
-  }
-  
-  .info-label {
-    font-weight: 600;
-    width: 150px;
-    color: var(--text-secondary);
-  }
-  
-  .info-value {
-    flex: 1;
-  }
-  
-  .form-control {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    background-color: var(--bg-primary);
-    transition: border-color var(--transition-normal);
-  }
-  
-  .form-control:focus {
-    border-color: var(--primary);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(212, 43, 30, 0.1);
-  }
-  
-  .btn-success {
-    background-color: var(--success-color);
-    color: white;
-    border: none;
-    transition: all var(--transition-normal);
-    box-shadow: var(--elevation-1);
-    font-weight: 600;
-    min-width: 180px;
-    justify-content: center;
-  }
-  
-  .btn-success:hover {
-    background-color: #047857;
-    transform: translateY(-2px);
-    box-shadow: var(--elevation-2);
-  }
-  
-  .btn-success:active {
-    transform: translateY(0);
-    box-shadow: var(--elevation-1);
-  }
-</style>
-{% endblock %}
+<link rel="stylesheet" href="{% static 'css/approval.css' %}">
 {% endblock %}

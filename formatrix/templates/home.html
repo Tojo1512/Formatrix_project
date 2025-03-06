@@ -1,143 +1,116 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Accueil - Formatrix{% endblock %}
+{% block title %}Home - Formatrix{% endblock %}
 
-{% block splash %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% if not user.is_authenticated %}
 <link rel="stylesheet" href="{% static 'css/splashscreen.css' %}">
 {% endif %}
 {% endblock %}
 
-{% block splash_content %}
-{% with show_splash=True %}
-  {{ block.super }}
-{% endwith %}
+{% block splash %}
+{% if not user.is_authenticated %}
+<div class="splash-screen">
+    <div class="splash-content">
+        <h1>Welcome to Formatrix</h1>
+        <p>Your training management platform</p>
+        <div class="splash-features">
+            <div class="feature">
+                <i class="fas fa-book"></i>
+                <span>Training Management</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-users"></i>
+                <span>Learner Tracking</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-chart-bar"></i>
+                <span>Detailed Reports</span>
+            </div>
+        </div>
+        <div class="splash-actions">
+            <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-outline">Sign Up</a>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
-<div class="home-content">
-  <div class="text-center">
-      <h1 class="display-4 mb-4 fw-bold">
-        <i class="fas fa-graduation-cap text-primary me-3"></i>
-        Bienvenue sur Formatrix
-      </h1>
-      
-      {% if user.is_authenticated %}
-        <div class="card bg-dark text-light border-0 shadow-sm mb-4">
-          <div class="card-body">
-            <div class="d-flex align-items-center justify-content-center mb-3">
-              <i class="fas fa-user-circle text-primary me-2 fa-2x"></i>
-              <div>
-                <h4 class="card-title mb-1">{{ user.username }}</h4>
-                <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} mb-2">
-                  {% if user.is_staff %}
-                    <i class="fas fa-user-shield me-1"></i>Administrateur
-                  {% else %}
-                    <i class="fas fa-chalkboard-teacher me-1"></i>Formateur
-                  {% endif %}
-                </span>
-              </div>
-            </div>
-            <p class="card-text mb-4">
-              {% if user.is_staff %}
-                Vous avez accès à toutes les fonctionnalités d'administration.
-              {% else %}
-                Vous avez accès aux fonctionnalités de gestion des formations.
-              {% endif %}
-            </p>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-danger">
-                  <i class="fas fa-sign-out-alt me-2"></i>Se déconnecter
-                </button>
-              </form>
-            </div>
-          </div>
+<div class="home-container">
+    <div class="welcome-section">
+        <h1>Welcome to Formatrix</h1>
+        <p class="welcome-text">Your training management platform</p>
+    </div>
+
+    <div class="description-section">
+        <div class="about-platform">
+            <h2><i class="fas fa-info-circle"></i> About Formatrix</h2>
+            <p>Formatrix is a comprehensive training management platform designed to streamline and optimize your educational programs. Our platform offers powerful tools for course creation, student tracking, and program management, making it easier than ever to deliver high-quality training.</p>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="row g-4 mt-2">
-          {% if user.is_staff %}
-            <!-- Actions Administrateur -->
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-users-cog text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Gestion des Utilisateurs</h5>
-                  <p class="card-text">Gérez les formateurs et les accès</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-chart-pie text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Statistiques Globales</h5>
-                  <p class="card-text">Analysez les performances</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-cogs text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Configuration</h5>
-                  <p class="card-text">Paramètres du système</p>
-                </div>
-              </div>
-            </div>
-          {% else %}
-            <!-- Actions Formateur -->
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-chalkboard-teacher text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Mes Formations</h5>
-                  <p class="card-text">Gérez vos sessions de formation</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-user-graduate text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Mes Apprenants</h5>
-                  <p class="card-text">Suivez vos apprenants</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-chart-line text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Mes Rapports</h5>
-                  <p class="card-text">Consultez vos statistiques</p>
-                </div>
-              </div>
-            </div>
-          {% endif %}
+        <div class="key-features">
+            <h3><i class="fas fa-star"></i> Key Features</h3>
+            <ul>
+                <li><i class="fas fa-check"></i> Easy course creation and management</li>
+                <li><i class="fas fa-check"></i> Flexible training formats (In-Person, Remote, Hybrid)</li>
+                <li><i class="fas fa-check"></i> Detailed tracking and reporting</li>
+                <li><i class="fas fa-check"></i> Approval workflow system</li>
+                <li><i class="fas fa-check"></i> Resource management</li>
+            </ul>
         </div>
-      {% else %}
-        <div class="card bg-dark text-light border-0 shadow-sm">
-          <div class="card-body py-5">
-            <h4 class="card-title mb-4">Connectez-vous pour accéder à votre espace</h4>
-            <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-              <a href="{% url 'login' %}" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
-              </a>
-              <a href="{% url 'register' %}" class="btn btn-outline-light">
-                <i class="fas fa-user-plus me-2"></i>S'inscrire
-              </a>
-              <a href="{% url 'password_reset' %}" class="btn btn-link text-light">
-                <i class="fas fa-key me-2"></i>Mot de passe oublié ?
-              </a>
-            </div>
-          </div>
+
+        <div class="platform-benefits">
+            <h3><i class="fas fa-gift"></i> Benefits</h3>
+            <ul>
+                <li><i class="fas fa-check"></i> Streamlined training organization</li>
+                <li><i class="fas fa-check"></i> Enhanced learning experience</li>
+                <li><i class="fas fa-check"></i> Time and resource optimization</li>
+                <li><i class="fas fa-check"></i> Comprehensive progress tracking</li>
+            </ul>
         </div>
-      {% endif %}
     </div>
-  </div>
+
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-buttons">
+            <a href="{% url 'cours-create' %}" class="action-button">
+                <i class="fas fa-plus"></i>
+                <span>Create Course</span>
+            </a>
+            <a href="{% url 'cours-list' %}" class="action-button">
+                <i class="fas fa-list"></i>
+                <span>View All Courses</span>
+            </a>
+        </div>
+    </div>
+
+    {% if recent_courses %}
+    <div class="recent-courses">
+        <h2>Recent Courses</h2>
+        <div class="courses-grid">
+            {% for course in recent_courses %}
+            <div class="course-card">
+                <div class="course-header">
+                    <h3>{{ course.nom_cours }}</h3>
+                    <span class="badge {% if course.statut_approbation == 'APPROUVE' %}badge-success{% elif course.statut_approbation == 'EN_ATTENTE' %}badge-warning{% else %}badge-danger{% endif %}">
+                        {{ course.get_statut_approbation_display }}
+                    </span>
+                </div>
+                <div class="course-info">
+                    <p><i class="fas fa-clock"></i> {{ course.duree }} hours</p>
+                    <p><i class="fas fa-chalkboard-teacher"></i> {{ course.get_type_cours_display }}</p>
+                </div>
+                <div class="course-actions">
+                    <a href="{% url 'cours-detail' course.pk %}" class="btn btn-sm btn-primary">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %} 

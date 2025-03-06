@@ -1,108 +1,47 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Supprimer le cours - Formatrix{% endblock %}
+{% block title %}Delete Course - {{ cours.nom_cours }}{% endblock %}
 
 {% block content %}
-<div class="card">
-  <h2 class="mb-4">Confirmer la suppression</h2>
-  
-  <div class="alert alert-danger">
-    <i class="fas fa-exclamation-triangle"></i>
-    Êtes-vous sûr de vouloir supprimer le cours "{{ object.nom_cours }}" ?
-  </div>
-  
-  <div class="course-info mb-4">
-    <div class="info-row">
-      <div class="info-label">Type de cours :</div>
-      <div class="info-value">{{ object.get_type_cours_display }}</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Durée :</div>
-      <div class="info-value">{{ object.duree_heures }} heures</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Statut :</div>
-      <div class="info-value">
-        <span class="badge {% if object.statut_approbation == 'approuve' %}badge-success{% elif object.statut_approbation == 'en_attente' %}badge-warning{% elif object.statut_approbation == 'refuse' %}badge-danger{% else %}badge-secondary{% endif %}">
-          {{ object.get_statut_approbation_display }}
-        </span>
-      </div>
-    </div>
-  </div>
-  
-  <form method="post">
-    {% csrf_token %}
-    <div class="form-actions">
-      <a href="{% url 'cours-list' %}" class="btn btn-outline">
-        <i class="fas fa-arrow-left"></i>
-        Annuler
-      </a>
-      <button type="submit" class="btn btn-danger">
-        <i class="fas fa-trash"></i>
-        Confirmer la suppression
-      </button>
-    </div>
-  </form>
-</div>
+<div class="delete-confirmation-container">
+    <div class="delete-card">
+        <div class="delete-header">
+            <div class="warning-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2>Delete Course</h2>
+            <p>Are you sure you want to delete this course?</p>
+        </div>
 
-{% block extra_css %}
-<style>
-  .alert-danger {
-    background-color: var(--error-bg);
-    color: var(--error-color);
-    padding: 1rem;
-    border-radius: var(--radius-md);
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    border-left: 4px solid var(--error-color);
-  }
-  
-  .course-info {
-    background-color: var(--bg-secondary);
-    padding: 1.5rem;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-  }
-  
-  .info-row {
-    display: flex;
-    margin-bottom: 0.75rem;
-  }
-  
-  .info-label {
-    font-weight: 600;
-    width: 150px;
-    color: var(--text-secondary);
-  }
-  
-  .info-value {
-    flex: 1;
-  }
-  
-  .btn-danger {
-    background-color: var(--error-color);
-    color: white;
-    border: none;
-    transition: all var(--transition-normal);
-    box-shadow: var(--elevation-1);
-    font-weight: 600;
-    min-width: 120px;
-    justify-content: center;
-  }
-  
-  .btn-danger:hover {
-    background-color: #b91c1c;
-    transform: translateY(-2px);
-    box-shadow: var(--elevation-2);
-  }
-  
-  .btn-danger:active {
-    transform: translateY(0);
-    box-shadow: var(--elevation-1);
-  }
-</style>
-{% endblock %}
+        <div class="course-info">
+            <h3>{{ cours.nom_cours }}</h3>
+            <div class="info-details">
+                <p><i class="fas fa-clock"></i> {{ cours.duree }} hours</p>
+                <p><i class="fas fa-chalkboard-teacher"></i> {{ cours.get_type_cours_display }}</p>
+                <span class="badge {% if cours.statut_approbation == 'APPROUVE' %}badge-success{% elif cours.statut_approbation == 'EN_ATTENTE' %}badge-warning{% else %}badge-danger{% endif %}">
+                    {{ cours.get_statut_approbation_display }}
+                </span>
+            </div>
+        </div>
+
+        <div class="warning-message">
+            <p><strong>Warning:</strong> This action cannot be undone. All data associated with this course will be permanently deleted.</p>
+        </div>
+
+        <form method="post" class="delete-form">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i>
+                    Delete Course
+                </button>
+                <a href="{% url 'cours-list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
