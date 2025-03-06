@@ -3,18 +3,6 @@
 
 {% block title %}Accueil - Formatrix{% endblock %}
 
-{% block splash %}
-{% if not user.is_authenticated %}
-<link rel="stylesheet" href="{% static 'css/splashscreen.css' %}">
-{% endif %}
-{% endblock %}
-
-{% block splash_content %}
-{% with show_splash=True %}
-  {{ block.super }}
-{% endwith %}
-{% endblock %}
-
 {% block content %}
 <div class="home-content">
   <div class="text-center">
@@ -140,4 +128,4 @@
     </div>
   </div>
 </div>
-{% endblock %} 
+{% endblock %}
