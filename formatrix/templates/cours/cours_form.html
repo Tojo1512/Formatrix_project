@@ -6,13 +6,12 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/theme.css' %}">
 <link rel="stylesheet" href="{% static 'css/forms.css' %}">
-<link rel="stylesheet" href="{% static 'css/cours_form.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="course-form-container">
-  <div class="course-form-header">
-    <h2 class="course-form-title">
+<div class="form-container">
+  <div class="form-header">
+    <h2 class="form-title">
       <i class="fas {% if object.cours_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
       {% if object.cours_id %}Modifier{% else %}Créer{% endif %} un Cours
     </h2>
@@ -40,9 +39,9 @@
 
   <form method="post" novalidate>
     {% csrf_token %}
-    <div class="course-form-grid">
+    <div class="form-grid">
       <!-- Informations essentielles -->
-      <div class="course-form-section">
+      <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-info-circle"></i>
           Informations essentielles
@@ -108,7 +107,7 @@
       </div>
 
       <!-- Contenu pédagogique -->
-      <div class="course-form-section">
+      <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-book"></i>
           Contenu pédagogique
@@ -134,7 +133,7 @@
       </div>
 
       <!-- Prérequis et matériel -->
-      <div class="course-form-section">
+      <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-clipboard-list"></i>
           Prérequis et matériel
@@ -160,7 +159,7 @@
       </div>
 
       <!-- Horaires -->
-      <div class="course-form-section">
+      <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-clock"></i>
           Horaires
