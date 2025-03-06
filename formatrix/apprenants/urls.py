@@ -8,3 +8,5 @@ router.register(r'apprenants', ApprenantViewSet)
 urlpatterns = [
     path('', include(router.urls)),
 ]
+
+# Template-based views are now in template_urls.py

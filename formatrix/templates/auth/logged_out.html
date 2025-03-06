@@ -1,29 +1,22 @@
 {% extends "base.html" %}
-{% load static %}
 
-{% block title %}Logged Out - Formatrix{% endblock %}
+{% block title %}Déconnexion - Formatrix{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <div class="logout-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h2>Successfully Logged Out</h2>
-            <p>Thank you for using Formatrix</p>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">Déconnexion réussie</h4>
         </div>
-
-        <div class="auth-footer">
-            <a href="{% url 'login' %}" class="btn btn-primary btn-block">
-                <i class="fas fa-sign-in-alt"></i>
-                Login Again
-            </a>
-            <a href="{% url 'home' %}" class="btn btn-link btn-block">
-                <i class="fas fa-home"></i>
-                Return to Home
-            </a>
+        <div class="card-body text-center">
+          <p class="lead">Vous avez été déconnecté avec succès.</p>
+          <a href="{% url 'login' %}" class="btn btn-primary">Se reconnecter</a>
+          <a href="{% url 'home' %}" class="btn btn-outline-secondary">Retour à l'accueil</a>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %} 

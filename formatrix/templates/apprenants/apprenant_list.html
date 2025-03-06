@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liste des Apprenants - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <h2 class="table-title">Liste des Apprenants</h2>
+        
+        <div class="table-actions">
+            <div class="search-and-filters">
+                <form method="get" class="search-form">
+                    <input type="text" name="search" class="search-input" placeholder="Rechercher un apprenant..." value="{{ search_query }}">
+                    
+                    <select name="sexe" class="filter-select">
+                        <option value="">Tous les genres</option>
+                        {% for code, label in sexe_choices %}
+                        <option value="{{ code }}" {% if sexe_filter == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="niveau" class="filter-select">
+                        <option value="">Tous les niveaux</option>
+                        {% for code, label in niveau_choices %}
+                        <option value="{{ code }}" {% if niveau_filter == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select name="age" class="filter-select">
+                        <option value="">Toutes les catégories d'âge</option>
+                        {% for code, label in age_choices %}
+                        <option value="{{ code }}" {% if age_filter == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit" class="search-button">
+                        Rechercher
+                    </button>
+                </form>
+            </div>
+
+            {% if show_create_button %}
+            <a href="{{ create_url }}" class="create-button">
+                <i class="fas fa-plus"></i>
+                Ajouter un apprenant
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        {% if apprenants_list %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="?{% if ordering == 'nom_apprenant' %}-{% endif %}nom_apprenant{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau={{ niveau_filter }}{% endif %}{% if age_filter %}&age={{ age_filter }}{% endif %}" class="sort-link {% if 'nom_apprenant' in ordering %}active{% endif %}">
+                            Nom
+                            <i class="fas fa-sort{% if ordering == 'nom_apprenant' %}-up{% elif ordering == '-nom_apprenant' %}-down{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>CIN</th>
+                    <th>
+                        <a href="?{% if ordering == 'ville' %}-{% endif %}ville{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau={{ niveau_filter }}{% endif %}{% if age_filter %}&age={{ age_filter }}{% endif %}" class="sort-link {% if 'ville' in ordering %}active{% endif %}">
+                            Ville
+                            <i class="fas fa-sort{% if ordering == 'ville' %}-up{% elif ordering == '-ville' %}-down{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?{% if ordering == 'sexe' %}-{% endif %}sexe{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau={{ niveau_filter }}{% endif %}{% if age_filter %}&age={{ age_filter }}{% endif %}" class="sort-link {% if 'sexe' in ordering %}active{% endif %}">
+                            Genre
+                            <i class="fas fa-sort{% if ordering == 'sexe' %}-up{% elif ordering == '-sexe' %}-down{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?{% if ordering == 'categorie_age' %}-{% endif %}categorie_age{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau={{ niveau_filter }}{% endif %}{% if age_filter %}&age={{ age_filter }}{% endif %}" class="sort-link {% if 'categorie_age' in ordering %}active{% endif %}">
+                            Âge
+                            <i class="fas fa-sort{% if ordering == 'categorie_age' %}-up{% elif ordering == '-categorie_age' %}-down{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for apprenant in apprenants_list %}
+                <tr>
+                    <td>{{ apprenant.nom_apprenant }}</td>
+                    <td>{{ apprenant.cin }}</td>
+                    <td>{{ apprenant.ville }}</td>
+                    <td>
+                        <span class="badge badge-secondary">
+                            {% for code, label in sexe_choices %}
+                                {% if code == apprenant.sexe %}{{ label }}{% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge badge-info">
+                            {% for code, label in age_choices %}
+                                {% if code == apprenant.categorie_age %}{{ label }}{% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
+                    <td class="actions-column">
+                        <a href="{% url 'apprenant-detail' apprenant.apprenant_id %}" class="btn btn-sm btn-info" title="Voir">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'apprenant-update' apprenant.apprenant_id %}" class="btn btn-sm btn-warning" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'apprenant-delete' apprenant.apprenant_id %}" class="btn btn-sm btn-danger" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if is_paginated %}
+            <tfoot>
+                <tr>
+                    <td colspan="6">
+                        <div class="table-pagination">
+                            <div class="pagination-info">
+                                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                            </div>
+                            <div class="pagination-controls">
+                                {% if page_obj.has_previous %}
+                                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau={{ niveau_filter }}{% endif %}{% if age_filter %}&age={{ age_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" class="btn btn-sm btn-outline">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Précédent
+                                    </a>
+                                {% endif %}
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau={{ niveau_filter }}{% endif %}{% if age_filter %}&age={{ age_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" class="btn btn-sm btn-outline">
+                                        Suivant
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <p class="empty-state-text">Aucun apprenant trouvé</p>
+            {% if has_active_filters %}
+            <a href="{{ reset_url }}" class="btn btn-secondary">Réinitialiser les filtres</a>
+            {% else %}
+            <a href="{{ create_url }}" class="btn btn-primary">{{ create_button_text }}</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

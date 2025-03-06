@@ -1,117 +1,246 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ cours.nom_cours }} - Course Details{% endblock %}
+{% block title %}{{ cours.nom_cours }} - Formatrix{% endblock %}
 
 {% block content %}
-<div class="course-detail-container">
-    <div class="course-header">
-        <div class="course-title">
-            <h1>{{ cours.nom_cours }}</h1>
-            <span class="badge {% if cours.statut_approbation == 'APPROUVE' %}badge-success{% elif cours.statut_approbation == 'EN_ATTENTE' %}badge-warning{% else %}badge-danger{% endif %}">
-                {{ cours.get_statut_approbation_display }}
-            </span>
-        </div>
-        <div class="header-actions">
-            <a href="{% url 'cours-update' cours.cours_id %}" class="btn btn-primary">
-                <i class="fas fa-edit"></i>
-                Edit Course
-            </a>
-            <a href="{% url 'cours-list' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i>
-                Back to List
-            </a>
-        </div>
+<div class="card">
+    <div class="d-flex justify-between align-center mb-4">
+      <h2>{{ cours.nom_cours }}</h2>
+      <div>
+        <a href="{% url 'cours-update' cours.cours_id %}" class="btn btn-outline">Modifier</a>
+        <a href="{% url 'cours-list' %}" class="btn btn-outline">Retour à la liste</a>
+      </div>
     </div>
-
-    <div class="course-content">
-        <div class="content-section">
-            <h2>Course Information</h2>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="info-label">Duration</span>
-                    <span class="info-value">{{ cours.duree }} hours</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Type</span>
-                    <span class="info-value">{{ cours.get_type_cours_display }}</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Status</span>
-                    <span class="info-value">{{ cours.get_statut_approbation_display }}</span>
-                </div>
-                {% if cours.date_approbation %}
-                <div class="info-item">
-                    <span class="info-label">Approval Date</span>
-                    <span class="info-value">{{ cours.date_approbation|date:"F j, Y" }}</span>
-                </div>
-                {% endif %}
-                {% if cours.date_expiration %}
-                <div class="info-item">
-                    <span class="info-label">Expiration Date</span>
-                    <span class="info-value">{{ cours.date_expiration|date:"F j, Y" }}</span>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="content-section">
-            <h2>Description</h2>
-            <div class="text-content">
-                {{ cours.description|linebreaks }}
-            </div>
-        </div>
-
-        {% if cours.prerequis %}
-        <div class="content-section">
-            <h2>Prerequisites</h2>
-            <div class="text-content">
-                {{ cours.prerequis|linebreaks }}
-            </div>
-        </div>
-        {% endif %}
-
-        <div class="content-section">
-            <h2>Learning Objectives</h2>
-            <div class="text-content">
-                {{ cours.objectifs|linebreaks }}
-            </div>
-        </div>
-
-        {% if cours.commentaires %}
-        <div class="content-section">
-            <h2>Comments</h2>
-            <div class="text-content">
-                {{ cours.commentaires|linebreaks }}
-            </div>
-        </div>
-        {% endif %}
-
-        {% if cours.statut_approbation == 'EN_ATTENTE' and perms.formatrix.can_approve_cours %}
-        <div class="approval-actions">
-            <h2>Approval Actions</h2>
-            <div class="action-buttons">
-                <form method="post" action="{% url 'cours-approuver' cours.cours_id %}" class="inline-form">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-check"></i>
-                        Approve Course
-                    </button>
-                </form>
-                <form method="post" action="{% url 'cours-refuser' cours.cours_id %}" class="inline-form">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-times"></i>
-                        Reject Course
-                    </button>
-                </form>
-            </div>
-        </div>
-        {% endif %}
+    
+    <div class="cours-status mb-4">
+      <span class="badge {% if cours.statut_approbation == 'approuve' %}badge-success{% elif cours.statut_approbation == 'en_attente' %}badge-warning{% elif cours.statut_approbation == 'refuse' %}badge-danger{% else %}badge-secondary{% endif %}">
+        {{ cours.get_statut_approbation_display }}
+      </span>
+      {% if cours.alerte_expiration %}
+        <span class="badge badge-warning">Expire dans {{ cours.jours_restants }} jours</span>
+      {% endif %}
     </div>
+    
+    <div class="row">
+      <div class="col-md-6">
+        <div class="info-group">
+          <h3>Informations générales</h3>
+          <div class="info-item">
+            <span class="info-label">Type de cours:</span>
+            <span class="info-value">{{ cours.get_type_cours_display }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Niveau:</span>
+            <span class="info-value">{{ cours.niveau }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Frais par participant:</span>
+            <span class="info-value">{{ cours.frais_par_participant }} Ar</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Durée:</span>
+            <span class="info-value">{{ cours.duree_heures }} heures</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Période:</span>
+            <span class="info-value">{{ cours.periode_mois }} mois</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Horaire:</span>
+            <span class="info-value">{{ cours.horaire }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="info-group">
+          <h3>Description</h3>
+          <p>{{ cours.description|linebreaks }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-md-4">
+        <div class="info-group">
+          <h3>Objectifs</h3>
+          <p>{{ cours.objectifs|linebreaks }}</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="info-group">
+          <h3>Prérequis</h3>
+          <p>{{ cours.prerequis|linebreaks }}</p>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="info-group">
+          <h3>Matériel requis</h3>
+          <p>{{ cours.materiel_requis|linebreaks }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="info-group">
+          <h3>Modules</h3>
+          {% if cours.modules.all %}
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Durée (heures)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for module in cours.modules.all %}
+                    <tr>
+                      <td>{{ module.nom_module }}</td>
+                      <td>{{ module.description }}</td>
+                      <td>{{ module.duree_heures }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p>Aucun module n'a été ajouté à ce cours.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/detail.css' %}">
+<style>
+  .d-flex {
+    display: flex;
+  }
+  
+  .justify-between {
+    justify-content: space-between;
+  }
+  
+  .align-center {
+    align-items: center;
+  }
+  
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+  }
+  
+  .col-md-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+    padding: 0 15px;
+  }
+  
+  .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 15px;
+  }
+  
+  .col-md-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0 15px;
+  }
+  
+  @media (max-width: 768px) {
+    .col-md-4, .col-md-6, .col-md-12 {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+  
+  .info-group {
+    margin-bottom: 2rem;
+  }
+  
+  .info-group h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  
+  .info-item {
+    display: flex;
+    margin-bottom: 0.5rem;
+  }
+  
+  .info-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    width: 40%;
+  }
+  
+  .info-value {
+    width: 60%;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+  
+  .badge-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+  
+  .badge-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+  
+  .badge-danger {
+    background-color: rgba(227, 30, 38, 0.1);
+    color: var(--danger);
+  }
+  
+  .badge-secondary {
+    background-color: rgba(100, 116, 139, 0.1);
+    color: var(--text-secondary);
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th, .table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .table th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  
+  .table tbody tr:hover {
+    background-color: var(--bg-secondary);
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+</style>
+{% endblock %}
 {% endblock %}

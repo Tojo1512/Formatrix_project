@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Supprimer l'apprenant {{ apprenant.nom_apprenant }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delete.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+  <div class="delete-card">
+    <div class="delete-header">
+      <div class="delete-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h2 class="delete-title">Confirmer la suppression</h2>
+    </div>
+    
+    <div class="delete-content">
+      <p class="delete-message">
+        Êtes-vous sûr de vouloir supprimer l'apprenant <strong>{{ apprenant.nom_apprenant }}</strong> ?
+      </p>
+      
+      <div class="delete-details">
+        <div class="detail-item">
+          <span class="detail-label">CIN :</span>
+          <span class="detail-value">{{ apprenant.cin }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="detail-label">Ville :</span>
+          <span class="detail-value">{{ apprenant.ville }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <span class="detail-label">Genre :</span>
+          <span class="detail-value">
+            {% for code, label in sexe_choices %}
+              {% if code == apprenant.sexe %}{{ label }}{% endif %}
+            {% endfor %}
+          </span>
+        </div>
+      </div>
+      
+      <div class="delete-warning">
+        <i class="fas fa-info-circle"></i>
+        Cette action est irréversible. Toutes les données associées à cet apprenant seront supprimées définitivement.
+      </div>
+    </div>
+    
+    <div class="delete-actions">
+      <form method="post">
+        {% csrf_token %}
+        <a href="{% url 'apprenant-detail' apprenant.apprenant_id %}" class="btn btn-outline">
+          <i class="fas fa-times"></i>
+          Annuler
+        </a>
+        <button type="submit" class="btn btn-danger">
+          <i class="fas fa-trash"></i>
+          Confirmer la suppression
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
