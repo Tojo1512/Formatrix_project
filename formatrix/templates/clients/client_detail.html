@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Détails du Client - {{ client.nomclient }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<link rel="stylesheet" href="{% static 'css/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+  <div class="detail-header">
+    <h2 class="detail-title">
+      <i class="fas fa-user"></i>
+      Détails du Client
+    </h2>
+    <div class="detail-actions">
+      <a href="{% url 'client-list' %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i>
+        Retour à la liste
+      </a>
+      <a href="{% url 'client-update' client.clientid %}" class="btn btn-warning">
+        <i class="fas fa-edit"></i>
+        Modifier
+      </a>
+      <a href="{% url 'client-delete' client.clientid %}" class="btn btn-danger">
+        <i class="fas fa-trash"></i>
+        Supprimer
+      </a>
+    </div>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="detail-content">
+    <div class="detail-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Informations générales
+      </h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Nom du client</span>
+          <span class="detail-value">{{ client.nomclient }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Autres noms</span>
+          <span class="detail-value">{{ client.autresnom|default:"Non spécifié" }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Type de client</span>
+          <span class="detail-value">
+            <span class="badge badge-secondary">{{ client.typeclientid.typeclient }}</span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Numéro d'immatriculation</span>
+          <span class="detail-value">{{ client.numero_immatriculation|default:"Non spécifié" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3 class="section-title">
+        <i class="fas fa-map-marker-alt"></i>
+        Adresse et contact
+      </h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Email</span>
+          <span class="detail-value">{{ client.email|default:"Non spécifié" }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Téléphone</span>
+          <span class="detail-value">{{ client.telephone|default:"Non spécifié" }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Ville</span>
+          <span class="detail-value">{{ client.ville|default:"Non spécifié" }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Localité</span>
+          <span class="detail-value">{{ client.localite|default:"Non spécifié" }}</span>
+        </div>
+        <div class="detail-item full-width">
+          <span class="detail-label">Adresse complète</span>
+          <span class="detail-value">{{ client.adresse_rue|default:"Non spécifié" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3 class="section-title">
+        <i class="fas fa-history"></i>
+        Inscriptions associées
+      </h3>
+      <div class="related-list">
+        <!-- Cette section pourrait être remplie avec les inscriptions liées à ce client -->
+        <p class="empty-related">Aucune inscription associée à ce client pour le moment.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

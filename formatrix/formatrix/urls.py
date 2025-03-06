@@ -24,22 +24,17 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('formatrix/admin/', admin.site.urls),
-    path('api/cours/', include('cours.urls')),
-    path('api/modules/', include('modules.urls')),
-    path('api/documents/', include('documents.urls')),
-    path('api/renouvellements/', include('renouvellements.urls')),
-    path('api/seances/', include('seances.urls')),
-    path('api/clients/', include('clients.urls')),
-    path('api/lieux/', include('lieux.urls')),
-    path('api/apprenants/', include('apprenants.urls')),
-    path('api/inscriptions/', include('inscriptions.urls')),
-    path('api/evaluations/', include('evaluations.urls')),
-    path('api/presences/', include('presences.urls')),
-    
-    # Template-based views
-    path('cours/', include('cours.template_urls')),
-    path('apprenants/', include('apprenants.template_urls')),
-    
+    path('api/', include('cours.urls')),
+    path('api/', include('modules.urls')),
+    path('api/', include('documents.urls')),
+    path('api/', include('renouvellements.urls')),
+    path('api/', include('seances.urls')),
+    path('api/', include('clients.urls')),
+    path('api/', include('lieux.urls')),
+    path('api/', include('apprenants.urls')),
+    path('api/', include('inscriptions.urls')),
+    path('api/', include('evaluations.urls')),
+    path('api/', include('presences.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('register/', register_view, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='auth/login.html'), name='login'),
@@ -49,4 +44,10 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='auth/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='auth/password_reset_complete.html'), name='password_reset_complete'),
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    
+    # URLs pour les templates de cours
+    path('cours/', include('cours.urls')),
+    
+    # URLs pour les templates de clients
+    path('clients/', include('clients.urls')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

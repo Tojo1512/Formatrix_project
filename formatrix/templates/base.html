@@ -461,6 +461,28 @@
             </ul>
           </li>
           
+          <li class="sidebar-item has-submenu">
+            <a href="#" class="sidebar-link {% if 'client' in request.resolver_match.url_name %}active{% endif %}">
+              <i class="fas fa-users"></i>
+              <span>Clients</span>
+              <i class="fas fa-chevron-right submenu-icon"></i>
+            </a>
+            <ul class="submenu">
+              <li>
+                <a href="{% url 'client-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
+                  <i class="fas fa-list"></i>
+                  <span>All Clients</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'client-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'client-create' %}active{% endif %}">
+                  <i class="fas fa-plus"></i>
+                  <span>Add New Client</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          
           {% if user.is_staff %}
           <li class="sidebar-item">
             <a href="{% url 'admin:index' %}" class="sidebar-link">
