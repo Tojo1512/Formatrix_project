@@ -146,14 +146,14 @@
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save"></i>
-        {% if object.clientid %}Mettre à jour{% else %}Enregistrer{% endif %}
-      </button>
-      <a href="{% url 'client-list' %}" class="btn btn-secondary">
+      <a href="{% url 'client-list' %}" class="btn btn-outline">
         <i class="fas fa-times"></i>
         Annuler
       </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas {% if object.clientid %}fa-save{% else %}fa-plus{% endif %}"></i>
+        {% if object.clientid %}Enregistrer{% else %}Valider{% endif %}
+      </button>
     </div>
   </form>
 </div>
