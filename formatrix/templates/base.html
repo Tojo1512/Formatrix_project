@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
   {% block extra_css %}{% endblock %}
   <title>{% block title %}Formatrix{% endblock %}</title>
   <style>
-    /* Styles pour la sidebar */
+    /* Styles for the sidebar */
     .app-container {
       display: flex;
       min-height: 100vh;
@@ -400,7 +400,7 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Sidebar - visible uniquement pour les utilisateurs authentifiés -->
+    <!-- Sidebar - visible only for authenticated users -->
     {% if user.is_authenticated %}
     <aside class="sidebar">
       <div class="sidebar-header">
@@ -412,49 +412,49 @@
           <li class="sidebar-item">
             <a href="{% url 'home' %}" class="sidebar-link">
               <i class="fas fa-home"></i>
-              <span>Accueil</span>
+              <span>Home</span>
             </a>
           </li>
           
           <li class="sidebar-item has-submenu">
             <a href="#" class="sidebar-link">
               <i class="fas fa-book"></i>
-              <span>Cours</span>
+              <span>Courses</span>
               <i class="fas fa-chevron-right submenu-icon"></i>
             </a>
             <ul class="submenu">
               <li class="submenu-item">
-                <a href="{% url 'cours-create' %}" class="submenu-link">
-                  <i class="fas fa-plus"></i>
-                  <span>Créer un cours</span>
-                </a>
               </li>
               <li class="submenu-item">
                 <a href="{% url 'cours-list' %}" class="submenu-link">
                   <i class="fas fa-list"></i>
-                  <span>Liste des cours</span>
+                  <span>All courses </span>
                 </a>
               </li>
+                <a href="{% url 'cours-create' %}" class="submenu-link">
+                  <i class="fas fa-plus"></i>
+                  <span>Add course</span>
+                </a>
             </ul>
           </li>
           
           <li class="sidebar-item has-submenu">
             <a href="#" class="sidebar-link {% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
               <i class="fas fa-user-graduate"></i>
-              <span>Apprenants</span>
+              <span>Students</span>
               <i class="fas fa-chevron-right submenu-icon"></i>
             </a>
             <ul class="submenu">
               <li>
                 <a href="{% url 'apprenant-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'apprenant-list' %}active{% endif %}">
                   <i class="fas fa-list"></i>
-                  <span>Tous les Apprenants</span>
+                  <span>All Students</span>
                 </a>
               </li>
               <li>
                 <a href="{% url 'apprenant-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'apprenant-create' %}active{% endif %}">
                   <i class="fas fa-plus"></i>
-                  <span>Ajouter un Apprenant</span>
+                  <span>Add a Student</span>
                 </a>
               </li>
             </ul>
@@ -504,7 +504,7 @@
                 <input type="hidden" name="next" value="{% url 'home' %}">
                 <button type="submit" class="logout-btn">
                   <i class="fas fa-sign-out-alt"></i>
-                  <span>Déconnexion</span>
+                  <span>Logout</span>
                 </button>
               </form>
             </div>
@@ -524,11 +524,11 @@
         <div class="auth-actions">
           <a href="{% url 'login' %}" class="auth-btn-header">
             <i class="fas fa-sign-in-alt"></i>
-            <span>Connexion</span>
+            <span>Login</span>
           </a>
           <a href="{% url 'register' %}" class="auth-btn-header auth-btn-primary">
             <i class="fas fa-user-plus"></i>
-            <span>Inscription</span>
+            <span>Register</span>
           </a>
         </div>
       </header>
@@ -540,7 +540,7 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <p>&copy; 2025 Formatrix. Tous droits réservés.</p>
+      <p>&copy; 2025 Formatrix. All rights reserved.</p>
     </div>
   </footer>
   
@@ -548,7 +548,7 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Gérer les sous-menus de la sidebar
+      // Handle sidebar submenus
       const submenuItems = document.querySelectorAll('.has-submenu');
       
       submenuItems.forEach(item => {
@@ -560,7 +560,7 @@
         });
       });
       
-      // Activer automatiquement le sous-menu en fonction de l'URL actuelle
+      // Automatically activate submenu based on current URL
       const currentPath = window.location.pathname;
       
       document.querySelectorAll('.submenu-link').forEach(link => {

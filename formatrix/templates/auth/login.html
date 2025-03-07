@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Connexion - Formatrix{% endblock %}
+{% block title %}Login - Formatrix{% endblock %}
 
 {% block content %}
 <div class="auth-container" style="max-width: 400px; margin: 2rem auto;">
   <div class="card">
-    <h2 class="text-center mb-4">Connexion</h2>
+    <h2 class="text-center mb-4">Login</h2>
 
     {% if form.errors %}
     <div class="alert alert-danger mb-4">
-      Nom d'utilisateur ou mot de passe incorrect.
+      Incorrect username or password.
     </div>
     {% endif %}
 
@@ -18,12 +18,12 @@
       {% csrf_token %}
       
       <div class="form-group">
-        <label class="form-label" for="id_username">Nom d'utilisateur</label>
+        <label class="form-label" for="id_username">Username</label>
         <input type="text" name="username" id="id_username" class="form-input" required>
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="id_password">Mot de passe</label>
+        <label class="form-label" for="id_password">Password</label>
         <div class="password-input-container">
           <input type="password" name="password" id="id_password" class="form-input" required>
           <button type="button" class="toggle-password" data-target="id_password" style="background-color: #f0f0f0; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
@@ -35,14 +35,14 @@
       <input type="hidden" name="next" value="{{ next }}">
 
       <div class="form-group">
-        <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
       </div>
 
       <div class="text-center mt-4">
-        <a href="{% url 'password_reset' %}" class="btn btn-link">Mot de passe oublié ?</a>
+        <a href="{% url 'password_reset' %}" class="btn btn-link">Forgot password?</a>
         <p class="mt-2">
-          Pas encore de compte ? 
-          <a href="{% url 'register' %}" class="text-accent">S'inscrire</a>
+          Don't have an account yet? 
+          <a href="{% url 'register' %}" class="text-accent">Register</a>
         </p>
       </div>
     </form>
@@ -53,17 +53,17 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Sélectionner tous les boutons de basculement de visibilité du mot de passe
+    // Select all password visibility toggle buttons
     const toggleButtons = document.querySelectorAll('.toggle-password');
     
-    // Ajouter un écouteur d'événement à chaque bouton
+    // Add an event listener to each button
     toggleButtons.forEach(button => {
       button.addEventListener('click', function() {
-        // Obtenir l'ID du champ de mot de passe cible
+        // Get the target password field ID
         const targetId = this.getAttribute('data-target');
         const passwordInput = document.getElementById(targetId);
         
-        // Basculer le type du champ entre 'password' et 'text'
+        // Toggle the field type between 'password' and 'text'
         if (passwordInput.type === 'password') {
           passwordInput.type = 'text';
           this.innerHTML = '<i class="fas fa-eye-slash"></i>';
@@ -72,7 +72,7 @@
           this.innerHTML = '<i class="fas fa-eye"></i>';
         }
         
-        // S'assurer que le style du bouton est préservé
+        // Ensure the button style is preserved
         this.style.backgroundColor = '#f0f0f0';
         this.style.borderRadius = '50%';
         this.style.width = '30px';
@@ -103,18 +103,18 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: #475569; /* Couleur fixe au lieu de var */
+    color: #475569; /* Fixed color instead of var */
     padding: 5px;
     font-size: 1.1rem;
     z-index: 10;
   }
   
   .toggle-password:hover {
-    color: #e31e26; /* Rouge Caritas */
+    color: #e31e26; /* Caritas Red */
   }
   
   .form-input {
-    padding-right: 40px !important; /* Espace pour le bouton */
+    padding-right: 40px !important; /* Space for the button */
     width: 100% !important;
   }
 </style>

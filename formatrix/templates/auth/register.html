@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Inscription - Formatrix{% endblock %}
+{% block title %}Registration - Formatrix{% endblock %}
 
 {% block content %}
 <div class="auth-container" style="max-width: 400px; margin: 2rem auto;">
   <div class="card auth-card">
-    <h2 class="text-center mb-4">Inscription</h2>
+    <h2 class="text-center mb-4">Registration</h2>
 
     {% if form.non_field_errors %}
     <div class="alert alert-danger mb-4" style="color: #e31e26 !important;">
@@ -20,7 +20,7 @@
       {% csrf_token %}
       
       <div class="form-group {% if form.username.errors %}form-error{% endif %}">
-        <label class="form-label" for="id_username">Nom d'utilisateur</label>
+        <label class="form-label" for="id_username">Username</label>
         <input type="text" name="username" id="id_username" class="form-input" value="{{ form.username.value|default:'' }}" required>
         {% if form.username.errors %}
           {% for error in form.username.errors %}
@@ -40,7 +40,7 @@
       </div>
 
       <div class="form-group {% if form.password1.errors %}form-error{% endif %}">
-        <label class="form-label" for="id_password1">Mot de passe</label>
+        <label class="form-label" for="id_password1">Password</label>
         <div class="password-input-container">
           <input type="password" name="password1" id="id_password1" class="form-input" required>
           <button type="button" class="toggle-password" data-target="id_password1" style="background-color: #f0f0f0; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
@@ -53,13 +53,13 @@
           {% endfor %}
         {% else %}
           <small class="form-text text-muted">
-            Le mot de passe doit contenir au moins 8 caractères.
+            Password must contain at least 8 characters.
           </small>
         {% endif %}
       </div>
 
       <div class="form-group {% if form.password2.errors %}form-error{% endif %}">
-        <label class="form-label" for="id_password2">Confirmer le mot de passe</label>
+        <label class="form-label" for="id_password2">Confirm password</label>
         <div class="password-input-container">
           <input type="password" name="password2" id="id_password2" class="form-input" required>
           <button type="button" class="toggle-password" data-target="id_password2" style="background-color: #f0f0f0; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
@@ -74,10 +74,10 @@
       </div>
 
       <div class="form-group {% if form.role.errors %}form-error{% endif %}">
-        <label class="form-label" for="id_role">Rôle</label>
+        <label class="form-label" for="id_role">Role</label>
         <select name="role" id="id_role" class="form-input" required>
-          <option value="formateur" {% if form.role.value == 'formateur' %}selected{% endif %}>Formateur</option>
-          <option value="admin" {% if form.role.value == 'admin' %}selected{% endif %}>Administrateur</option>
+          <option value="formateur" {% if form.role.value == 'formateur' %}selected{% endif %}>Trainer</option>
+          <option value="admin" {% if form.role.value == 'admin' %}selected{% endif %}>Administrator</option>
         </select>
         {% if form.role.errors %}
           {% for error in form.role.errors %}
@@ -85,19 +85,19 @@
           {% endfor %}
         {% else %}
           <small class="form-text text-muted">
-            Les administrateurs ont accès à toutes les fonctionnalités de gestion.
+            Administrators have access to all management features.
           </small>
         {% endif %}
       </div>
 
       <div class="form-group">
-        <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+        <button type="submit" class="btn btn-primary w-100">Register</button>
       </div>
 
       <div class="text-center mt-4">
         <p>
-          Déjà inscrit ? 
-          <a href="{% url 'login' %}" class="text-accent">Se connecter</a>
+          Already registered? 
+          <a href="{% url 'login' %}" class="text-accent">Login</a>
         </p>
       </div>
     </form>
@@ -108,17 +108,17 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Sélectionner tous les boutons de basculement de visibilité du mot de passe
+    // Select all password visibility toggle buttons
     const toggleButtons = document.querySelectorAll('.toggle-password');
     
-    // Ajouter un écouteur d'événement à chaque bouton
+    // Add an event listener to each button
     toggleButtons.forEach(button => {
       button.addEventListener('click', function() {
-        // Obtenir l'ID du champ de mot de passe cible
+        // Get the target password field ID
         const targetId = this.getAttribute('data-target');
         const passwordInput = document.getElementById(targetId);
         
-        // Basculer le type du champ entre 'password' et 'text'
+        // Toggle the field type between 'password' and 'text'
         if (passwordInput.type === 'password') {
           passwordInput.type = 'text';
           this.innerHTML = '<i class="fas fa-eye-slash"></i>';
@@ -127,7 +127,7 @@
           this.innerHTML = '<i class="fas fa-eye"></i>';
         }
         
-        // S'assurer que le style du bouton est préservé
+        // Ensure the button style is preserved
         this.style.backgroundColor = '#f0f0f0';
         this.style.borderRadius = '50%';
         this.style.width = '30px';
@@ -158,18 +158,18 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: #475569; /* Couleur fixe au lieu de var */
+    color: #475569; /* Fixed color instead of var */
     padding: 5px;
     font-size: 1.1rem;
     z-index: 10;
   }
   
   .toggle-password:hover {
-    color: #e31e26; /* Rouge Caritas */
+    color: #e31e26; /* Caritas Red */
   }
   
   .form-input {
-    padding-right: 40px !important; /* Espace pour le bouton */
+    padding-right: 40px !important; /* Space for the button */
     width: 100% !important;
   }
 </style>
