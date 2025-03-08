@@ -489,6 +489,12 @@
                   <span>Add a Student</span>
                 </a>
               </li>
+              <li>
+                <a href="{% url 'rapports-demographiques' %}" class="submenu-link {% if request.resolver_match.url_name == 'rapports-demographiques' %}active{% endif %}">
+                  <i class="fas fa-chart-pie"></i>
+                  <span>Demographics</span>
+                </a>
+              </li>
             </ul>
           </li>
           

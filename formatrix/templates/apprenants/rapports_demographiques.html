@@ -1,0 +1,705 @@
+{% extends "base.html" %}
+{% load static %}
+{% load apprenant_tags %}
+
+{% block title %}Demographic Reports - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/reports.css' %}">
+<style>
+    :root {
+        --primary-color: #3498db;
+        --primary-dark: #2980b9;
+        --primary-light: rgba(52, 152, 219, 0.1);
+        --primary-lighter: rgba(52, 152, 219, 0.05);
+        --primary-shadow: rgba(52, 152, 219, 0.15);
+        --accent-color: #e74c3c;
+    }
+    
+    body {
+        color: #333;
+        background-color: #f5f7fa;
+    }
+    
+    .card {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        padding: 1.5rem;
+    }
+    
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.25rem;
+        margin: 1.25rem 0;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid #f0f0f0;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 250px;
+        margin: 0.75rem 0;
+        padding: 0.5rem;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .stats-card h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        position: relative;
+        padding-left: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .stats-card h3::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 18px;
+        background: var(--primary-color);
+        border-radius: 2px;
+    }
+
+    .stats-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 0.75rem;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        font-size: 0.9rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .stats-table th,
+    .stats-table td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        color: #333;
+    }
+
+    .stats-table th {
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    .stats-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .stats-table tr:hover td {
+        background-color: var(--primary-lighter);
+    }
+
+    .total-row {
+        font-weight: 600;
+        background-color: var(--primary-lighter);
+    }
+
+    .total-row td {
+        border-top: 1px solid var(--primary-light);
+    }
+
+    .percentage {
+        color: #7f8c8d;
+        font-size: 0.8rem;
+        background: var(--primary-lighter);
+        padding: 0.15rem 0.4rem;
+        border-radius: 20px;
+        margin-left: 0.4rem;
+    }
+
+    .chart-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        margin: 1.25rem 0;
+    }
+
+    @media (max-width: 1000px) {
+        .chart-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .chart-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid #f0f0f0;
+    }
+
+    .chart-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .summary-box {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 1.75rem;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 4px 12px var(--primary-shadow);
+    }
+
+    .summary-item {
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        min-width: 140px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .summary-item .number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-item .label {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.9);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 500;
+    }
+
+    .page-header {
+        margin-bottom: 1.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    
+    .page-header-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .page-header i {
+        font-size: 1.2rem;
+        color: white;
+        background: var(--primary-color);
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px var(--primary-shadow);
+    }
+
+    .view-toggle {
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 30px;
+        padding: 0.25rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .view-toggle button {
+        background: none;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #7f8c8d;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .view-toggle button i {
+        font-size: 0.9rem;
+    }
+
+    .view-toggle button.active {
+        background: var(--primary-color);
+        color: white;
+        box-shadow: 0 2px 5px var(--primary-shadow);
+    }
+
+    .view-toggle button:hover:not(.active) {
+        background: rgba(0, 0, 0, 0.03);
+        color: #2c3e50;
+    }
+
+    .charts-view, .tables-view {
+        display: none;
+    }
+
+    .charts-view.active, .tables-view.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .summary-box {
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 1.25rem;
+        }
+
+        .summary-item {
+            width: 100%;
+        }
+
+        .stats-card {
+            padding: 1rem;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .view-toggle {
+            margin-top: 1rem;
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="page-header">
+        <div class="page-header-left">
+            <i class="fas fa-chart-pie"></i>
+            <h2>Student Demographic Reports</h2>
+        </div>
+        <div class="view-toggle">
+            <button id="charts-btn" class="active"><i class="fas fa-chart-bar"></i> Charts</button>
+            <button id="tables-btn"><i class="fas fa-table"></i> Tables</button>
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-item">
+            <div class="number">{{ total_apprenants }}</div>
+            <div class="label">Total Students</div>
+        </div>
+        <div class="summary-item">
+            <div class="number">{{ total_hommes }}</div>
+            <div class="label">Male</div>
+        </div>
+        <div class="summary-item">
+            <div class="number">{{ total_femmes }}</div>
+            <div class="label">Female</div>
+        </div>
+    </div>
+
+    <div id="charts-view" class="charts-view active">
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>Gender Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Age Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="ageChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Academic Level Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="academicChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3>Gender by Age Group</h3>
+                <div class="chart-container">
+                    <canvas id="genderAgeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tables-view" class="tables-view">
+        <div class="stats-container">
+            <div class="stats-card">
+                <h3>Distribution by Age Group</h3>
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>Age Group</th>
+                            <th>Male</th>
+                            <th>Female</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for categorie in categories_age %}
+                        <tr>
+                            <td>{{ categorie }}</td>
+                            <td>
+                                {{ stats_age_hommes|get:categorie|default:0 }}
+                                <span class="percentage">
+                                    {{ stats_age_hommes|get:categorie|default:0|div:total_hommes|mul:100|floatformat:1 }}%
+                                </span>
+                            </td>
+                            <td>
+                                {{ stats_age_femmes|get:categorie|default:0 }}
+                                <span class="percentage">
+                                    {{ stats_age_femmes|get:categorie|default:0|div:total_femmes|mul:100|floatformat:1 }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="total-row">
+                            <td>Total</td>
+                            <td>{{ total_hommes }}</td>
+                            <td>{{ total_femmes }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="stats-card">
+                <h3>Distribution by Academic Level</h3>
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>Academic Level</th>
+                            <th>Male</th>
+                            <th>Female</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for niveau in niveaux_academiques %}
+                        <tr>
+                            <td>
+                                {% if niveau == 'below_certificate' %}
+                                    Below High School
+                                {% elif niveau == 'high_school' %}
+                                    High School Diploma
+                                {% elif niveau == 'higher_education' %}
+                                    Higher Education
+                                {% else %}
+                                    {{ niveau }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ stats_niveau_hommes|get:niveau|default:0 }}
+                                <span class="percentage">
+                                    {{ stats_niveau_hommes|get:niveau|default:0|div:total_hommes|mul:100|floatformat:1 }}%
+                                </span>
+                            </td>
+                            <td>
+                                {{ stats_niveau_femmes|get:niveau|default:0 }}
+                                <span class="percentage">
+                                    {{ stats_niveau_femmes|get:niveau|default:0|div:total_femmes|mul:100|floatformat:1 }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="total-row">
+                            <td>Total</td>
+                            <td>{{ total_hommes }}</td>
+                            <td>{{ total_femmes }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle view buttons
+    const chartsBtn = document.getElementById('charts-btn');
+    const tablesBtn = document.getElementById('tables-btn');
+    const chartsView = document.getElementById('charts-view');
+    const tablesView = document.getElementById('tables-view');
+    
+    chartsBtn.addEventListener('click', function() {
+        chartsBtn.classList.add('active');
+        tablesBtn.classList.remove('active');
+        chartsView.classList.add('active');
+        tablesView.classList.remove('active');
+    });
+    
+    tablesBtn.addEventListener('click', function() {
+        tablesBtn.classList.add('active');
+        chartsBtn.classList.remove('active');
+        tablesView.classList.add('active');
+        chartsView.classList.remove('active');
+    });
+
+    // Chart configuration
+    const chartColors = {
+        blue: getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#3498db',
+        red: getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#e74c3c',
+        green: '#2ecc71',
+        yellow: '#f39c12',
+        lightBlue: '#36b9cc'
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 15,
+                    usePointStyle: true,
+                    font: {
+                        size: 11
+                    }
+                }
+            },
+            title: {
+                font: {
+                    size: 13
+                }
+            }
+        }
+    };
+
+    // Gender Distribution Pie Chart
+    const genderChart = new Chart(document.getElementById('genderChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                data: [{{ total_hommes }}, {{ total_femmes }}],
+                backgroundColor: [chartColors.blue, chartColors.red],
+                borderWidth: 0,
+                borderColor: 'white'
+            }]
+        },
+        options: Object.assign({}, chartOptions, {
+            cutout: '65%',
+            plugins: Object.assign({}, chartOptions.plugins, {
+                title: {
+                    display: true,
+                    text: 'Gender Distribution',
+                    font: {
+                        size: 13
+                    }
+                }
+            })
+        })
+    });
+
+    // Age Distribution Bar Chart
+    const ageChart = new Chart(document.getElementById('ageChart'), {
+        type: 'bar',
+        data: {
+            labels: [{% for categorie in categories_age %}'{{ categorie }}',{% endfor %}],
+            datasets: [{
+                label: 'Male',
+                data: [{% for categorie in categories_age %}{{ stats_age_hommes|get:categorie|default:0 }},{% endfor %}],
+                backgroundColor: chartColors.blue,
+                borderRadius: 5
+            }, {
+                label: 'Female',
+                data: [{% for categorie in categories_age %}{{ stats_age_femmes|get:categorie|default:0 }},{% endfor %}],
+                backgroundColor: chartColors.red,
+                borderRadius: 5
+            }]
+        },
+        options: Object.assign({}, chartOptions, {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false,
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                }
+            }
+        })
+    });
+
+    // Academic Level Distribution Bar Chart
+    const academicChart = new Chart(document.getElementById('academicChart'), {
+        type: 'bar',
+        data: {
+            labels: [
+                'Below High School',
+                'High School Diploma',
+                'Higher Education'
+            ],
+            datasets: [{
+                label: 'Male',
+                data: [
+                    {{ stats_niveau_hommes|get:'below_certificate'|default:0 }},
+                    {{ stats_niveau_hommes|get:'high_school'|default:0 }},
+                    {{ stats_niveau_hommes|get:'higher_education'|default:0 }}
+                ],
+                backgroundColor: chartColors.blue,
+                borderRadius: 5
+            }, {
+                label: 'Female',
+                data: [
+                    {{ stats_niveau_femmes|get:'below_certificate'|default:0 }},
+                    {{ stats_niveau_femmes|get:'high_school'|default:0 }},
+                    {{ stats_niveau_femmes|get:'higher_education'|default:0 }}
+                ],
+                backgroundColor: chartColors.red,
+                borderRadius: 5
+            }]
+        },
+        options: Object.assign({}, chartOptions, {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false,
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                }
+            }
+        })
+    });
+
+    // Gender by Age Group Stacked Bar Chart
+    const genderAgeChart = new Chart(document.getElementById('genderAgeChart'), {
+        type: 'bar',
+        data: {
+            labels: [{% for categorie in categories_age %}'{{ categorie }}',{% endfor %}],
+            datasets: [{
+                label: 'Male',
+                data: [{% for categorie in categories_age %}{{ stats_age_hommes|get:categorie|default:0 }},{% endfor %}],
+                backgroundColor: chartColors.blue,
+                borderRadius: 5
+            }, {
+                label: 'Female',
+                data: [{% for categorie in categories_age %}{{ stats_age_femmes|get:categorie|default:0 }},{% endfor %}],
+                backgroundColor: chartColors.red,
+                borderRadius: 5
+            }]
+        },
+        options: Object.assign({}, chartOptions, {
+            scales: {
+                x: {
+                    stacked: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false,
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                }
+            }
+        })
+    });
+});
+</script>
+{% endblock %} 

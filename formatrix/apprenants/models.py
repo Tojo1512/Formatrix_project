@@ -16,9 +16,9 @@ class Apprenant(models.Model):
     ]
 
     NIVEAU_ACADEMIQUE_CHOICES = [
-        ('sous_certificat', 'Below school certificate'),
-        ('certificat', 'School certificate'),
-        ('superieur', 'Above certificate')
+        ('below_certificate', 'Below High School'),
+        ('high_school', 'High School Diploma'),
+        ('higher_education', 'Higher Education')
     ]
 
     apprenant_id = models.AutoField(primary_key=True)

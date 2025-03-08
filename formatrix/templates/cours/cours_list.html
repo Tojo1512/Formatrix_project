@@ -106,13 +106,23 @@
                         <a href="{% url 'cours-delete' cours.pk %}" class="btn btn-sm btn-danger" title="Delete">
                             <i class="fas fa-trash"></i>
                         </a>
-                        {% if user.is_staff and cours.status != 'cancelled' %}
-                        <form method="post" action="{% url 'cours-cancel' cours.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel this course?');">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger" title="Cancel Course">
-                                <i class="fas fa-ban"></i>
-                            </button>
-                        </form>
+                        {% if user.is_staff %}
+                            {% if cours.statut_approbation == 'en_attente' %}
+                                <a href="{% url 'cours-approuver' cours.pk %}" class="btn btn-sm btn-success" title="Approve">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <a href="{% url 'cours-refuser' cours.pk %}" class="btn btn-sm btn-danger" title="Reject">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            {% endif %}
+                            {% if cours.status != 'cancelled' %}
+                                <form method="post" action="{% url 'cours-cancel' cours.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel this course?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Cancel Course">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>
