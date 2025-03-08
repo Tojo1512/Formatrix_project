@@ -76,7 +76,7 @@
       <div class="form-group {% if form.role.errors %}form-error{% endif %}">
         <label class="form-label" for="id_role">Role</label>
         <select name="role" id="id_role" class="form-input" required>
-          <option value="formateur" {% if form.role.value == 'formateur' %}selected{% endif %}>Trainer</option>
+          <option value="trainer" {% if form.role.value == 'trainer' %}selected{% endif %}>Responsble</option>
           <option value="admin" {% if form.role.value == 'admin' %}selected{% endif %}>Administrator</option>
         </select>
         {% if form.role.errors %}
@@ -85,7 +85,7 @@
           {% endfor %}
         {% else %}
           <small class="form-text text-muted">
-            Administrators have access to all management features.
+            Administrators have full access to all system features and management capabilities.
           </small>
         {% endif %}
       </div>

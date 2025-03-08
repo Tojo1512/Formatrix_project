@@ -4,21 +4,21 @@ from seances.models import Seance
 
 class Apprenant(models.Model):
     GENRE_CHOICES = [
-        ('M', 'Masculin'),
-        ('F', 'Féminin'),
-        ('A', 'Autre')
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('A', 'Other')
     ]
 
     CATEGORIE_AGE_CHOICES = [
-        ('16-30', '16-30 ans'),
-        ('31-60', '31-60 ans'),
-        ('60+', 'Plus de 60 ans')
+        ('16-30', '16-30 years'),
+        ('31-60', '31-60 years'),
+        ('60+', 'Over 60 years')
     ]
 
     NIVEAU_ACADEMIQUE_CHOICES = [
-        ('sous_certificat', 'En dessous du certificat scolaire'),
-        ('certificat', 'Certificat scolaire'),
-        ('superieur', 'Au-dessus du certificat')
+        ('sous_certificat', 'Below school certificate'),
+        ('certificat', 'School certificate'),
+        ('superieur', 'Above certificate')
     ]
 
     apprenant_id = models.AutoField(primary_key=True)

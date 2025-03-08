@@ -6,6 +6,7 @@
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/variables.css' %}">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/file-upload.css' %}">
   {% block splash %}{% endblock %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   {% block extra_css %}{% endblock %}
@@ -396,6 +397,37 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    
+    /* Style pour le bouton de thème */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      margin-top: 1rem;
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--sidebar-border);
+      border-radius: var(--radius-md);
+      color: var(--sidebar-text);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+    }
+    
+    .theme-toggle:hover {
+      background: var(--sidebar-hover);
+      border-color: var(--sidebar-accent);
+      color: var(--sidebar-accent);
+    }
+    
+    .theme-toggle i {
+      font-size: 1rem;
+      transition: transform var(--transition-bounce);
+    }
+    
+    .theme-toggle:hover i {
+      transform: rotate(15deg);
+    }
   </style>
 </head>
 <body>
@@ -482,6 +514,28 @@
             </ul>
           </li>
           
+          <li class="sidebar-item has-submenu">
+            <a href="#" class="sidebar-link {% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
+              <i class="fas fa-chalkboard-teacher"></i>
+              <span>Trainers</span>
+              <i class="fas fa-chevron-right submenu-icon"></i>
+            </a>
+            <ul class="submenu">
+              <li>
+                <a href="{% url 'formateur-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'formateur-list' %}active{% endif %}">
+                  <i class="fas fa-list"></i>
+                  <span>All Trainers</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'formateur-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'formateur-create' %}active{% endif %}">
+                  <i class="fas fa-plus"></i>
+                  <span>Add New Trainer</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          
           {% if user.is_staff %}
           <li class="sidebar-item">
             <a href="{% url 'admin:index' %}" class="sidebar-link">
@@ -509,6 +563,7 @@
               </form>
             </div>
           </div>
+
         </div>
       </nav>
     </aside>
@@ -544,8 +599,7 @@
     </div>
   </footer>
   
-  {% block extra_js %}{% endblock %}
-  
+  {% block extra_js %}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Handle sidebar submenus
@@ -569,7 +623,14 @@
           link.closest('.has-submenu').classList.add('active');
         }
       });
+      
+      // Le code de gestion du thème sombre a été supprimé
+      // S'assurer que le mode sombre est désactivé
+      document.documentElement.classList.remove('dark-theme');
+      localStorage.removeItem('theme');
     });
   </script>
+  <script src="{% static 'js/file-upload.js' %}"></script>
+  {% endblock %}
 </body>
 </html>

@@ -3,17 +3,25 @@
 
 {% block title %}{{ apprenant.nom_apprenant }} - Formatrix{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/details.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="card">
-    <div class="d-flex justify-between align-center mb-4">
-      <h2>{{ apprenant.nom_apprenant }}</h2>
+    <div class="card-header">
+      <h2 class="card-title">{{ apprenant.nom_apprenant }}</h2>
       <div>
-        <a href="{% url 'apprenant-update' apprenant.apprenant_id %}" class="btn btn-outline">Modifier</a>
-        <a href="{% url 'apprenant-list' %}" class="btn btn-outline">Retour à la liste</a>
+        <a href="{% url 'apprenant-update' apprenant.apprenant_id %}" class="btn btn-outline">
+          <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{% url 'apprenant-list' %}" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
       </div>
     </div>
     
-    <div class="apprenant-status mb-4">
+    <div class="status-badges">
       <span class="badge badge-info">
         {% for code, label in sexe_choices %}
             {% if code == apprenant.sexe %}{{ label }}{% endif %}
@@ -46,7 +54,7 @@
           </div>
           {% endif %}
           <div class="info-item">
-            <span class="info-label">CIN:</span>
+            <span class="info-label">Numéro CIN:</span>
             <span class="info-value">{{ apprenant.cin }}</span>
           </div>
           <div class="info-item">
@@ -70,13 +78,11 @@
             </span>
           </div>
         </div>
-      </div>
-      
-      <div class="col-md-6">
+
         <div class="info-group">
           <h3>Adresse</h3>
           <div class="info-item">
-            <span class="info-label">Adresse:</span>
+            <span class="info-label">Rue:</span>
             <span class="info-value">{{ apprenant.adresse_rue }}</span>
           </div>
           <div class="info-item">
@@ -89,9 +95,7 @@
           </div>
         </div>
       </div>
-    </div>
-    
-    <div class="row mt-4">
+      
       <div class="col-md-6">
         <div class="info-group">
           <h3>Informations académiques</h3>
@@ -118,9 +122,7 @@
           </div>
           {% endif %}
         </div>
-      </div>
-      
-      <div class="col-md-6">
+
         <div class="info-group">
           <h3>Contact d'urgence</h3>
           <div class="info-item">
@@ -135,208 +137,20 @@
       </div>
     </div>
     
-    <div class="row mt-4">
-      <div class="col-md-12">
-        <div class="action-buttons">
-          <a href="{% url 'apprenant-update' apprenant.apprenant_id %}" class="btn btn-primary">
-            <i class="fas fa-edit"></i>
-            Modifier
-          </a>
-          <a href="{% url 'apprenant-delete' apprenant.apprenant_id %}" class="btn btn-danger">
-            <i class="fas fa-trash"></i>
-            Supprimer
-          </a>
-          <a href="{% url 'apprenant-list' %}" class="btn btn-outline">
-            <i class="fas fa-arrow-left"></i>
-            Retour à la liste
-          </a>
-        </div>
-      </div>
+    <div class="action-buttons">
+      <a href="{% url 'apprenant-list' %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i>
+        Retour à la liste
+      </a>
+      <a href="{% url 'apprenant-update' apprenant.apprenant_id %}" class="btn btn-primary">
+        <i class="fas fa-edit"></i>
+        Modifier
+      </a>
+      <a href="{% url 'apprenant-delete' apprenant.apprenant_id %}" class="btn btn-danger">
+        <i class="fas fa-trash"></i>
+        Supprimer
+      </a>
     </div>
   </div>
 </div>
-
-{% block extra_css %}
-<style>
-  .d-flex {
-    display: flex;
-  }
-  
-  .justify-between {
-    justify-content: space-between;
-  }
-  
-  .align-center {
-    align-items: center;
-  }
-  
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0 -15px;
-  }
-  
-  .col-md-4 {
-    flex: 0 0 33.333333%;
-    max-width: 33.333333%;
-    padding: 0 15px;
-  }
-  
-  .col-md-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
-    padding: 0 15px;
-  }
-  
-  .col-md-12 {
-    flex: 0 0 100%;
-    max-width: 100%;
-    padding: 0 15px;
-  }
-  
-  @media (max-width: 768px) {
-    .col-md-4, .col-md-6, .col-md-12 {
-      flex: 0 0 100%;
-      max-width: 100%;
-    }
-  }
-  
-  .info-group {
-    margin-bottom: 2rem;
-  }
-  
-  .info-group h3 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-    font-weight: 600;
-  }
-  
-  .info-item {
-    display: flex;
-    margin-bottom: 0.5rem;
-  }
-  
-  .info-label {
-    font-weight: 600;
-    color: var(--text-secondary);
-    width: 40%;
-  }
-  
-  .info-value {
-    width: 60%;
-  }
-  
-  .badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-right: 0.5rem;
-  }
-  
-  .badge-primary {
-    background-color: var(--primary-color);
-    color: white;
-  }
-  
-  .badge-secondary {
-    background-color: var(--secondary-color);
-    color: white;
-  }
-  
-  .badge-info {
-    background-color: var(--info-color);
-    color: white;
-  }
-  
-  .badge-success {
-    background-color: var(--success-color);
-    color: white;
-  }
-  
-  .badge-warning {
-    background-color: var(--warning-color);
-    color: white;
-  }
-  
-  .badge-danger {
-    background-color: var(--error-color);
-    color: white;
-  }
-  
-  .mb-4 {
-    margin-bottom: 1.5rem;
-  }
-  
-  .mt-4 {
-    margin-top: 1.5rem;
-  }
-  
-  .action-buttons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-  
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    text-decoration: none;
-  }
-  
-  .btn-primary {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-  }
-  
-  .btn-primary:hover {
-    background-color: var(--primary-color-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(212, 43, 30, 0.2);
-  }
-  
-  .btn-outline {
-    background-color: transparent;
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
-  }
-  
-  .btn-outline:hover {
-    background-color: rgba(212, 43, 30, 0.05);
-    transform: translateY(-2px);
-  }
-  
-  .btn-danger {
-    background-color: var(--error-color);
-    color: white;
-    border: none;
-  }
-  
-  .btn-danger:hover {
-    background-color: #a01e14;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(160, 30, 20, 0.2);
-  }
-  
-  @media (max-width: 768px) {
-    .action-buttons {
-      flex-direction: column;
-    }
-    
-    .btn {
-      width: 100%;
-      justify-content: center;
-      margin-bottom: 0.5rem;
-    }
-  }
-</style>
-{% endblock %}
 {% endblock %}

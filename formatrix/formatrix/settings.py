@@ -27,6 +27,10 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Media files (Uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -61,6 +65,7 @@ INSTALLED_APPS = [
     'inscriptions',
     'evaluations',
     'presences',
+    'formateurs',
 ]
 
 MIDDLEWARE = [
@@ -132,7 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', 'fr-fr')
+LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', 'en-us')
 TIME_ZONE = os.environ.get('TIME_ZONE', 'Indian/Mauritius')
 USE_I18N = os.environ.get('USE_I18N', 'True') == 'True'
 USE_L10N = os.environ.get('USE_L10N', 'True') == 'True'

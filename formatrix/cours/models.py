@@ -4,23 +4,30 @@ from datetime import timedelta
 
 class Cours(models.Model):
     TYPE_CHOICES = [
-        ('formateur', 'Formation pour Formateur'),
-        ('apprenant', 'Formation pour Apprenant'),
-        ('court', 'Cours Court'),
-        ('long', 'Cours Long')
+        ('formateur', 'Training for Trainer'),
+        ('apprenant', 'Training for Learner'),
+        ('court', 'Short Course'),
+        ('long', 'Long Course')
     ]
 
     STATUT_APPROBATION_CHOICES = [
-        ('en_attente', 'En attente'),
-        ('approuve', 'Approuvé'),
-        ('refuse', 'Refusé'),
-        ('expire', 'Expiré')
+        ('en_attente', 'Pending'),
+        ('approuve', 'Approved'),
+        ('refuse', 'Rejected'),
+        ('expire', 'Expired')
     ]
 
     HORAIRE_CHOICES = [
-        ('pendant_bureau', 'Pendant les heures de bureau'),
-        ('apres_bureau', 'Après les heures de bureau'),
+        ('pendant_bureau', 'During office hours'),
+        ('apres_bureau', 'After office hours'),
         ('weekend', 'Weekend')
+    ]
+
+    STATUS_CHOICES = [
+        ('not_started', 'Not Started'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled')
     ]
 
     cours_id = models.AutoField(primary_key=True)
@@ -43,6 +50,14 @@ class Cours(models.Model):
     date_approbation = models.DateField(null=True)
     date_expiration_validite = models.DateField(null=True)
     version = models.IntegerField(default=1)
+    start_time = models.DateTimeField(null=True)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='not_started')
+    formateurs = models.ManyToManyField(
+        'formateurs.Formateur',
+        related_name='cours_assignes',
+        blank=True,
+        verbose_name="Formateurs assignés"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -54,13 +69,13 @@ class Cours(models.Model):
 
     def save(self, *args, **kwargs):
         if self.date_approbation and not self.date_expiration_validite:
-            # Définir la date d'expiration à 3 ans après l'approbation
+            # Set expiration date to 3 years after approval
             self.date_expiration_validite = self.date_approbation + timedelta(days=3*365)
         super().save(*args, **kwargs)
 
     @property
     def alerte_expiration(self):
-        """Retourne True si la date d'expiration est dans moins de 3 mois"""
+        """Returns True if the expiration date is less than 3 months away"""
         if self.date_expiration_validite:
             aujourd_hui = timezone.now().date()
             jours_restants = (self.date_expiration_validite - aujourd_hui).days
@@ -69,7 +84,26 @@ class Cours(models.Model):
 
     @property
     def est_expire(self):
-        """Retourne True si le cours est expiré"""
+        """Returns True if the course has expired"""
         if self.date_expiration_validite:
             return timezone.now().date() > self.date_expiration_validite
         return False
+
+    def update_status(self):
+        """Automatically updates course status based on start time and duration"""
+        if not self.start_time:
+            return
+
+        now = timezone.now()
+        end_time = self.start_time + timedelta(hours=self.duree_heures)
+
+        if self.status == 'cancelled':
+            return
+        elif now < self.start_time:
+            self.status = 'not_started'
+        elif self.start_time <= now <= end_time:
+            self.status = 'in_progress'
+        elif now > end_time:
+            self.status = 'completed'
+
+        self.save()

@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Supprimer l'apprenant {{ apprenant.nom_apprenant }} - Formatrix{% endblock %}
+{% block title %}Delete learner {{ apprenant.nom_apprenant }} - Formatrix{% endblock %}
 
 {% block content %}
 <div class="card">
-  <h2 class="mb-4">Confirmer la suppression</h2>
+  <h2 class="mb-4">Confirm Deletion</h2>
   
   <div class="alert alert-danger">
     <i class="fas fa-exclamation-triangle"></i>
-    Êtes-vous sûr de vouloir supprimer l'apprenant <strong>{{ apprenant.nom_apprenant }}</strong> ?
+    Are you sure you want to delete the learner <strong>{{ apprenant.nom_apprenant }}</strong>?
   </div>
   
   <div class="course-info mb-4">
     <div class="info-row">
-      <div class="info-label">CIN :</div>
+      <div class="info-label">ID Number:</div>
       <div class="info-value">{{ apprenant.cin }}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Ville :</div>
+      <div class="info-label">City:</div>
       <div class="info-value">{{ apprenant.ville }}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Genre :</div>
+      <div class="info-label">Gender:</div>
       <div class="info-value">
         <span class="badge {% if apprenant.sexe == 'M' %}badge-info{% else %}badge-secondary{% endif %}">
           {% for code, label in sexe_choices %}
@@ -38,11 +38,11 @@
     <div class="form-actions">
       <a href="{% url 'apprenant-list' %}" class="btn btn-outline">
         <i class="fas fa-arrow-left"></i>
-        Annuler
+        Cancel
       </a>
       <button type="submit" class="btn btn-danger">
         <i class="fas fa-trash"></i>
-        Confirmer la suppression
+        Confirm Deletion
       </button>
     </div>
   </form>

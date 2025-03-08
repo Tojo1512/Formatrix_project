@@ -67,7 +67,7 @@ class ApprenantListView(LoginRequiredMixin, ListView):
             'ordering': self.request.GET.get('ordering', '-created_at'),
             'show_create_button': True,
             'create_url': reverse_lazy('apprenant-create'),
-            'create_button_text': 'Ajouter un apprenant',
+            'create_button_text': 'Add a learner',
             'form_action': self.request.path,
             'reset_url': self.request.path,
             'has_active_filters': bool(
@@ -93,10 +93,10 @@ class ApprenantCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         try:
             response = super().form_valid(form)
-            messages.success(self.request, "L'apprenant a été créé avec succès!")
+            messages.success(self.request, "Learner has been created successfully!")
             return response
         except Exception as e:
-            messages.error(self.request, f"Erreur lors de la création de l'apprenant: {str(e)}")
+            messages.error(self.request, f"Error creating learner: {str(e)}")
             return self.form_invalid(form)
 
     def form_invalid(self, form):
@@ -134,10 +134,10 @@ class ApprenantUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         try:
             response = super().form_valid(form)
-            messages.success(self.request, "L'apprenant a été mis à jour avec succès!")
+            messages.success(self.request, "Learner has been updated successfully!")
             return response
         except Exception as e:
-            messages.error(self.request, f"Erreur lors de la mise à jour de l'apprenant: {str(e)}")
+            messages.error(self.request, f"Error updating learner: {str(e)}")
             return self.form_invalid(form)
 
     def form_invalid(self, form):
@@ -161,5 +161,5 @@ class ApprenantDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def delete(self, request, *args, **kwargs):
         apprenant = self.get_object()
-        messages.success(request, f"L'apprenant \"{apprenant.nom_apprenant}\" a été supprimé avec succès!")
+        messages.success(request, f"Learner \"{apprenant.nom_apprenant}\" has been deleted successfully!")
         return super().delete(request, *args, **kwargs)

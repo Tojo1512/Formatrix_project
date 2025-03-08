@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if object.cours_id %}Modifier{% else %}Créer{% endif %} un Cours - Formatrix{% endblock %}
+{% block title %}{% if object.cours_id %}Edit{% else %}Create{% endif %} a Course - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/theme.css' %}">
@@ -13,11 +13,11 @@
   <div class="form-header">
     <h2 class="form-title">
       <i class="fas {% if object.cours_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
-      {% if object.cours_id %}Modifier{% else %}Créer{% endif %} un Cours
+      {% if object.cours_id %}Edit{% else %}Create{% endif %} a Course
     </h2>
     <a href="{% url 'cours-list' %}" class="btn btn-outline">
       <i class="fas fa-arrow-left"></i>
-      Retour
+      Back
     </a>
   </div>
 
@@ -40,17 +40,17 @@
   <form method="post" novalidate>
     {% csrf_token %}
     <div class="form-grid">
-      <!-- Informations essentielles -->
+      <!-- Essential Information -->
       <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-info-circle"></i>
-          Informations essentielles
+          Essential Information
         </h3>
         
         <div class="form-group {% if form.nom_cours.errors %}has-error{% endif %}">
           <label class="form-label" for="{{ form.nom_cours.id_for_label }}">
             <i class="fas fa-heading"></i>
-            Nom du cours
+            Course Name
           </label>
           {{ form.nom_cours }}
           {% include "includes/field_errors.html" with field=form.nom_cours %}
@@ -69,7 +69,7 @@
           <div class="form-group {% if form.niveau.errors %}has-error{% endif %}">
             <label class="form-label" for="{{ form.niveau.id_for_label }}">
               <i class="fas fa-layer-group"></i>
-              Niveau
+              Level
             </label>
             {{ form.niveau }}
             {% include "includes/field_errors.html" with field=form.niveau %}
@@ -80,7 +80,7 @@
           <div class="form-group {% if form.duree_heures.errors %}has-error{% endif %}">
             <label class="form-label" for="{{ form.duree_heures.id_for_label }}">
               <i class="fas fa-clock"></i>
-              Durée (heures)
+              Duration (hours)
             </label>
             {{ form.duree_heures }}
             {% include "includes/field_errors.html" with field=form.duree_heures %}
@@ -89,7 +89,7 @@
           <div class="form-group {% if form.frais_par_participant.errors %}has-error{% endif %}">
             <label class="form-label" for="{{ form.frais_par_participant.id_for_label }}">
               <i class="fas fa-coins"></i>
-              Frais par participant (Ar)
+              Fee per participant (Ar)
             </label>
             {{ form.frais_par_participant }}
             {% include "includes/field_errors.html" with field=form.frais_par_participant %}
@@ -98,7 +98,7 @@
           <div class="form-group {% if form.periode_mois.errors %}has-error{% endif %}">
             <label class="form-label" for="{{ form.periode_mois.id_for_label }}">
               <i class="fas fa-calendar-alt"></i>
-              Période (mois)
+              Period (months)
             </label>
             {{ form.periode_mois }}
             {% include "includes/field_errors.html" with field=form.periode_mois %}
@@ -106,11 +106,11 @@
         </div>
       </div>
 
-      <!-- Contenu pédagogique -->
+      <!-- Course Content -->
       <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-book"></i>
-          Contenu pédagogique
+          Course Content
         </h3>
         
         <div class="form-group {% if form.description.errors %}has-error{% endif %}">
@@ -125,24 +125,24 @@
         <div class="form-group {% if form.objectifs.errors %}has-error{% endif %}">
           <label class="form-label" for="{{ form.objectifs.id_for_label }}">
             <i class="fas fa-bullseye"></i>
-            Objectifs
+            Objectives
           </label>
           {{ form.objectifs }}
           {% include "includes/field_errors.html" with field=form.objectifs %}
         </div>
       </div>
 
-      <!-- Prérequis et matériel -->
+      <!-- Prerequisites and Materials -->
       <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-clipboard-list"></i>
-          Prérequis et matériel
+          Prerequisites and Materials
         </h3>
         
         <div class="form-group {% if form.prerequis.errors %}has-error{% endif %}">
           <label class="form-label" for="{{ form.prerequis.id_for_label }}">
             <i class="fas fa-check-square"></i>
-            Prérequis
+            Prerequisites
           </label>
           {{ form.prerequis }}
           {% include "includes/field_errors.html" with field=form.prerequis %}
@@ -151,40 +151,79 @@
         <div class="form-group {% if form.materiel_requis.errors %}has-error{% endif %}">
           <label class="form-label" for="{{ form.materiel_requis.id_for_label }}">
             <i class="fas fa-tools"></i>
-            Matériel requis
+            Required Materials
           </label>
           {{ form.materiel_requis }}
           {% include "includes/field_errors.html" with field=form.materiel_requis %}
         </div>
       </div>
 
-      <!-- Horaires -->
+      <!-- Schedule -->
       <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-clock"></i>
-          Horaires
+          Schedule
         </h3>
         
         <div class="form-group {% if form.horaire.errors %}has-error{% endif %}">
           <label class="form-label" for="{{ form.horaire.id_for_label }}">
             <i class="fas fa-calendar-alt"></i>
-            Horaire
+            Schedule Type
           </label>
           {{ form.horaire }}
           {% include "includes/field_errors.html" with field=form.horaire %}
         </div>
+
+        <div class="form-group {% if form.start_time.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.start_time.id_for_label }}">
+            <i class="fas fa-calendar-plus"></i>
+            Start Time
+          </label>
+          {{ form.start_time }}
+          {% include "includes/field_errors.html" with field=form.start_time %}
+        </div>
+
+        <div class="form-group {% if form.status.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.status.id_for_label }}">
+            <i class="fas fa-flag"></i>
+            Status
+          </label>
+          {{ form.status }}
+          {% include "includes/field_errors.html" with field=form.status %}
+        </div>
         <input type="hidden" name="statut_approbation" value="en_attente">
+      </div>
+      
+      <!-- Trainers -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-users"></i>
+          Trainers
+        </h3>
+        
+        <div class="form-group {% if form.formateurs.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.formateurs.id_for_label }}">
+            <i class="fas fa-user-tie"></i>
+            Assigned Trainers
+          </label>
+          {{ form.formateurs }}
+          {% include "includes/field_errors.html" with field=form.formateurs %}
+          <small class="form-text text-muted">
+            <i class="fas fa-info-circle"></i>
+            Select one or more trainers for this course. Hold Ctrl (or Cmd on Mac) to select multiple trainers.
+          </small>
+        </div>
       </div>
     </div>
 
     <div class="form-actions">
       <a href="{% url 'cours-list' %}" class="btn btn-outline">
         <i class="fas fa-times"></i>
-        Annuler
+        Cancel
       </a>
       <button type="submit" class="btn btn-primary">
         <i class="fas {% if object.cours_id %}fa-save{% else %}fa-plus{% endif %}"></i>
-        {% if object.cours_id %}Enregistrer{% else %}Valider{% endif %}
+        {% if object.cours_id %}Save Changes{% else %}Submit{% endif %}
       </button>
     </div>
   </form>

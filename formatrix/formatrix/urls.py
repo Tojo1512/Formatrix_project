@@ -53,4 +53,11 @@ urlpatterns = [
     
     # URLs pour les templates d'apprenants
     path('apprenants/', include('apprenants.template_urls')),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+    # URLs pour les templates de formateurs
+    path('formateurs/', include('formateurs.urls')),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

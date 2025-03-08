@@ -7,7 +7,7 @@ from django import forms
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     role = forms.ChoiceField(
-        choices=[('formateur', 'Formateur'), ('admin', 'Administrateur')],
+        choices=[('trainer', 'Trainer'), ('admin', 'Administrator')],
         required=True
     )
 
@@ -21,12 +21,13 @@ def register_view(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.email = form.cleaned_data['email']
-            # Définir is_staff en fonction du rôle choisi
+            # Set staff and superuser status based on role
             if form.cleaned_data['role'] == 'admin':
                 user.is_staff = True
+                user.is_superuser = True  # Make admin users superusers
             user.save()
             login(request, user)
             return redirect('home')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'auth/register.html', {'form': form}) 
+    return render(request, 'auth/register.html', {'form': form})

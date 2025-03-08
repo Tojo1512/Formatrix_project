@@ -11,29 +11,42 @@ class ClientForm(forms.ModelForm):
     
     class Meta:
         model = Client
-        fields = ['nomclient', 'autresnom', 'email', 'localite', 'ville', 
-                 'numero_immatriculation', 'adresse_rue', 'telephone', 'typeclientid']
+        fields = ['nom_entite', 'sigle', 'secteur_activite', 'email', 'localite', 'ville', 
+                 'numero_immatriculation', 'adresse_siege', 'telephone', 'site_web',
+                 'typeclientid', 'personne_contact', 'fonction_contact', 'email_contact', 
+                 'telephone_contact']
         labels = {
-            'nomclient': 'Nom du client',
-            'autresnom': 'Autres noms',
+            'nom_entite': 'Nom de l\'entité',
+            'sigle': 'Sigle/Acronyme',
+            'secteur_activite': 'Secteur d\'activité',
             'email': 'Email',
             'localite': 'Localité',
             'ville': 'Ville',
             'numero_immatriculation': 'Numéro d\'immatriculation',
-            'adresse_rue': 'Adresse',
+            'adresse_siege': 'Adresse du siège',
             'telephone': 'Téléphone',
+            'site_web': 'Site web',
             'typeclientid': 'Type de client',
+            'personne_contact': 'Personne de contact',
+            'fonction_contact': 'Fonction',
+            'email_contact': 'Email de contact',
+            'telephone_contact': 'Téléphone de contact',
         }
         widgets = {
-            'nomclient': forms.TextInput(attrs={'class': 'form-control'}),
-            'autresnom': forms.TextInput(attrs={'class': 'form-control'}),
-            # Le widget email est défini directement dans le champ personnalisé ci-dessus
+            'nom_entite': forms.TextInput(attrs={'class': 'form-control'}),
+            'sigle': forms.TextInput(attrs={'class': 'form-control'}),
+            'secteur_activite': forms.Select(attrs={'class': 'form-control'}),
             'localite': forms.TextInput(attrs={'class': 'form-control'}),
             'ville': forms.TextInput(attrs={'class': 'form-control'}),
             'numero_immatriculation': forms.TextInput(attrs={'class': 'form-control'}),
-            'adresse_rue': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'adresse_siege': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+            'site_web': forms.URLInput(attrs={'class': 'form-control'}),
             'typeclientid': forms.Select(attrs={'class': 'form-control'}),
+            'personne_contact': forms.TextInput(attrs={'class': 'form-control'}),
+            'fonction_contact': forms.TextInput(attrs={'class': 'form-control'}),
+            'email_contact': forms.EmailInput(attrs={'class': 'form-control'}),
+            'telephone_contact': forms.TextInput(attrs={'class': 'form-control'}),
         }
         
     def clean_email(self):

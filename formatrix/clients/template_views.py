@@ -28,7 +28,7 @@ class ClientListView(LoginRequiredMixin, ListView):
         
         # Application des filtres de l'API
         if search:
-            queryset = queryset.filter(nomclient__icontains=search)
+            queryset = queryset.filter(nom_entite__icontains=search)
             
         if type_client:
             queryset = queryset.filter(typeclientid__typeclient=type_client)
@@ -72,9 +72,9 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         try:
-            response = super().form_valid(form)
-            messages.success(self.request, 'Le client a été créé avec succès!')
-            return response
+            client = form.save()
+            messages.success(self.request, f'Le client "{client.nom_entite}" a été créé avec succès!')
+            return redirect('client-detail', pk=client.clientid)
         except Exception as e:
             messages.error(self.request, f'Erreur lors de la création du client: {str(e)}')
             return self.form_invalid(form)
@@ -105,9 +105,9 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         try:
-            response = super().form_valid(form)
-            messages.success(self.request, 'Le client a été mis à jour avec succès!')
-            return response
+            client = form.save()
+            messages.success(self.request, f'Le client "{client.nom_entite}" a été mis à jour avec succès!')
+            return redirect('client-detail', pk=client.clientid)
         except Exception as e:
             messages.error(self.request, f'Erreur lors de la mise à jour du client: {str(e)}')
             return self.form_invalid(form)
@@ -134,5 +134,5 @@ class ClientDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def delete(self, request, *args, **kwargs):
         client = self.get_object()
-        messages.success(request, f'Le client "{client.nomclient}" a été supprimé avec succès!')
+        messages.success(request, f'Client "{client.nom_entite}" has been deleted successfully!')
         return super().delete(request, *args, **kwargs)

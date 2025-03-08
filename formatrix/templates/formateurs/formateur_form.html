@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if object.formateurid %}Edit{% else %}Create{% endif %} a Trainer - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h2 class="form-title">
+      <i class="fas {% if object.formateurid %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+      {% if object.formateurid %}Edit{% else %}Create{% endif %} a Trainer
+    </h2>
+    <a href="{% url 'formateur-list' %}" class="btn btn-outline">
+      <i class="fas fa-arrow-left"></i>
+      Back
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <div class="form-grid">
+      <!-- Personal Information -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-user"></i>
+          Personal Information
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group {% if form.nom.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.nom.id_for_label }}">
+              <i class="fas fa-user"></i>
+              Last Name
+            </label>
+            {{ form.nom }}
+            {% include "includes/field_errors.html" with field=form.nom %}
+          </div>
+
+          <div class="form-group {% if form.prenom.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.prenom.id_for_label }}">
+              <i class="fas fa-user"></i>
+              First Name
+            </label>
+            {{ form.prenom }}
+            {% include "includes/field_errors.html" with field=form.prenom %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.email.id_for_label }}">
+              <i class="fas fa-envelope"></i>
+              Email
+            </label>
+            {{ form.email }}
+            {% include "includes/field_errors.html" with field=form.email %}
+          </div>
+
+          <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.telephone.id_for_label }}">
+              <i class="fas fa-phone"></i>
+              Phone
+            </label>
+            {{ form.telephone }}
+            {% include "includes/field_errors.html" with field=form.telephone %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group {% if form.date_naissance.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.date_naissance.id_for_label }}">
+              <i class="fas fa-calendar"></i>
+              Birth Date
+            </label>
+            {{ form.date_naissance }}
+            {% include "includes/field_errors.html" with field=form.date_naissance %}
+          </div>
+
+          <div class="form-group {% if form.ville.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.ville.id_for_label }}">
+              <i class="fas fa-city"></i>
+              City
+            </label>
+            {{ form.ville }}
+            {% include "includes/field_errors.html" with field=form.ville %}
+          </div>
+        </div>
+
+        <div class="form-group {% if form.adresse.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.adresse.id_for_label }}">
+            <i class="fas fa-map-marker-alt"></i>
+            Address
+          </label>
+          {{ form.adresse }}
+          {% include "includes/field_errors.html" with field=form.adresse %}
+        </div>
+      </div>
+
+      <!-- Professional Information -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-briefcase"></i>
+          Professional Information
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group {% if form.type_formateur.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.type_formateur.id_for_label }}">
+              <i class="fas fa-tag"></i>
+              Trainer Type
+            </label>
+            {{ form.type_formateur }}
+            {% include "includes/field_errors.html" with field=form.type_formateur %}
+          </div>
+
+          <div class="form-group {% if form.niveau_expertise.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.niveau_expertise.id_for_label }}">
+              <i class="fas fa-layer-group"></i>
+              Expertise Level
+            </label>
+            {{ form.niveau_expertise }}
+            {% include "includes/field_errors.html" with field=form.niveau_expertise %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group {% if form.date_embauche.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.date_embauche.id_for_label }}">
+              <i class="fas fa-calendar-check"></i>
+              Hire Date
+            </label>
+            {{ form.date_embauche }}
+            {% include "includes/field_errors.html" with field=form.date_embauche %}
+          </div>
+
+          <div class="form-group {% if form.tarif_horaire.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.tarif_horaire.id_for_label }}">
+              <i class="fas fa-money-bill"></i>
+              Hourly Rate (Ar)
+            </label>
+            {{ form.tarif_horaire }}
+            {% include "includes/field_errors.html" with field=form.tarif_horaire %}
+          </div>
+        </div>
+
+        <div class="form-group {% if form.specialites.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.specialites.id_for_label }}">
+            <i class="fas fa-star"></i>
+            Specialties
+          </label>
+          {{ form.specialites }}
+          {% include "includes/field_errors.html" with field=form.specialites %}
+        </div>
+      </div>
+
+      <!-- Status and Availability -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-clock"></i>
+          Status and Availability
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group {% if form.statut.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.statut.id_for_label }}">
+              <i class="fas fa-toggle-on"></i>
+              Status
+            </label>
+            {{ form.statut }}
+            {% include "includes/field_errors.html" with field=form.statut %}
+          </div>
+
+          <div class="form-group {% if form.disponibilite.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.disponibilite.id_for_label }}">
+              <i class="fas fa-calendar-alt"></i>
+              Availability
+            </label>
+            {{ form.disponibilite }}
+            {% include "includes/field_errors.html" with field=form.disponibilite %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Courses and Documents -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-book"></i>
+          Courses and Documents
+        </h3>
+        
+        <!-- La section des cours assignés a été supprimée -->
+
+        <div class="form-row">
+          <div class="form-group {% if form.cv.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.cv.id_for_label }}">
+              <i class="fas fa-file-pdf"></i>
+              CV
+            </label>
+            <div class="file-upload-container">
+              <div class="file-upload-box" id="cv-upload-box">
+                <i class="fas fa-file-upload upload-icon"></i>
+                <div class="upload-text">
+                  <span class="primary-text">Glissez votre CV ici</span>
+                  <span class="secondary-text">ou cliquez pour sélectionner un fichier</span>
+                </div>
+                <div class="file-info" id="cv-file-info">
+                  <i class="fas fa-file-pdf file-icon"></i>
+                  <span class="file-name" id="cv-file-name">Aucun fichier sélectionné</span>
+                  <button type="button" class="remove-file" id="cv-remove-file">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="real-file-input">
+                {{ form.cv }}
+              </div>
+            </div>
+            {% include "includes/field_errors.html" with field=form.cv %}
+            <small class="form-text text-muted">
+              Formats acceptés: PDF, DOC, DOCX. Taille max: 5MB
+            </small>
+          </div>
+
+          <div class="form-group {% if form.photo.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.photo.id_for_label }}">
+              <i class="fas fa-camera"></i>
+              Photo
+            </label>
+            <div class="file-upload-container">
+              <div class="file-upload-box image-upload-box" id="photo-upload-box">
+                <div class="image-preview" id="photo-preview">
+                  <i class="fas fa-user-circle placeholder-icon"></i>
+                </div>
+                <div class="upload-text">
+                  <span class="primary-text">Ajouter une photo</span>
+                  <span class="secondary-text">JPG, PNG ou GIF</span>
+                </div>
+              </div>
+              <div class="real-file-input">
+                {{ form.photo }}
+              </div>
+            </div>
+            {% include "includes/field_errors.html" with field=form.photo %}
+            <small class="form-text text-muted">
+              Formats acceptés: JPG, PNG, GIF. Taille max: 2MB
+            </small>
+          </div>
+        </div>
+
+        <div class="form-group {% if form.notes.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.notes.id_for_label }}">
+            <i class="fas fa-sticky-note"></i>
+            Notes
+          </label>
+          {{ form.notes }}
+          {% include "includes/field_errors.html" with field=form.notes %}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'formateur-list' %}" class="btn btn-outline">
+        <i class="fas fa-times"></i>
+        Cancel
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas {% if object.formateurid %}fa-save{% else %}fa-plus{% endif %}"></i>
+        {% if object.formateurid %}Save Changes{% else %}Submit{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock content %} 

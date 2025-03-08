@@ -1,31 +1,31 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Supprimer le cours - Formatrix{% endblock %}
+{% block title %}Delete Course - Formatrix{% endblock %}
 
 {% block content %}
 <div class="card">
-  <h2 class="mb-4">Confirmer la suppression</h2>
+  <h2 class="mb-4">Confirm Deletion</h2>
   
   <div class="alert alert-danger">
     <i class="fas fa-exclamation-triangle"></i>
-    Êtes-vous sûr de vouloir supprimer le cours "{{ object.nom_cours }}" ?
+    Are you sure you want to delete the course "{{ object.nom_cours }}"?
   </div>
   
   <div class="course-info mb-4">
     <div class="info-row">
-      <div class="info-label">Type de cours :</div>
+      <div class="info-label">Course Type:</div>
       <div class="info-value">{{ object.get_type_cours_display }}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Durée :</div>
-      <div class="info-value">{{ object.duree_heures }} heures</div>
+      <div class="info-label">Duration:</div>
+      <div class="info-value">{{ object.duree_heures }} hours</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Statut :</div>
+      <div class="info-label">Status:</div>
       <div class="info-value">
         <span class="badge {% if object.statut_approbation == 'approuve' %}badge-success{% elif object.statut_approbation == 'en_attente' %}badge-warning{% elif object.statut_approbation == 'refuse' %}badge-danger{% else %}badge-secondary{% endif %}">
-          {{ object.get_statut_approbation_display }}
+          {% if object.statut_approbation == 'approuve' %}Approved{% elif object.statut_approbation == 'en_attente' %}Pending{% elif object.statut_approbation == 'refuse' %}Rejected{% else %}Unknown{% endif %}
         </span>
       </div>
     </div>
@@ -36,11 +36,11 @@
     <div class="form-actions">
       <a href="{% url 'cours-list' %}" class="btn btn-outline">
         <i class="fas fa-arrow-left"></i>
-        Annuler
+        Cancel
       </a>
       <button type="submit" class="btn btn-danger">
         <i class="fas fa-trash"></i>
-        Confirmer la suppression
+        Confirm Deletion
       </button>
     </div>
   </form>

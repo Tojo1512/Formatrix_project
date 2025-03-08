@@ -1,64 +1,69 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Confirmer la suppression - {{ client.nomclient }} - Formatrix{% endblock %}
+{% block title %}Delete Client - {{ client.nom_entite }} - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/theme.css' %}">
-<link rel="stylesheet" href="{% static 'css/delete.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="delete-container">
-  <div class="delete-card">
-    <div class="delete-header">
-      <h2 class="delete-title">
-        <i class="fas fa-exclamation-triangle"></i>
-        Confirmer la suppression
-      </h2>
-    </div>
+<div class="form-container">
+  <div class="form-header">
+    <h2 class="form-title">
+      <i class="fas fa-exclamation-triangle"></i>
+      Delete Confirmation
+    </h2>
+    <a href="{% url 'client-list' %}" class="btn btn-outline">
+      <i class="fas fa-arrow-left"></i>
+      Back
+    </a>
+  </div>
 
-    <div class="delete-content">
-      <p class="delete-message">
-        Êtes-vous sûr de vouloir supprimer le client <strong>"{{ client.nomclient }}"</strong> ?
-      </p>
-      <p class="delete-warning">
-        Cette action est irréversible et supprimera toutes les données associées à ce client.
-      </p>
+  <div class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle"></i>
+    Are you sure you want to delete the client <strong>"{{ client.nom_entite }}"</strong>?
+    This action is irreversible and will delete all data associated with this client.
+  </div>
 
-      <div class="client-info">
-        <div class="info-item">
-          <span class="info-label">Nom:</span>
-          <span class="info-value">{{ client.nomclient }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Type:</span>
-          <span class="info-value">{{ client.typeclientid.typeclient }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Email:</span>
-          <span class="info-value">{{ client.email|default:"Non spécifié" }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Ville:</span>
-          <span class="info-value">{{ client.ville|default:"Non spécifié" }}</span>
-        </div>
+  <div class="form-section">
+    <h3 class="section-title">
+      <i class="fas fa-info-circle"></i>
+      Client Information
+    </h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <span class="detail-label">Entity Name:</span>
+        <span class="detail-value">{{ client.nom_entite }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Type:</span>
+        <span class="detail-value">{{ client.typeclientid.typeclient }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Business Sector:</span>
+        <span class="detail-value">{{ client.get_secteur_activite_display }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">City:</span>
+        <span class="detail-value">{{ client.ville|default:"Not specified" }}</span>
       </div>
     </div>
-
-    <div class="delete-actions">
-      <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">
-          <i class="fas fa-trash"></i>
-          Confirmer la suppression
-        </button>
-        <a href="{% url 'client-detail' client.clientid %}" class="btn btn-secondary">
-          <i class="fas fa-times"></i>
-          Annuler
-        </a>
-      </form>
-    </div>
   </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+      <a href="{% url 'client-detail' client.clientid %}" class="btn btn-outline">
+        <i class="fas fa-times"></i>
+        Cancel
+      </a>
+      <button type="submit" class="btn btn-danger">
+        <i class="fas fa-trash"></i>
+        Confirm Delete
+      </button>
+    </div>
+  </form>
 </div>
 {% endblock %}

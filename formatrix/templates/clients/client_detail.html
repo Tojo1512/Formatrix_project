@@ -1,26 +1,135 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Détails du Client - {{ client.nomclient }} - Formatrix{% endblock %}
+{% block title %}{{ client.nom_entite }} - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/theme.css' %}">
-<link rel="stylesheet" href="{% static 'css/detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/details.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="detail-container">
-  <div class="detail-header">
-    <h2 class="detail-title">
-      <i class="fas fa-user"></i>
-      Détails du Client
-    </h2>
-    <div class="detail-actions">
-      <a href="{% url 'client-list' %}" class="btn btn-outline">
-        <i class="fas fa-arrow-left"></i>
-        Retour à la liste
-      </a>
-      <a href="{% url 'client-update' client.clientid %}" class="btn btn-warning">
+<div class="card">
+    <div class="card-header">
+      <h2 class="card-title">{{ client.nom_entite }}</h2>
+      <div>
+        <a href="{% url 'client-update' client.clientid %}" class="btn btn-outline">
+          <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{% url 'client-list' %}" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
+      </div>
+    </div>
+    
+    <div class="status-badges">
+      <span class="badge badge-info">
+        {{ client.typeclientid.get_categorie_display }}
+      </span>
+      <span class="badge badge-secondary">
+        {{ client.get_secteur_activite_display }}
+      </span>
+      {% if client.email %}
+      <span class="badge badge-secondary">
+        <i class="fas fa-envelope"></i> {{ client.email }}
+      </span>
+      {% endif %}
+      {% if client.telephone %}
+      <span class="badge badge-secondary">
+        <i class="fas fa-phone"></i> {{ client.telephone }}
+      </span>
+      {% endif %}
+    </div>
+    
+    <div class="row">
+      <div class="col-md-6">
+        <div class="info-group">
+          <h3>Informations de l'entité</h3>
+          <div class="info-item">
+            <span class="info-label">Nom de l'entité:</span>
+            <span class="info-value">{{ client.nom_entite }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Sigle/Acronyme:</span>
+            <span class="info-value">{{ client.sigle|default:"Non spécifié" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Type de client:</span>
+            <span class="info-value">{{ client.typeclientid.typeclient }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Secteur d'activité:</span>
+            <span class="info-value">{{ client.get_secteur_activite_display }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Site web:</span>
+            <span class="info-value">
+              {% if client.site_web %}
+                <a href="{{ client.site_web }}" target="_blank">{{ client.site_web }}</a>
+              {% else %}
+                Non spécifié
+              {% endif %}
+            </span>
+          </div>
+        </div>
+
+        <div class="info-group">
+          <h3>Coordonnées</h3>
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span class="info-value">{{ client.email|default:"Non spécifié" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Téléphone:</span>
+            <span class="info-value">{{ client.telephone|default:"Non spécifié" }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="info-group">
+          <h3>Adresse et localisation</h3>
+          <div class="info-item">
+            <span class="info-label">Adresse du siège:</span>
+            <span class="info-value">{{ client.adresse_siege|default:"Non spécifié" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Ville:</span>
+            <span class="info-value">{{ client.ville|default:"Non spécifié" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Localité:</span>
+            <span class="info-value">{{ client.localite|default:"Non spécifié" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Numéro d'immatriculation:</span>
+            <span class="info-value">{{ client.numero_immatriculation|default:"Non spécifié" }}</span>
+          </div>
+        </div>
+
+        <div class="info-group">
+          <h3>Personne de contact</h3>
+          <div class="info-item">
+            <span class="info-label">Nom:</span>
+            <span class="info-value">{{ client.personne_contact|default:"Non spécifié" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Fonction:</span>
+            <span class="info-value">{{ client.fonction_contact|default:"Non spécifié" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span class="info-value">{{ client.email_contact|default:"Non spécifié" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Téléphone:</span>
+            <span class="info-value">{{ client.telephone_contact|default:"Non spécifié" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <a href="{% url 'client-update' client.clientid %}" class="btn btn-primary">
         <i class="fas fa-edit"></i>
         Modifier
       </a>
@@ -28,83 +137,10 @@
         <i class="fas fa-trash"></i>
         Supprimer
       </a>
-    </div>
-  </div>
-
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  <div class="detail-content">
-    <div class="detail-section">
-      <h3 class="section-title">
-        <i class="fas fa-info-circle"></i>
-        Informations générales
-      </h3>
-      <div class="detail-grid">
-        <div class="detail-item">
-          <span class="detail-label">Nom du client</span>
-          <span class="detail-value">{{ client.nomclient }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Autres noms</span>
-          <span class="detail-value">{{ client.autresnom|default:"Non spécifié" }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Type de client</span>
-          <span class="detail-value">
-            <span class="badge badge-secondary">{{ client.typeclientid.typeclient }}</span>
-          </span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Numéro d'immatriculation</span>
-          <span class="detail-value">{{ client.numero_immatriculation|default:"Non spécifié" }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <h3 class="section-title">
-        <i class="fas fa-map-marker-alt"></i>
-        Adresse et contact
-      </h3>
-      <div class="detail-grid">
-        <div class="detail-item">
-          <span class="detail-label">Email</span>
-          <span class="detail-value">{{ client.email|default:"Non spécifié" }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Téléphone</span>
-          <span class="detail-value">{{ client.telephone|default:"Non spécifié" }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Ville</span>
-          <span class="detail-value">{{ client.ville|default:"Non spécifié" }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Localité</span>
-          <span class="detail-value">{{ client.localite|default:"Non spécifié" }}</span>
-        </div>
-        <div class="detail-item full-width">
-          <span class="detail-label">Adresse complète</span>
-          <span class="detail-value">{{ client.adresse_rue|default:"Non spécifié" }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <h3 class="section-title">
-        <i class="fas fa-history"></i>
-        Inscriptions associées
-      </h3>
-      <div class="related-list">
-        <!-- Cette section pourrait être remplie avec les inscriptions liées à ce client -->
-        <p class="empty-related">Aucune inscription associée à ce client pour le moment.</p>
-      </div>
+      <a href="{% url 'client-list' %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i>
+        Retour à la liste
+      </a>
     </div>
   </div>
 </div>

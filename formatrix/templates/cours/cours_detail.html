@@ -3,23 +3,45 @@
 
 {% block title %}{{ cours.nom_cours }} - Formatrix{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/details.css' %}">
+{% endblock %}
+
+<style>
+  .card{
+    height: auto;
+  }
+</style>
+
 {% block content %}
 <div class="card">
-    <div class="d-flex justify-between align-center mb-4">
-      <h2>{{ cours.nom_cours }}</h2>
+    <div class="card-header">
+      <h2 class="card-title">{{ cours.nom_cours }}</h2>
       <div>
-        <a href="{% url 'cours-update' cours.cours_id %}" class="btn btn-outline">Modifier</a>
-        <a href="{% url 'cours-list' %}" class="btn btn-outline">Retour à la liste</a>
+        <a href="{% url 'cours-update' cours.cours_id %}" class="btn btn-outline">
+          <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{% url 'cours-list' %}" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
       </div>
     </div>
     
-    <div class="cours-status mb-4">
-      <span class="badge {% if cours.statut_approbation == 'approuve' %}badge-success{% elif cours.statut_approbation == 'en_attente' %}badge-warning{% elif cours.statut_approbation == 'refuse' %}badge-danger{% else %}badge-secondary{% endif %}">
-        {{ cours.get_statut_approbation_display }}
+    <div class="status-badges">
+      <span class="badge badge-info">
+        {% for code, label in type_cours_choices %}
+            {% if code == cours.type_cours %}{{ label }}{% endif %}
+        {% endfor %}
       </span>
-      {% if cours.alerte_expiration %}
-        <span class="badge badge-warning">Expire dans {{ cours.jours_restants }} jours</span>
-      {% endif %}
+      <span class="badge badge-secondary">
+        {{ cours.niveau }}
+      </span>
+      <span class="badge {% if cours.statut_approbation == 'approuve' %}badge-success{% elif cours.statut_approbation == 'en_attente' %}badge-warning{% elif cours.statut_approbation == 'refuse' %}badge-danger{% endif %}">
+        {% if cours.statut_approbation == 'approuve' %}Approuvé{% elif cours.statut_approbation == 'en_attente' %}En attente{% elif cours.statut_approbation == 'refuse' %}Refusé{% endif %}
+      </span>
+      <span class="badge {% if cours.status == 'in_progress' %}badge-primary{% elif cours.status == 'completed' %}badge-success{% elif cours.status == 'cancelled' %}badge-danger{% endif %}">
+        {{ cours.get_status_display }}
+      </span>
     </div>
     
     <div class="row">
@@ -35,7 +57,7 @@
             <span class="info-value">{{ cours.niveau }}</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Frais par participant:</span>
+            <span class="info-label">Frais:</span>
             <span class="info-value">{{ cours.frais_par_participant }} Ar</span>
           </div>
           <div class="info-item">
@@ -51,196 +73,134 @@
             <span class="info-value">{{ cours.horaire }}</span>
           </div>
         </div>
+
+        <div class="info-group">
+          <h3>Description</h3>
+          <div class="info-item">
+            <span class="info-value">{{ cours.description|linebreaks }}</span>
+          </div>
+        </div>
       </div>
       
       <div class="col-md-6">
         <div class="info-group">
-          <h3>Description</h3>
-          <p>{{ cours.description|linebreaks }}</p>
-        </div>
-      </div>
-    </div>
-    
-    <div class="row mt-4">
-      <div class="col-md-4">
-        <div class="info-group">
           <h3>Objectifs</h3>
-          <p>{{ cours.objectifs|linebreaks }}</p>
+          <div class="info-item">
+            <span class="info-value">{{ cours.objectifs|linebreaks }}</span>
+          </div>
         </div>
-      </div>
-      
-      <div class="col-md-4">
+
         <div class="info-group">
           <h3>Prérequis</h3>
-          <p>{{ cours.prerequis|linebreaks }}</p>
+          <div class="info-item">
+            <span class="info-value">{{ cours.prerequis|linebreaks }}</span>
+          </div>
         </div>
-      </div>
-      
-      <div class="col-md-4">
+
         <div class="info-group">
           <h3>Matériel requis</h3>
-          <p>{{ cours.materiel_requis|linebreaks }}</p>
+          <div class="info-item">
+            <span class="info-value">{{ cours.materiel_requis|linebreaks }}</span>
+          </div>
         </div>
       </div>
     </div>
-    
-    <div class="row mt-4">
-      <div class="col-md-12">
-        <div class="info-group">
-          <h3>Modules</h3>
-          {% if cours.modules.all %}
-            <div class="table-responsive">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Nom</th>
-                    <th>Description</th>
-                    <th>Durée (heures)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for module in cours.modules.all %}
-                    <tr>
-                      <td>{{ module.nom_module }}</td>
-                      <td>{{ module.description }}</td>
-                      <td>{{ module.duree_heures }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          {% else %}
-            <p>Aucun module n'a été ajouté à ce cours.</p>
-          {% endif %}
+
+    <div class="info-group">
+      <h3>Modules</h3>
+      {% if cours.modules.all %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Durée (heures)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for module in cours.modules.all %}
+              <tr>
+                <td>{{ module.nom_module }}</td>
+                <td>{{ module.description }}</td>
+                <td>{{ module.duree_heures }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-      </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>Aucun module défini pour ce cours.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="info-group">
+      <h3><i class="fas fa-users"></i> Formateurs assignés</h3>
+      {% if cours.formateurs.all %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Niveau d'expertise</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for formateur in cours.formateurs.all %}
+              <tr>
+                <td>{{ formateur.get_full_name }}</td>
+                <td>
+                  <span class="badge badge-info">
+                    {{ formateur.get_type_formateur_display }}
+                  </span>
+                </td>
+                <td>{{ formateur.get_niveau_expertise_display }}</td>
+                <td>
+                  <span class="badge {% if formateur.statut == 'actif' %}badge-success{% elif formateur.statut == 'inactif' %}badge-danger{% else %}badge-warning{% endif %}">
+                    {{ formateur.get_statut_display }}
+                  </span>
+                </td>
+                <td>
+                  <a href="{% url 'formateur-detail' formateur.formateurid %}" class="btn btn-sm btn-info">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-user-tie"></i>
+          <p>Aucun formateur n'est assigné à ce cours.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="action-buttons">
+      <a href="{% url 'cours-list' %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i>
+        Retour à la liste
+      </a>
+      <a href="{% url 'cours-update' cours.cours_id %}" class="btn btn-primary">
+        <i class="fas fa-edit"></i>
+        Modifier
+      </a>
+      {% if cours.status != 'cancelled' and user.is_staff %}
+      <a href="{% url 'cours-cancel' cours.cours_id %}" class="btn btn-danger" 
+         onclick="return confirm('Êtes-vous sûr de vouloir annuler ce cours ?');">
+        <i class="fas fa-ban"></i>
+        Annuler le cours
+      </a>
+      {% endif %}
     </div>
   </div>
 </div>
-
-{% block extra_css %}
-<style>
-  .d-flex {
-    display: flex;
-  }
-  
-  .justify-between {
-    justify-content: space-between;
-  }
-  
-  .align-center {
-    align-items: center;
-  }
-  
-  .row {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0 -15px;
-  }
-  
-  .col-md-4 {
-    flex: 0 0 33.333333%;
-    max-width: 33.333333%;
-    padding: 0 15px;
-  }
-  
-  .col-md-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
-    padding: 0 15px;
-  }
-  
-  .col-md-12 {
-    flex: 0 0 100%;
-    max-width: 100%;
-    padding: 0 15px;
-  }
-  
-  @media (max-width: 768px) {
-    .col-md-4, .col-md-6, .col-md-12 {
-      flex: 0 0 100%;
-      max-width: 100%;
-    }
-  }
-  
-  .info-group {
-    margin-bottom: 2rem;
-  }
-  
-  .info-group h3 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-    font-weight: 600;
-  }
-  
-  .info-item {
-    display: flex;
-    margin-bottom: 0.5rem;
-  }
-  
-  .info-label {
-    font-weight: 600;
-    color: var(--text-secondary);
-    width: 40%;
-  }
-  
-  .info-value {
-    width: 60%;
-  }
-  
-  .badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-right: 0.5rem;
-  }
-  
-  .badge-success {
-    background-color: rgba(16, 185, 129, 0.1);
-    color: var(--success);
-  }
-  
-  .badge-warning {
-    background-color: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-  }
-  
-  .badge-danger {
-    background-color: rgba(227, 30, 38, 0.1);
-    color: var(--danger);
-  }
-  
-  .badge-secondary {
-    background-color: rgba(100, 116, 139, 0.1);
-    color: var(--text-secondary);
-  }
-  
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .table th, .table td {
-    padding: 0.75rem;
-    border-bottom: 1px solid var(--border-color);
-  }
-  
-  .table th {
-    text-align: left;
-    font-weight: 600;
-    color: var(--text-secondary);
-  }
-  
-  .table tbody tr:hover {
-    background-color: var(--bg-secondary);
-  }
-  
-  .table-responsive {
-    overflow-x: auto;
-  }
-</style>
-{% endblock %}
 {% endblock %}
