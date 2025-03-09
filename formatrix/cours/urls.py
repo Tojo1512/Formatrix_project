@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import CoursViewSet, ModuleViewSet, DocumentViewSet, RenouvellementViewSet, SeanceViewSet
 from .template_views import (
     CoursListView, CoursCreateView, CoursDetailView, CoursUpdateView,
-    CoursDeleteView, CoursApprouverView, CoursRefuserView, CoursCancelView
+    CoursDeleteView, CoursApprouverView, CoursRefuserView
 )
 
 router = DefaultRouter()
@@ -24,5 +24,4 @@ urlpatterns = [
     path('<int:pk>/supprimer/', CoursDeleteView.as_view(), name='cours-delete'),
     path('<int:pk>/approuver/', CoursApprouverView.as_view(), name='cours-approuver'),
     path('<int:pk>/refuser/', CoursRefuserView.as_view(), name='cours-refuser'),
-    path('<int:pk>/cancel/', CoursCancelView.as_view(), name='cours-cancel'),
 ]

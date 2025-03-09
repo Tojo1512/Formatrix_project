@@ -21,12 +21,6 @@ class CoursForm(forms.ModelForm):
         required=True
     )
 
-    status = forms.ChoiceField(
-        choices=Cours.STATUS_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        required=True
-    )
-
     start_time = forms.DateTimeField(
         widget=forms.DateTimeInput(
             attrs={
@@ -52,8 +46,7 @@ class CoursForm(forms.ModelForm):
             'horaire',
             'statut_approbation',
             'formateurs',
-            'start_time',
-            'status'
+            'start_time'
         ]
         widgets = {
             'nom_cours': forms.TextInput(attrs={

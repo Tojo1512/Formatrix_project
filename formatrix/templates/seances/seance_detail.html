@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Détail de la séance - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/details.css' %}">
+<style>
+  .card {
+    height: auto;
+  }
+
+  .status-controls {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+
+  .status-controls .btn {
+    margin-right: 10px;
+  }
+
+  .btn-start {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .btn-complete {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .btn-cancel {
+    background-color: #dc3545;
+    color: white;
+  }
+
+  .status-badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .status-pas-commence {
+    background-color: #ffc107;
+    color: #000;
+  }
+
+  .status-en-cours {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .status-termine {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .status-annule {
+    background-color: #dc3545;
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Détails de la séance</h2>
+      <div>
+        <a href="{% url 'seance-update' seance.seance_id %}" class="btn btn-outline">
+          <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{% url 'seance-list' %}" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
+      </div>
+    </div>
+    
+    <div class="status-badges">
+      <span class="badge status-{{ seance.statut }}">
+        {% for code, label in status_choices %}
+            {% if code == seance.statut %}{{ label }}{% endif %}
+        {% endfor %}
+      </span>
+      {% if seance.est_complet %}
+      <span class="badge badge-warning">Complet</span>
+      {% endif %}
+    </div>
+    
+    <div class="row">
+      <div class="col-md-6">
+        <div class="info-group">
+          <h3>Informations générales</h3>
+          <div class="info-item">
+            <span class="info-label">Cours:</span>
+            <span class="info-value">
+              {% for cours in seance.cours.all %}
+                {{ cours.nom_cours }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Lieu:</span>
+            <span class="info-value">{{ seance.lieu.nom }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Adresse:</span>
+            <span class="info-value">{{ seance.lieu.adresse }}</span>
+          </div>
+        </div>
+
+        <div class="info-group">
+          <h3>Date</h3>
+          <div class="info-item">
+            <span class="info-label">Date:</span>
+            <span class="info-value">{{ seance.date|date:"d/m/Y" }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="info-group">
+          <h3>Capacité</h3>
+          <div class="info-item">
+            <span class="info-label">Places totales:</span>
+            <span class="info-value">{{ seance.nombre_places }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Places réservées:</span>
+            <span class="info-value">{{ seance.places_reservees }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Places disponibles:</span>
+            <span class="info-value">{{ seance.places_disponibles }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Prix:</span>
+            <span class="info-value">{{ seance.prix }} €</span>
+          </div>
+        </div>
+
+        <div class="info-group">
+          <h3>Statut</h3>
+          <div class="info-item">
+            <span class="info-label">Statut actuel:</span>
+            <span class="info-value">
+              <span class="status-badge status-{{ seance.statut }}">
+                {% for code, label in status_choices %}
+                    {% if code == seance.statut %}{{ label }}{% endif %}
+                {% endfor %}
+              </span>
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Créé le:</span>
+            <span class="info-value">{{ seance.created_at|date:"d/m/Y H:i" }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Dernière mise à jour:</span>
+            <span class="info-value">{{ seance.updated_at|date:"d/m/Y H:i" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-controls">
+      <h3>Contrôle de la séance</h3>
+      <div class="current-status">
+        Statut actuel: 
+        <span class="status-badge status-{{ seance.statut }}">
+          {% for code, label in status_choices %}
+              {% if code == seance.statut %}{{ label }}{% endif %}
+          {% endfor %}
+        </span>
+      </div>
+      <div class="control-buttons mt-3">
+        {% if seance.can_start %}
+        <button class="btn btn-start" onclick="updateStatus('start')">
+          <i class="fas fa-play"></i> Commencer la séance
+        </button>
+        {% endif %}
+        
+        {% if seance.can_complete %}
+        <button class="btn btn-complete" onclick="updateStatus('complete')">
+          <i class="fas fa-check"></i> Terminer la séance
+        </button>
+        {% endif %}
+        
+        {% if seance.can_cancel %}
+        <button class="btn btn-cancel" onclick="updateStatus('cancel')">
+          <i class="fas fa-times"></i> Annuler la séance
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function updateStatus(action) {
+    const actionMessages = {
+        'start': 'commencer',
+        'complete': 'terminer',
+        'cancel': 'annuler'
+    };
+
+    if (!confirm(`Êtes-vous sûr de vouloir ${actionMessages[action]} cette séance ?`)) {
+        return;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+    
+    fetch(`/seances/{{ seance.pk }}/${action}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            // Mettre à jour le statut affiché
+            const statusBadges = document.querySelectorAll('.status-badge');
+            statusBadges.forEach(badge => {
+                // Supprimer les anciennes classes de statut
+                badge.classList.forEach(className => {
+                    if (className.startsWith('status-')) {
+                        badge.classList.remove(className);
+                    }
+                });
+                // Ajouter la nouvelle classe de statut
+                badge.classList.add(`status-${data.new_status.toLowerCase().replace(/ /g, '_')}`);
+                badge.textContent = data.new_status;
+            });
+
+            // Afficher un message de succès
+            const message = document.createElement('div');
+            message.className = 'alert alert-success';
+            message.style.position = 'fixed';
+            message.style.top = '20px';
+            message.style.right = '20px';
+            message.style.zIndex = '1000';
+            message.innerHTML = `<strong>Succès!</strong> La séance a été ${actionMessages[action]}e.`;
+            document.body.appendChild(message);
+
+            // Recharger la page après un court délai
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Afficher un message d'erreur
+        const message = document.createElement('div');
+        message.className = 'alert alert-danger';
+        message.style.position = 'fixed';
+        message.style.top = '20px';
+        message.style.right = '20px';
+        message.style.zIndex = '1000';
+        message.innerHTML = '<strong>Erreur!</strong> Une erreur est survenue lors de la mise à jour du statut de la séance.';
+        document.body.appendChild(message);
+
+        // Supprimer le message d'erreur après 5 secondes
+        setTimeout(() => {
+            message.remove();
+        }, 5000);
+    });
+}
+</script>
+{% endblock %} 

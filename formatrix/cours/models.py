@@ -23,13 +23,6 @@ class Cours(models.Model):
         ('weekend', 'Weekend')
     ]
 
-    STATUS_CHOICES = [
-        ('not_started', 'Not Started'),
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled')
-    ]
-
     cours_id = models.AutoField(primary_key=True)
     nom_cours = models.CharField(max_length=200)
     description = models.TextField()
@@ -51,7 +44,6 @@ class Cours(models.Model):
     date_expiration_validite = models.DateField(null=True)
     version = models.IntegerField(default=1)
     start_time = models.DateTimeField(null=True)
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='not_started')
     formateurs = models.ManyToManyField(
         'formateurs.Formateur',
         related_name='cours_assignes',
@@ -88,22 +80,3 @@ class Cours(models.Model):
         if self.date_expiration_validite:
             return timezone.now().date() > self.date_expiration_validite
         return False
-
-    def update_status(self):
-        """Automatically updates course status based on start time and duration"""
-        if not self.start_time:
-            return
-
-        now = timezone.now()
-        end_time = self.start_time + timedelta(hours=self.duree_heures)
-
-        if self.status == 'cancelled':
-            return
-        elif now < self.start_time:
-            self.status = 'not_started'
-        elif self.start_time <= now <= end_time:
-            self.status = 'in_progress'
-        elif now > end_time:
-            self.status = 'completed'
-
-        self.save()

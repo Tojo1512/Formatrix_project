@@ -471,6 +471,28 @@
           </li>
           
           <li class="sidebar-item has-submenu">
+            <a href="#" class="sidebar-link {% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Séances</span>
+              <i class="fas fa-chevron-right submenu-icon"></i>
+            </a>
+            <ul class="submenu">
+              <li>
+                <a href="{% url 'seance-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'seance-list' %}active{% endif %}">
+                  <i class="fas fa-list"></i>
+                  <span>Toutes les séances</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'seance-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
+                  <i class="fas fa-plus"></i>
+                  <span>Ajouter une séance</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          
+          <li class="sidebar-item has-submenu">
             <a href="#" class="sidebar-link {% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
               <i class="fas fa-user-graduate"></i>
               <span>Students</span>

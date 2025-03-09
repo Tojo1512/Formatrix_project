@@ -1,51 +1,94 @@
 from django.db import models
 from cours.models import Cours
 from lieux.models import Lieu
+from django.utils import timezone
+from decimal import Decimal
 
 # Create your models here.
 
 class Seance(models.Model):
-    STATUT_CHOICES = [
-        ('en_cours', 'En cours (live)'),
-        ('termine', 'Terminé (completed)'),
-        ('annule_avec_paiement', 'Annulé avec paiement'),
-        ('annule_sans_paiement', 'Annulé sans paiement')
-    ]
-
-    HORAIRE_CHOICES = [
-        ('pendant_bureau', 'Pendant les heures de bureau'),
-        ('apres_bureau', 'Après les heures de bureau'),
-        ('weekend', 'Weekend')
+    STATUS_CHOICES = [
+        ('pas_commence', 'Pas encore commencé'),
+        ('en_cours', 'En cours'),
+        ('termine', 'Terminé'),
+        ('annule', 'Annulé')
     ]
 
     seance_id = models.AutoField(primary_key=True)
-    cours = models.ForeignKey(Cours, on_delete=models.CASCADE)
     lieu = models.ForeignKey(Lieu, on_delete=models.CASCADE)
-    horaires = models.CharField(max_length=100, choices=HORAIRE_CHOICES)
-    date_debut = models.DateField()
-    date_fin = models.DateField(null=True)
-    statut = models.CharField(max_length=50, choices=STATUT_CHOICES)
-    nombre_places_total = models.IntegerField()
-    nombre_places_restantes = models.IntegerField()
+    date = models.DateField()
+    cours = models.ForeignKey(
+        Cours, 
+        on_delete=models.CASCADE, 
+        related_name='seances',
+        null=True,  # Permettre temporairement null
+        default=None  # Valeur par défaut None
+    )
+    nombre_places = models.IntegerField(default=10)
+    places_reservees = models.IntegerField(default=0)
+    prix = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    statut = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pas_commence')
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'session'  # Utilise le même nom de table que dans SQL
+        db_table = 'session'
 
     def __str__(self):
-        return f"{self.cours.nom_cours} - {self.date_debut}"
+        return f"Session de {self.cours.nom_cours if self.cours else 'Cours non défini'} à {self.lieu.lieu} le {self.date}"
 
-    def save(self, *args, **kwargs):
-        # Si c'est une nouvelle séance, initialiser les places restantes
-        if not self.pk:
-            self.nombre_places_restantes = self.nombre_places_total
-        super().save(*args, **kwargs)
+    def start_session(self):
+        """Start the session"""
+        if self.statut == 'pas_commence':
+            self.statut = 'en_cours'
+            self.started_at = timezone.now()
+            self.save()
+            return True
+        return False
+
+    def complete_session(self):
+        """Complete the session"""
+        if self.statut == 'en_cours':
+            self.statut = 'termine'
+            self.completed_at = timezone.now()
+            self.save()
+            return True
+        return False
+
+    def cancel_session(self):
+        """Cancel the session"""
+        if self.statut in ['pas_commence', 'en_cours']:
+            self.statut = 'annule'
+            self.save()
+            return True
+        return False
+
+    @property
+    def can_start(self):
+        """Check if the session can be started"""
+        return self.statut == 'pas_commence'
+
+    @property
+    def can_complete(self):
+        """Check if the session can be completed"""
+        return self.statut == 'en_cours'
+
+    @property
+    def can_cancel(self):
+        """Check if the session can be cancelled"""
+        return self.statut in ['pas_commence', 'en_cours']
 
     @property
     def est_complet(self):
-        """Retourne True si toutes les places sont prises"""
-        return self.nombre_places_restantes == 0
+        """Returns True if all seats are taken"""
+        return self.places_reservees >= self.nombre_places
+
+    @property
+    def places_disponibles(self):
+        """Returns the number of available seats"""
+        return max(0, self.nombre_places - self.places_reservees)
 
     @property
     def duree_totale(self):
