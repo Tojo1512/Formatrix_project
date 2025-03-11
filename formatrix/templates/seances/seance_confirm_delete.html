@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Confirmer la suppression - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<style>
+  .delete-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .delete-icon {
+    font-size: 3rem;
+    color: #dc3545;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .delete-title {
+    color: #dc3545;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .delete-warning {
+    margin-bottom: 2rem;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .delete-info {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+  }
+  
+  .delete-info-item {
+    margin-bottom: 0.5rem;
+  }
+  
+  .delete-info-label {
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+  
+  .delete-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+  <div class="delete-icon">
+    <i class="fas fa-exclamation-triangle"></i>
+  </div>
+  
+  <h2 class="delete-title">Confirmer la suppression</h2>
+  
+  <p class="delete-warning">
+    Êtes-vous sûr de vouloir supprimer cette séance ? Cette action est irréversible.
+  </p>
+  
+  <div class="delete-info">
+    <div class="delete-info-item">
+      <span class="delete-info-label">Cours:</span>
+      <span>{{ object.cours.nom_cours }}</span>
+    </div>
+    <div class="delete-info-item">
+      <span class="delete-info-label">Lieu:</span>
+      <span>{{ object.lieu.nom }}</span>
+    </div>
+    <div class="delete-info-item">
+      <span class="delete-info-label">Dates:</span>
+      <span>Du {{ object.date_debut|date:"d/m/Y" }} au {{ object.date_fin|date:"d/m/Y" }}</span>
+    </div>
+    <div class="delete-info-item">
+      <span class="delete-info-label">Statut:</span>
+      <span>
+        {% for code, label in object.STATUT_CHOICES %}
+            {% if code == object.statut %}{{ label }}{% endif %}
+        {% endfor %}
+      </span>
+    </div>
+    <div class="delete-info-item">
+      <span class="delete-info-label">Places:</span>
+      <span>{{ object.nombre_places_restantes }} / {{ object.nombre_places_total }}</span>
+    </div>
+  </div>
+  
+  <form method="post">
+    {% csrf_token %}
+    <div class="delete-actions">
+      <a href="{% url 'seance-detail' object.pk %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i> Annuler
+      </a>
+      <button type="submit" class="btn btn-danger">
+        <i class="fas fa-trash"></i> Supprimer
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %} 

@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liste des Séances - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+<style>
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    .status-pas-commence { background-color: #ffc107; color: #000; }
+    .status-en-cours { background-color: #28a745; color: white; }
+    .status-termine { background-color: #007bff; color: white; }
+    .status-annule { background-color: #dc3545; color: white; }
+    
+    .btn-start { background-color: #28a745; color: white; }
+    .btn-complete { background-color: #007bff; color: white; }
+    .btn-cancel { background-color: #dc3545; color: white; }
+    
+    .actions-column .btn {
+        margin-right: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function updateSeanceStatus(seanceId, action) {
+    if (!confirm(`Êtes-vous sûr de vouloir ${action === 'start' ? 'commencer' : action === 'complete' ? 'terminer' : 'annuler'} cette séance ?`)) {
+        return;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+    
+    fetch(`/seances/${seanceId}/${action}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            // Trouver la ligne du tableau correspondante
+            const row = document.querySelector(`tr[data-seance-id="${seanceId}"]`);
+            if (row) {
+                // Mettre à jour le badge de statut
+                const statusBadge = row.querySelector('.status-badge');
+                if (statusBadge) {
+                    // Supprimer les anciennes classes de statut
+                    statusBadge.classList.forEach(className => {
+                        if (className.startsWith('status-')) {
+                            statusBadge.classList.remove(className);
+                        }
+                    });
+                    // Ajouter la nouvelle classe de statut
+                    const newStatusClass = `status-${data.new_status.toLowerCase().replace(/ /g, '_')}`;
+                    statusBadge.classList.add(newStatusClass);
+                    statusBadge.textContent = data.new_status;
+                }
+
+                // Mettre à jour les boutons d'action
+                const actionsCell = row.querySelector('.actions-column');
+                if (actionsCell) {
+                    location.reload(); // Recharger la page pour mettre à jour les boutons d'action
+                }
+            }
+
+            // Afficher un message de succès
+            const message = document.createElement('div');
+            message.className = 'alert alert-success';
+            message.style.position = 'fixed';
+            message.style.top = '20px';
+            message.style.right = '20px';
+            message.style.zIndex = '1000';
+            message.innerHTML = `<strong>Succès!</strong> La séance a été ${action === 'start' ? 'démarrée' : action === 'complete' ? 'terminée' : 'annulée'} avec succès.`;
+            document.body.appendChild(message);
+
+            // Faire disparaître le message après 3 secondes
+            setTimeout(() => {
+                message.style.opacity = '0';
+                setTimeout(() => message.remove(), 300);
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Afficher un message d'erreur
+        const message = document.createElement('div');
+        message.className = 'alert alert-danger';
+        message.style.position = 'fixed';
+        message.style.top = '20px';
+        message.style.right = '20px';
+        message.style.zIndex = '1000';
+        message.innerHTML = '<strong>Erreur!</strong> Une erreur est survenue lors de la mise à jour du statut de la séance.';
+        document.body.appendChild(message);
+
+        setTimeout(() => {
+            message.style.opacity = '0';
+            setTimeout(() => message.remove(), 300);
+        }, 3000);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Gérer les formulaires d'action de séance
+    document.querySelectorAll('form[data-action]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const seanceId = this.getAttribute('data-seance-id');
+            const action = this.getAttribute('data-action');
+            updateSeanceStatus(seanceId, action);
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <h2 class="table-title">Liste des séances</h2>
+        
+        <div class="table-actions">
+            <div class="search-and-filters">
+                <form method="get" class="search-form">
+                    <input type="text" name="search" class="search-input" placeholder="Rechercher une séance..." value="{{ search_query }}">
+                    <select name="statut" class="filter-select">
+                        <option value="">Tous les statuts</option>
+                        <option value="pas_commence" {% if statut_filter == 'pas_commence' %}selected{% endif %}>Pas encore commencé</option>
+                        <option value="en_cours" {% if statut_filter == 'en_cours' %}selected{% endif %}>En cours</option>
+                        <option value="termine" {% if statut_filter == 'termine' %}selected{% endif %}>Terminé</option>
+                        <option value="annule" {% if statut_filter == 'annule' %}selected{% endif %}>Annulé</option>
+                    </select>
+
+                    <button type="submit" class="search-button">
+                        Rechercher
+                    </button>
+                </form>
+            </div>
+
+            {% if show_create_button %}
+            <a href="{{ create_url }}" class="create-button">
+                <i class="fas fa-plus"></i>
+                {{ create_button_text }}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        {% if seance_list %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cours</th>
+                    <th>Lieu</th>
+                    <th>
+                        <a href="?{% if ordering == 'date' %}-{% endif %}date{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="sort-link {% if 'date' in ordering %}active{% endif %}">
+                            Date
+                            <i class="fas fa-sort{% if ordering == 'date' %}-up{% elif ordering == '-date' %}-down{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a href="?{% if ordering == 'statut' %}-{% endif %}statut{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="sort-link {% if 'statut' in ordering %}active{% endif %}">
+                            Statut
+                            <i class="fas fa-sort{% if ordering == 'statut' %}-up{% elif ordering == '-statut' %}-down{% endif %}"></i>
+                        </a>
+                    </th>
+                    <th>Places</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for seance in seance_list %}
+                <tr data-seance-id="{{ seance.pk }}">
+                    <td>{{ seance.cours.nom_cours }}</td>
+                    <td>{{ seance.lieu.lieu }}</td>
+                    <td>{{ seance.date|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="badge status-{{ seance.statut }}">
+                            {% for code, label in seance.STATUS_CHOICES %}
+                                {% if code == seance.statut %}{{ label }}{% endif %}
+                            {% endfor %}
+                        </span>
+                    </td>
+                    <td>
+                        {{ seance.places_disponibles }} / {{ seance.nombre_places }}
+                        {% if seance.est_complet %}
+                            <span class="badge badge-warning">Complet</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions-column">
+                        <a href="{% url 'seance-detail' seance.pk %}" class="btn btn-sm btn-info" title="Voir">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'seance-update' seance.pk %}" class="btn btn-sm btn-warning" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        
+                        {% if seance.can_start %}
+                        <form method="post" action="{% url 'seance-start' seance.pk %}" 
+                              style="display: inline;"
+                              data-action="start"
+                              data-seance-id="{{ seance.pk }}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-start" title="Commencer la séance">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        {% if seance.can_complete %}
+                        <form method="post" action="{% url 'seance-complete' seance.pk %}" 
+                              style="display: inline;"
+                              data-action="complete"
+                              data-seance-id="{{ seance.pk }}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-complete" title="Terminer la séance">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        {% if seance.can_cancel %}
+                        <form method="post" action="{% url 'seance-cancel' seance.pk %}" 
+                              style="display: inline;"
+                              data-action="cancel"
+                              data-seance-id="{{ seance.pk }}"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette séance ?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-cancel" title="Annuler la séance">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        <a href="{% url 'seance-delete' seance.pk %}" class="btn btn-sm btn-danger" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if is_paginated %}
+            <tfoot>
+                <tr>
+                    <td colspan="6">
+                        <div class="table-pagination">
+                            <div class="pagination-info">
+                                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                            </div>
+                            <div class="pagination-controls">
+                                {% if page_obj.has_previous %}
+                                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" class="btn btn-sm btn-outline">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Précédent
+                                    </a>
+                                {% endif %}
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" class="btn btn-sm btn-outline">
+                                        Suivant
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <p class="empty-state-text">Aucune séance trouvée</p>
+            {% if has_active_filters %}
+            <a href="{{ reset_url }}" class="btn btn-secondary">Réinitialiser les filtres</a>
+            {% else %}
+            <a href="{{ create_url }}" class="btn btn-primary">{{ create_button_text }}</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

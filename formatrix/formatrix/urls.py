@@ -28,7 +28,8 @@ urlpatterns = [
     path('api/', include('modules.urls')),
     path('api/', include('documents.urls')),
     path('api/', include('renouvellements.urls')),
-    path('api/', include('seances.urls')),
+    # path('api/', include('seances.urls')),  # Commenté car nous utilisons maintenant des vues basées sur des classes
+    path('api/seances/', include('seances.api_urls')),  # Nouvelle URL pour l'API des séances
     path('api/', include('clients.urls')),
     path('api/', include('lieux.urls')),
     path('api/', include('apprenants.urls')),
@@ -56,6 +57,12 @@ urlpatterns = [
 
     # URLs pour les templates de formateurs
     path('formateurs/', include('formateurs.urls')),
+    
+    # URLs pour les templates de séances
+    path('seances/', include('seances.urls')),
+    
+    # URLs pour les templates de lieux
+    path('lieux/', include('lieux.urls')),
 ]
 
 if settings.DEBUG:

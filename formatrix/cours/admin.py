@@ -3,8 +3,8 @@ from .models import Cours
 
 @admin.register(Cours)
 class CoursAdmin(admin.ModelAdmin):
-    list_display = ('nom_cours', 'type_cours', 'niveau', 'duree_heures', 'status', 'statut_approbation')
-    list_filter = ('type_cours', 'status', 'statut_approbation', 'horaire')
+    list_display = ('nom_cours', 'type_cours', 'niveau', 'duree_heures', 'statut_approbation')
+    list_filter = ('type_cours', 'statut_approbation', 'horaire')
     search_fields = ('nom_cours', 'description', 'objectifs')
     date_hierarchy = 'created_at'
     
@@ -19,7 +19,7 @@ class CoursAdmin(admin.ModelAdmin):
             'fields': ('duree_heures', 'periode_mois', 'frais_par_participant')
         }),
         ('Planification', {
-            'fields': ('horaire', 'start_time', 'status')
+            'fields': ('horaire', 'start_time')
         }),
         ('Formateurs', {
             'fields': ('formateurs',)

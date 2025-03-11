@@ -52,7 +52,7 @@ class CoursListView(LoginRequiredMixin, ListView):
             'type_filter': self.request.GET.get('type', ''),
             'show_create_button': True,
             'create_url': reverse_lazy('cours-create'),
-            'create_button_text': 'Create a course',
+            'create_button_text': 'Créer un cours',
             'form_action': self.request.path,
             'reset_url': self.request.path,
             'has_active_filters': bool(
@@ -77,10 +77,10 @@ class CoursCreateView(LoginRequiredMixin, CreateView):
                 form.instance.date_approbation = timezone.now().date()
             
             response = super().form_valid(form)
-            messages.success(self.request, 'Course has been created successfully!')
+            messages.success(self.request, 'Le cours a été créé avec succès!')
             return response
         except Exception as e:
-            messages.error(self.request, f'Error creating course: {str(e)}')
+            messages.error(self.request, f'Erreur lors de la création du cours: {str(e)}')
             return self.form_invalid(form)
 
     def form_invalid(self, form):
@@ -116,10 +116,10 @@ class CoursUpdateView(LoginRequiredMixin, UpdateView):
                 form.instance.date_expiration_validite = None
                 
             response = super().form_valid(form)
-            messages.success(self.request, 'Course has been updated successfully!')
+            messages.success(self.request, 'Le cours a été mis à jour avec succès!')
             return response
         except Exception as e:
-            messages.error(self.request, f'Error updating course: {str(e)}')
+            messages.error(self.request, f'Erreur lors de la mise à jour du cours: {str(e)}')
             return self.form_invalid(form)
 
     def form_invalid(self, form):
@@ -130,7 +130,6 @@ class CoursUpdateView(LoginRequiredMixin, UpdateView):
             for error in form.non_field_errors():
                 messages.error(self.request, error)
         return super().form_invalid(form)
-
 
 class CoursDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Cours
@@ -144,9 +143,8 @@ class CoursDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def delete(self, request, *args, **kwargs):
         cours = self.get_object()
-        messages.success(request, f'Course "{cours.nom_cours}" has been deleted successfully!')
+        messages.success(request, f'Le cours "{cours.nom_cours}" a été supprimé avec succès!')
         return super().delete(request, *args, **kwargs)
-
 
 class CoursApprouverView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/login/'
@@ -161,9 +159,8 @@ class CoursApprouverView(LoginRequiredMixin, UserPassesTestMixin, View):
         cours.date_approbation = timezone.now().date()
         # La date d'expiration sera automatiquement calculée dans la méthode save() du modèle
         cours.save()
-        messages.success(request, f'Course "{cours.nom_cours}" has been approved successfully!')
+        messages.success(request, f'Le cours "{cours.nom_cours}" a été approuvé avec succès!')
         return HttpResponseRedirect(reverse_lazy('cours-list'))
-
 
 class CoursRefuserView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/login/'
@@ -178,20 +175,5 @@ class CoursRefuserView(LoginRequiredMixin, UserPassesTestMixin, View):
         cours.date_approbation = None
         cours.date_expiration_validite = None
         cours.save()
-        messages.success(request, f'Course "{cours.nom_cours}" has been rejected!')
+        messages.success(request, f'Le cours "{cours.nom_cours}" a été refusé!')
         return HttpResponseRedirect(reverse_lazy('cours-list'))
-
-
-class CoursCancelView(LoginRequiredMixin, UserPassesTestMixin, View):
-    login_url = '/login/'
-    
-    def test_func(self):
-        # Only staff members can cancel a course
-        return self.request.user.is_staff
-    
-    def post(self, request, pk):
-        cours = get_object_or_404(Cours, pk=pk)
-        cours.status = 'cancelled'
-        cours.save()
-        messages.success(request, f'Course "{cours.nom_cours}" has been cancelled!')
-        return HttpResponseRedirect(reverse_lazy('cours-detail', kwargs={'pk': pk}))
