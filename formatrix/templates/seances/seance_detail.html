@@ -62,6 +62,26 @@
     background-color: #dc3545;
     color: white;
   }
+  
+  .participants-btn {
+    background-color: #17a2b8;
+    color: white;
+    margin-top: 15px;
+  }
+  
+  #participantsModal .modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .participant-item {
+    padding: 10px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .participant-item:last-child {
+    border-bottom: none;
+  }
 </style>
 {% endblock %}
 
@@ -140,6 +160,9 @@
             <span class="info-label">Prix:</span>
             <span class="info-value">{{ seance.prix }} €</span>
           </div>
+          <button class="btn participants-btn" onclick="loadParticipants('{{ seance.seance_id }}')">
+            <i class="fas fa-users"></i> Voir les participants
+          </button>
         </div>
 
         <div class="info-group">
@@ -198,6 +221,31 @@
     </div>
   </div>
 </div>
+
+<!-- Modal pour afficher les participants -->
+<div class="modal fade" id="participantsModal" tabindex="-1" role="dialog" aria-labelledby="participantsModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="participantsModalLabel">Participants à la séance</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="participantsContainer">
+        <div class="text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Chargement...</span>
+          </div>
+          <p>Chargement des participants...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -218,80 +266,106 @@ function getCookie(name) {
 }
 
 function updateStatus(action) {
-    const actionMessages = {
-        'start': 'commencer',
-        'complete': 'terminer',
-        'cancel': 'annuler'
-    };
-
-    if (!confirm(`Êtes-vous sûr de vouloir ${actionMessages[action]} cette séance ?`)) {
+    if (!confirm(`Êtes-vous sûr de vouloir ${action === 'start' ? 'démarrer' : action === 'complete' ? 'terminer' : 'annuler'} cette séance ?`)) {
         return;
     }
-
+    
     const csrftoken = getCookie('csrftoken');
     
-    fetch(`/seances/{{ seance.pk }}/${action}/`, {
+    fetch(`/seances/{{ seance.seance_id }}/${action}/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrftoken,
             'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'same-origin'
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error('Erreur lors de la mise à jour du statut');
         }
         return response.json();
     })
     .then(data => {
         if (data.status === 'success') {
-            // Mettre à jour le statut affiché
-            const statusBadges = document.querySelectorAll('.status-badge');
-            statusBadges.forEach(badge => {
-                // Supprimer les anciennes classes de statut
-                badge.classList.forEach(className => {
-                    if (className.startsWith('status-')) {
-                        badge.classList.remove(className);
-                    }
-                });
-                // Ajouter la nouvelle classe de statut
-                badge.classList.add(`status-${data.new_status.toLowerCase().replace(/ /g, '_')}`);
+            // Mettre à jour l'interface utilisateur
+            document.querySelectorAll('.status-badge').forEach(badge => {
                 badge.textContent = data.new_status;
+                badge.className = `status-badge status-${action === 'start' ? 'en_cours' : action === 'complete' ? 'termine' : 'annule'}`;
             });
-
+            
+            // Masquer les boutons selon le nouveau statut
+            document.querySelector('.control-buttons').innerHTML = '';
+            
             // Afficher un message de succès
-            const message = document.createElement('div');
-            message.className = 'alert alert-success';
-            message.style.position = 'fixed';
-            message.style.top = '20px';
-            message.style.right = '20px';
-            message.style.zIndex = '1000';
-            message.innerHTML = `<strong>Succès!</strong> La séance a été ${actionMessages[action]}e.`;
-            document.body.appendChild(message);
-
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success mt-3';
+            alertDiv.textContent = `La séance a été ${action === 'start' ? 'démarrée' : action === 'complete' ? 'terminée' : 'annulée'} avec succès !`;
+            document.querySelector('.status-controls').appendChild(alertDiv);
+            
             // Recharger la page après un court délai
             setTimeout(() => {
-                location.reload();
-            }, 1500);
+                window.location.reload();
+            }, 2000);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        // Afficher un message d'erreur
-        const message = document.createElement('div');
-        message.className = 'alert alert-danger';
-        message.style.position = 'fixed';
-        message.style.top = '20px';
-        message.style.right = '20px';
-        message.style.zIndex = '1000';
-        message.innerHTML = '<strong>Erreur!</strong> Une erreur est survenue lors de la mise à jour du statut de la séance.';
-        document.body.appendChild(message);
-
-        // Supprimer le message d'erreur après 5 secondes
-        setTimeout(() => {
-            message.remove();
-        }, 5000);
+        console.error('Erreur:', error);
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger mt-3';
+        alertDiv.textContent = `Erreur lors de la mise à jour du statut: ${error.message}`;
+        document.querySelector('.status-controls').appendChild(alertDiv);
     });
 }
+
+function loadParticipants(seanceId) {
+    // Afficher le modal
+    $('#participantsModal').modal('show');
+    
+    // Charger les participants
+    fetch(`/api/inscriptions/?seance=${seanceId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur lors du chargement des participants');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const container = document.getElementById('participantsContainer');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">Aucun participant inscrit à cette séance.</div>';
+                return;
+            }
+            
+            let html = '<div class="list-group">';
+            data.forEach(inscription => {
+                html += `
+                <div class="participant-item">
+                    <h5>${inscription.apprenant ? inscription.apprenant.nom : ''} ${inscription.apprenant ? inscription.apprenant.prenom : ''}</h5>
+                    <p><strong>Email:</strong> ${inscription.apprenant ? inscription.apprenant.email : 'Non renseigné'}</p>
+                    <p><strong>Téléphone:</strong> ${inscription.apprenant ? inscription.apprenant.telephone : 'Non renseigné'}</p>
+                    <p><strong>Type d'inscription:</strong> ${inscription.type_inscription || 'Non renseigné'}</p>
+                    <p><strong>Statut:</strong> ${inscription.statut_inscription || 'Non renseigné'}</p>
+                    <p><strong>Date d'inscription:</strong> ${inscription.date_inscription ? new Date(inscription.date_inscription).toLocaleDateString() : 'Non renseigné'}</p>
+                    <a href="/inscriptions/${inscription.id}/" class="btn btn-sm btn-primary mt-2">
+                        <i class="fas fa-eye"></i> Voir détails
+                    </a>
+                </div>
+                `;
+            });
+            html += '</div>';
+            
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            document.getElementById('participantsContainer').innerHTML = `
+                <div class="alert alert-danger">
+                    Erreur lors du chargement des participants: ${error.message}
+                </div>
+            `;
+        });
+}
 </script>
-{% endblock %} 
+{% endblock %}

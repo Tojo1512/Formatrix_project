@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liste des Inscriptions - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/list.css' %}">
+<style>
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn-multiple {
+    background-color: #17a2b8;
+    color: white;
+  }
+  
+  .status-badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  
+  .status-en_cours {
+    background-color: #ffc107;
+    color: #000;
+  }
+  
+  .status-validee {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .status-annulee {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .filter-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Liste des Inscriptions</h2>
+    <div class="action-buttons">
+      <a href="{% url 'inscription-create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nouvelle Inscription
+      </a>
+      <a href="{% url 'inscriptions-api:inscription-formulaire-multiple' %}" class="btn btn-multiple">
+        <i class="fas fa-users"></i> Inscription Multiple
+      </a>
+    </div>
+  </div>
+  
+  <div class="filter-section">
+    <h3>Filtres</h3>
+    <form id="filterForm" class="row">
+      <div class="col-md-3 mb-3">
+        <label for="filterSeance">Séance</label>
+        <select class="form-control" id="filterSeance" name="seance">
+          <option value="">Toutes les séances</option>
+          {% for seance in seances %}
+            <option value="{{ seance.seance_id }}">{{ seance.cours.nom_cours }} - {{ seance.date|date:"d/m/Y" }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-3 mb-3">
+        <label for="filterClient">Client</label>
+        <select class="form-control" id="filterClient" name="client">
+          <option value="">Tous les clients</option>
+          {% for client in clients %}
+            <option value="{{ client.client_id }}">{{ client.nom }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-3 mb-3">
+        <label for="filterStatut">Statut</label>
+        <select class="form-control" id="filterStatut" name="statut">
+          <option value="">Tous les statuts</option>
+          {% for code, label in status_choices %}
+            <option value="{{ code }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-3 mb-3">
+        <label for="filterType">Type d'inscription</label>
+        <select class="form-control" id="filterType" name="type">
+          <option value="">Tous les types</option>
+          {% for code, label in type_choices %}
+            <option value="{{ code }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-filter"></i> Filtrer
+        </button>
+        <button type="button" id="resetFilters" class="btn btn-outline-secondary">
+          <i class="fas fa-undo"></i> Réinitialiser
+        </button>
+      </div>
+    </form>
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Apprenant</th>
+          <th>Client</th>
+          <th>Séance</th>
+          <th>Type</th>
+          <th>Date d'inscription</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inscription in inscriptions %}
+        <tr>
+          <td>{{ inscription.inscription_id }}</td>
+          <td>{{ inscription.apprenant.nom }} {{ inscription.apprenant.prenom }}</td>
+          <td>{{ inscription.client.nom }}</td>
+          <td>{{ inscription.seance.cours.nom_cours }} - {{ inscription.seance.date|date:"d/m/Y" }}</td>
+          <td>
+            {% for code, label in type_choices %}
+              {% if code == inscription.type_inscription %}{{ label }}{% endif %}
+            {% endfor %}
+          </td>
+          <td>{{ inscription.date_inscription|date:"d/m/Y" }}</td>
+          <td>
+            <span class="status-badge status-{{ inscription.statut_inscription }}">
+              {% for code, label in status_choices %}
+                {% if code == inscription.statut_inscription %}{{ label }}{% endif %}
+              {% endfor %}
+            </span>
+          </td>
+          <td>
+            <div class="btn-group">
+              <a href="{% url 'inscription-detail' inscription.inscription_id %}" class="btn btn-sm btn-info">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'inscription-update' inscription.inscription_id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a href="{% url 'inscription-delete' inscription.inscription_id %}" class="btn btn-sm btn-danger">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center">Aucune inscription trouvée</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  {% include 'components/pagination.html' with page_obj=page_obj %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    // Appliquer les filtres existants dans l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Remplir les champs de filtres avec les valeurs de l'URL
+    $('#filterSeance').val(urlParams.get('seance') || '');
+    $('#filterClient').val(urlParams.get('client') || '');
+    $('#filterStatut').val(urlParams.get('statut') || '');
+    $('#filterType').val(urlParams.get('type') || '');
+    
+    // Réinitialiser les filtres
+    $('#resetFilters').on('click', function() {
+      $('#filterForm')[0].reset();
+      window.location.href = window.location.pathname;
+    });
+  });
+</script>
+{% endblock %}
