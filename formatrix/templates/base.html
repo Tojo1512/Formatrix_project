@@ -471,7 +471,7 @@
           </li>
           
           <li class="sidebar-item has-submenu">
-            <a href="#" class="sidebar-link {% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
+            <a href="#" class="sidebar-link {% if 'seance' in request.resolver_match.url_name or 'inscription' in request.resolver_match.url_name %}active{% endif %}">
               <i class="fas fa-calendar-alt"></i>
               <span>Séances</span>
               <i class="fas fa-chevron-right submenu-icon"></i>
@@ -487,6 +487,24 @@
                 <a href="{% url 'seance-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
                   <i class="fas fa-plus"></i>
                   <span>Ajouter une séance</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'inscription-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'inscription-list' %}active{% endif %}">
+                  <i class="fas fa-user-check"></i>
+                  <span>Inscriptions</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'inscription-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'inscription-create' %}active{% endif %}">
+                  <i class="fas fa-user-plus"></i>
+                  <span>Nouvelle inscription</span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'inscription-multiple' %}" class="submenu-link {% if request.resolver_match.url_name == 'inscription-multiple' %}active{% endif %}">
+                  <i class="fas fa-users-cog"></i>
+                  <span>Inscriptions multiples</span>
                 </a>
               </li>
             </ul>
