@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<style>
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  .form-help {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">{{ title }}</h2>
+    <a href="{% url 'inscription-list' %}" class="btn btn-outline">
+      <i class="fas fa-arrow-left"></i> Retour à la liste
+    </a>
+  </div>
+  
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="{{ form.client.id_for_label }}">Client</label>
+        {{ form.client }}
+        {% if form.client.errors %}
+          <div class="invalid-feedback">
+            {{ form.client.errors }}
+          </div>
+        {% endif %}
+        <div class="form-help">Sélectionnez le client qui effectue l'inscription.</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="{{ form.seance.id_for_label }}">Séance</label>
+        {{ form.seance }}
+        {% if form.seance.errors %}
+          <div class="invalid-feedback">
+            {{ form.seance.errors }}
+          </div>
+        {% endif %}
+        <div class="form-help">Sélectionnez la séance pour laquelle vous souhaitez inscrire l'apprenant.</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="{{ form.apprenant.id_for_label }}">Apprenant</label>
+        {{ form.apprenant }}
+        {% if form.apprenant.errors %}
+          <div class="invalid-feedback">
+            {{ form.apprenant.errors }}
+          </div>
+        {% endif %}
+        <div class="form-help">Sélectionnez l'apprenant à inscrire.</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="{{ form.type_inscription.id_for_label }}">Type d'inscription</label>
+        {{ form.type_inscription }}
+        {% if form.type_inscription.errors %}
+          <div class="invalid-feedback">
+            {{ form.type_inscription.errors }}
+          </div>
+        {% endif %}
+        <div class="form-help">Sélectionnez le type d'inscription.</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="{{ form.statut_inscription.id_for_label }}">Statut de l'inscription</label>
+        {{ form.statut_inscription }}
+        {% if form.statut_inscription.errors %}
+          <div class="invalid-feedback">
+            {{ form.statut_inscription.errors }}
+          </div>
+        {% endif %}
+        <div class="form-help">Sélectionnez le statut actuel de l'inscription.</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="{{ form.sponsor.id_for_label }}">Sponsor (optionnel)</label>
+        {{ form.sponsor }}
+        {% if form.sponsor.errors %}
+          <div class="invalid-feedback">
+            {{ form.sponsor.errors }}
+          </div>
+        {% endif %}
+        <div class="form-help">Sélectionnez un sponsor si l'inscription est sponsorisée.</div>
+      </div>
+      
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Enregistrer
+        </button>
+        <a href="{% url 'inscription-list' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-times"></i> Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    // Ajouter des classes Bootstrap aux champs du formulaire
+    $('select, input, textarea').addClass('form-control');
+    
+    // Vérifier les places disponibles lors du changement de séance
+    $('#id_seance').on('change', function() {
+      const seanceId = $(this).val();
+      if (seanceId) {
+        $.ajax({
+          url: `/seances/api/seances/${seanceId}/`,
+          type: 'GET',
+          success: function(data) {
+            if (data.places_disponibles <= 0) {
+              alert('Attention: Cette séance n\'a plus de places disponibles.');
+            } else {
+              console.log(`Places disponibles: ${data.places_disponibles}`);
+            }
+          },
+          error: function() {
+            console.error('Erreur lors de la récupération des informations de la séance');
+          }
+        });
+      }
+    });
+  });
+</script>
+{% endblock %}

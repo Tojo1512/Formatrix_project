@@ -38,3 +38,50 @@ class InscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Inscription
         fields = '__all__'
+
+
+class InscriptionMultipleSerializer(serializers.Serializer):
+    """
+    Sérialiseur pour inscrire plusieurs apprenants à une séance
+    """
+    client_id = serializers.PrimaryKeyRelatedField(
+        queryset=Client.objects.all()
+    )
+    seance_id = serializers.PrimaryKeyRelatedField(
+        queryset=Seance.objects.all()
+    )
+    apprenants_ids = serializers.ListField(
+        child=serializers.PrimaryKeyRelatedField(queryset=Apprenant.objects.all())
+    )
+    type_inscription = serializers.ChoiceField(
+        choices=Inscription.TYPE_INSCRIPTION_CHOICES,
+        default='groupe'
+    )
+    sponsor_id = serializers.PrimaryKeyRelatedField(
+        queryset=Client.objects.all(),
+        required=False,
+        allow_null=True
+    )
+
+    def create(self, validated_data):
+        client_id = validated_data['client_id'].client_id
+        seance_id = validated_data['seance_id'].seance_id
+        apprenants_ids = [apprenant.apprenant_id for apprenant in validated_data['apprenants_ids']]
+        type_inscription = validated_data.get('type_inscription', 'groupe')
+        sponsor_id = validated_data.get('sponsor_id')
+        sponsor_id = sponsor_id.client_id if sponsor_id else None
+        
+        # Utiliser la méthode de classe pour inscrire les apprenants
+        return Inscription.inscrire_apprenants(
+            client_id=client_id,
+            seance_id=seance_id,
+            apprenants_ids=apprenants_ids,
+            type_inscription=type_inscription,
+            sponsor_id=sponsor_id
+        )
+        
+    def update(self, instance, validated_data):
+        """
+        Cette méthode n'est pas utilisée car nous ne mettons pas à jour des inscriptions multiples
+        """
+        raise NotImplementedError("La mise à jour d'inscriptions multiples n'est pas supportée")

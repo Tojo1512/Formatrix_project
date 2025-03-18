@@ -38,7 +38,7 @@ urlpatterns = [
     path('api/', include('clients.urls')),
     path('api/', include('lieux.urls')),
     path('api/', include('apprenants.urls')),
-    path('api/', include('inscriptions.urls')),
+    path('api/', include(('inscriptions.urls', 'api'), namespace='api')),
     path('api/', include('evaluations.urls')),
     path('api/', include('presences.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
@@ -65,7 +65,7 @@ urlpatterns = [
     
     # URLs pour les templates de lieux
     path('lieux/', include(('lieux.urls', 'lieux'))),
-]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
