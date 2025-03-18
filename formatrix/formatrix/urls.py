@@ -18,12 +18,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
-from .views import register_view
+from .views import register_view, home_view
 from django.conf import settings
 from django.conf.urls.static import static
+from formateurs import urls as formateurs_urls
 
 urlpatterns = [
     path('formatrix/admin/', admin.site.urls),
+    
+    # URLs pour les templates de formateurs - déplacé en haut pour priorité
+    path('formateurs/', include((formateurs_urls.urlpatterns, 'formateurs'))),
+    
     path('api/', include('cours.urls')),
     path('api/', include('modules.urls')),
     path('api/', include('documents.urls')),
@@ -44,25 +49,22 @@ urlpatterns = [
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='auth/password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='auth/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='auth/password_reset_complete.html'), name='password_reset_complete'),
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('', home_view, name='home'),
     
     # URLs pour les templates de cours
-    path('cours/', include('cours.urls')),
+    path('cours/', include(('cours.urls', 'cours'))),
     
     # URLs pour les templates de clients
-    path('clients/', include('clients.urls')),
+    path('clients/', include(('clients.urls', 'clients'))),
     
     # URLs pour les templates d'apprenants
-    path('apprenants/', include('apprenants.template_urls')),
-
-    # URLs pour les templates de formateurs
-    path('formateurs/', include('formateurs.urls')),
+    path('apprenants/', include(('apprenants.template_urls', 'apprenants'))),
     
     # URLs pour les templates de séances
-    path('seances/', include('seances.urls')),
+    path('seances/', include(('seances.urls', 'seances'))),
     
     # URLs pour les templates de lieux
-    path('lieux/', include('lieux.urls')),
+    path('lieux/', include(('lieux.urls', 'lieux'))),
 ]
 
 if settings.DEBUG:

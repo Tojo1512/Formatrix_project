@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
+from django.conf import settings
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -15,19 +16,8 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ("username", "email", "password1", "password2", "role")
 
+def home_view(request):
+    return render(request, 'home.html')
+
 def register_view(request):
-    if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.email = form.cleaned_data['email']
-            # Set staff and superuser status based on role
-            if form.cleaned_data['role'] == 'admin':
-                user.is_staff = True
-                user.is_superuser = True  # Make admin users superusers
-            user.save()
-            login(request, user)
-            return redirect('home')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'auth/register.html', {'form': form})
+    return redirect('formateurs:formateur-register', registration_key=settings.FORMATEUR_REGISTRATION_KEY)

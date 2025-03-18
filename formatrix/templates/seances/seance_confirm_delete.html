@@ -77,30 +77,30 @@
     </div>
     <div class="delete-info-item">
       <span class="delete-info-label">Lieu:</span>
-      <span>{{ object.lieu.nom }}</span>
+      <span>{{ object.lieu.lieu }}</span>
     </div>
     <div class="delete-info-item">
-      <span class="delete-info-label">Dates:</span>
-      <span>Du {{ object.date_debut|date:"d/m/Y" }} au {{ object.date_fin|date:"d/m/Y" }}</span>
+      <span class="delete-info-label">Date:</span>
+      <span>{{ object.date|date:"d/m/Y" }}</span>
     </div>
     <div class="delete-info-item">
       <span class="delete-info-label">Statut:</span>
       <span>
-        {% for code, label in object.STATUT_CHOICES %}
+        {% for code, label in object.STATUS_CHOICES %}
             {% if code == object.statut %}{{ label }}{% endif %}
         {% endfor %}
       </span>
     </div>
     <div class="delete-info-item">
       <span class="delete-info-label">Places:</span>
-      <span>{{ object.nombre_places_restantes }} / {{ object.nombre_places_total }}</span>
+      <span>{{ object.places_disponibles }} / {{ object.nombre_places }}</span>
     </div>
   </div>
   
   <form method="post">
     {% csrf_token %}
     <div class="delete-actions">
-      <a href="{% url 'seance-detail' object.pk %}" class="btn btn-outline">
+      <a href="{% url 'seances:seance-detail' object.pk %}" class="btn btn-outline">
         <i class="fas fa-arrow-left"></i> Annuler
       </a>
       <button type="submit" class="btn btn-danger">

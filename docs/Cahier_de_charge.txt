@@ -114,10 +114,10 @@ Disponibilités
 
 3.3.2 Affectation et Rémunération
 
-Affectation d'au moins deux formateurs par programme
+Affectation d'au moins deux formateurs par seance de cours
 Gestion des remplacements en cas d'absence
 Suivi des heures de présence
-Calcul automatique de la rémunération (300 Rs/heure)
+Calcul automatique de la rémunération 
 
 3.4 Gestion Financière
 3.4.1 Facturation

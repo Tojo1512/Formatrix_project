@@ -3,6 +3,8 @@ from cours.models import Cours
 from lieux.models import Lieu
 from django.utils import timezone
 from decimal import Decimal
+from formateurs.models import Formateur
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -24,6 +26,11 @@ class Seance(models.Model):
         null=True,  # Permettre temporairement null
         default=None  # Valeur par défaut None
     )
+    formateurs = models.ManyToManyField(
+        Formateur,
+        related_name='seances_assignees',
+        verbose_name="Formateurs assignés"
+    )
     nombre_places = models.IntegerField(default=10)
     places_reservees = models.IntegerField(default=0)
     prix = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
@@ -39,6 +46,11 @@ class Seance(models.Model):
     def __str__(self):
         return f"Session de {self.cours.nom_cours if self.cours else 'Cours non défini'} à {self.lieu.lieu} le {self.date}"
 
+    def clean(self):
+        super().clean()
+        # Cette validation sera appliquée lors de l'enregistrement via un formulaire
+        # Nous vérifierons le nombre de formateurs dans la vue
+    
     def start_session(self):
         """Start the session"""
         if self.statut == 'pas_commence':
@@ -96,3 +108,65 @@ class Seance(models.Model):
         if self.date_fin:
             return (self.date_fin - self.date_debut).days + 1
         return None
+
+class Absence(models.Model):
+    RAISON_CHOICES = [
+        ('maladie', 'Maladie'),
+        ('conge', 'Congé'),
+        ('formation', 'Formation'),
+        ('autre', 'Autre raison')
+    ]
+    
+    absence_id = models.AutoField(primary_key=True)
+    seance = models.ForeignKey(Seance, on_delete=models.CASCADE, related_name='absences')
+    formateur_absent = models.ForeignKey(
+        Formateur, 
+        on_delete=models.CASCADE, 
+        related_name='absences',
+        verbose_name="Formateur absent"
+    )
+    formateur_remplacant = models.ForeignKey(
+        Formateur, 
+        on_delete=models.CASCADE, 
+        related_name='remplacements',
+        verbose_name="Formateur remplaçant",
+        null=True,
+        blank=True
+    )
+    date_absence = models.DateField(verbose_name="Date de l'absence")
+    raison = models.CharField(max_length=50, choices=RAISON_CHOICES, default='autre')
+    details = models.TextField(verbose_name="Détails de l'absence", blank=True, null=True)
+    est_remplace = models.BooleanField(default=False, verbose_name="Est remplacé")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Absence"
+        verbose_name_plural = "Absences"
+        ordering = ['-date_absence']
+        unique_together = ['seance', 'formateur_absent', 'date_absence']
+    
+    def __str__(self):
+        return f"Absence de {self.formateur_absent} le {self.date_absence} pour la séance {self.seance}"
+    
+    def clean(self):
+        # Vérifier que le formateur absent est bien assigné à la séance
+        if not self.seance.formateurs.filter(formateurid=self.formateur_absent.formateurid).exists():
+            raise ValidationError("Le formateur n'est pas assigné à cette séance.")
+            
+        # Vérifier que le remplaçant n'est pas le formateur absent
+        if self.formateur_remplacant and self.formateur_remplacant.formateurid == self.formateur_absent.formateurid:
+            raise ValidationError("Le formateur remplaçant ne peut pas être le même que le formateur absent.")
+            
+        # Vérifier que le remplaçant n'est pas déjà assigné à la séance
+        if self.formateur_remplacant and self.seance.formateurs.filter(formateurid=self.formateur_remplacant.formateurid).exists():
+            raise ValidationError("Le formateur remplaçant est déjà assigné à cette séance.")
+    
+    def save(self, *args, **kwargs):
+        # Mettre à jour l'état du remplacement
+        if self.formateur_remplacant:
+            self.est_remplace = True
+        else:
+            self.est_remplace = False
+        
+        super().save(*args, **kwargs)

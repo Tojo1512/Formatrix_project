@@ -1,0 +1,17 @@
+/* Styles pour les séparateurs et sections de menu */
+.submenu-separator {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 8px 15px;
+}
+
+.submenu-section {
+  font-weight: 600;
+  color: var(--accent-color) !important;
+  padding-top: 8px;
+}
+
+.submenu-section i {
+  margin-right: 10px;
+  color: var(--accent-color);
+} 

@@ -17,6 +17,10 @@ import os
 # Charger les variables d'environnement depuis le fichier .env
 # load_dotenv(Path(__file__).resolve().parent / '.env')
 
+# Clés d'inscription sécurisées
+FORMATEUR_REGISTRATION_KEY = "formateur_secret_key_2024"
+ADMIN_REGISTRATION_KEY = "admin_secret_key_2024"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
