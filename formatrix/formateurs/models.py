@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from cours.models import Cours
+from django.contrib.auth.models import User
 
 class Formateur(models.Model):
     STATUT_CHOICES = [
@@ -22,6 +23,7 @@ class Formateur(models.Model):
     ]
 
     formateurid = models.AutoField(primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='formateur_profile')
     nom = models.CharField(max_length=100, verbose_name="Nom")
     prenom = models.CharField(max_length=100, verbose_name="Prénom")
     email = models.EmailField(unique=True, verbose_name="Email")
@@ -91,7 +93,7 @@ class Formateur(models.Model):
         return f"{self.prenom} {self.nom}"
 
     def get_cours_actifs(self):
-        return self.cours_assignes.filter(status='in_progress')
+        return self.cours_assignes.filter(statut_approbation='approuve')
 
     def est_disponible(self):
         return self.statut == 'actif' 

@@ -15,7 +15,7 @@
       <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
       {% if form.instance.pk %}Modifier{% else %}Créer{% endif %} une Séance
     </h2>
-    <a href="{% url 'seance-list' %}" class="btn btn-outline">
+    <a href="{% url 'seances:seance-list' %}" class="btn btn-outline">
       <i class="fas fa-arrow-left"></i>
       Retour
     </a>
@@ -90,6 +90,27 @@
         </div>
       </div>
 
+      <!-- Formateurs -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-chalkboard-teacher"></i>
+          Formateurs
+        </h3>
+        
+        <div class="form-group {% if form.formateurs.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.formateurs.id_for_label }}">
+            <i class="fas fa-users"></i>
+            Formateurs assignés <span class="text-danger">*</span>
+          </label>
+          {{ form.formateurs }}
+          {% include "includes/field_errors.html" with field=form.formateurs %}
+          <small class="form-text text-info">
+            <i class="fas fa-info-circle"></i> 
+            {{ form.formateurs.help_text }}
+          </small>
+        </div>
+      </div>
+
       <!-- Capacité et Prix -->
       <div class="form-section">
         <h3 class="section-title">
@@ -137,7 +158,7 @@
     </div>
 
     <div class="form-actions">
-      <a href="{% url 'seance-list' %}" class="btn btn-outline">
+      <a href="{% url 'seances:seance-list' %}" class="btn btn-outline">
         <i class="fas fa-times"></i>
         Annuler
       </a>

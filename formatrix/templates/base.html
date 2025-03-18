@@ -458,12 +458,12 @@
               <li class="submenu-item">
               </li>
               <li class="submenu-item">
-                <a href="{% url 'cours-list' %}" class="submenu-link">
+                <a href="{% url 'cours:cours-list' %}" class="submenu-link">
                   <i class="fas fa-list"></i>
                   <span>All courses </span>
                 </a>
               </li>
-                <a href="{% url 'cours-create' %}" class="submenu-link">
+                <a href="{% url 'cours:cours-create' %}" class="submenu-link">
                   <i class="fas fa-plus"></i>
                   <span>Add course</span>
                 </a>
@@ -478,33 +478,22 @@
             </a>
             <ul class="submenu">
               <li>
-                <a href="{% url 'seance-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'seance-list' %}active{% endif %}">
+                <a href="{% url 'seances:seance-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'seance-list' %}active{% endif %}">
                   <i class="fas fa-list"></i>
                   <span>Toutes les séances</span>
                 </a>
               </li>
               <li>
-                <a href="{% url 'seance-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
+                <a href="{% url 'seances:seance-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
                   <i class="fas fa-plus"></i>
                   <span>Ajouter une séance</span>
                 </a>
               </li>
+              <li class="submenu-separator"></li>
               <li>
-                <a href="{% url 'inscription-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'inscription-list' %}active{% endif %}">
-                  <i class="fas fa-user-check"></i>
-                  <span>Inscriptions</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'inscription-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'inscription-create' %}active{% endif %}">
-                  <i class="fas fa-user-plus"></i>
-                  <span>Nouvelle inscription</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'inscription-multiple' %}" class="submenu-link {% if request.resolver_match.url_name == 'inscription-multiple' %}active{% endif %}">
-                  <i class="fas fa-users-cog"></i>
-                  <span>Inscriptions multiples</span>
+                <a href="{% url 'seances:seance-list' %}?filtre=absences" class="submenu-link submenu-section">
+                  <i class="fas fa-user-clock"></i>
+                  <span>Gestion des absences</span>
                 </a>
               </li>
             </ul>
@@ -518,21 +507,15 @@
             </a>
             <ul class="submenu">
               <li>
-                <a href="{% url 'apprenant-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'apprenant-list' %}active{% endif %}">
+                <a href="{% url 'apprenants:apprenant-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'apprenant-list' %}active{% endif %}">
                   <i class="fas fa-list"></i>
                   <span>All Students</span>
                 </a>
               </li>
               <li>
-                <a href="{% url 'apprenant-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'apprenant-create' %}active{% endif %}">
+                <a href="{% url 'apprenants:apprenant-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'apprenant-create' %}active{% endif %}">
                   <i class="fas fa-plus"></i>
                   <span>Add a Student</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'rapports-demographiques' %}" class="submenu-link {% if request.resolver_match.url_name == 'rapports-demographiques' %}active{% endif %}">
-                  <i class="fas fa-chart-pie"></i>
-                  <span>Demographics</span>
                 </a>
               </li>
             </ul>
@@ -546,13 +529,13 @@
             </a>
             <ul class="submenu">
               <li>
-                <a href="{% url 'client-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
+                <a href="{% url 'clients:client-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
                   <i class="fas fa-list"></i>
                   <span>All Clients</span>
                 </a>
               </li>
               <li>
-                <a href="{% url 'client-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'client-create' %}active{% endif %}">
+                <a href="{% url 'clients:client-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'client-create' %}active{% endif %}">
                   <i class="fas fa-plus"></i>
                   <span>Add New Client</span>
                 </a>
@@ -568,13 +551,13 @@
             </a>
             <ul class="submenu">
               <li>
-                <a href="{% url 'formateur-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'formateur-list' %}active{% endif %}">
+                <a href="{% url 'formateurs:formateur-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'formateur-list' %}active{% endif %}">
                   <i class="fas fa-list"></i>
                   <span>All Trainers</span>
                 </a>
               </li>
               <li>
-                <a href="{% url 'formateur-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'formateur-create' %}active{% endif %}">
+                <a href="{% url 'formateurs:formateur-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'formateur-create' %}active{% endif %}">
                   <i class="fas fa-plus"></i>
                   <span>Add New Trainer</span>
                 </a>
@@ -627,7 +610,7 @@
             <i class="fas fa-sign-in-alt"></i>
             <span>Login</span>
           </a>
-          <a href="{% url 'register' %}" class="auth-btn-header auth-btn-primary">
+          <a href="{% url 'formateurs:formateur-register' 'formateur_secret_key_2024' %}" class="auth-btn-header auth-btn-primary">
             <i class="fas fa-user-plus"></i>
             <span>Register</span>
           </a>

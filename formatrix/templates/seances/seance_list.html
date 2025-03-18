@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Liste des Séances - Formatrix{% endblock %}
+{% block title %}{{ page_title }} - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/table.css' %}">
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
 {% block content %}
 <div class="table-container">
     <div class="table-header">
-        <h2 class="table-title">Liste des séances</h2>
+        <h2 class="table-title">{{ page_title }}</h2>
         
         <div class="table-actions">
             <div class="search-and-filters">
@@ -215,15 +215,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         {% endif %}
                     </td>
                     <td class="actions-column">
-                        <a href="{% url 'seance-detail' seance.pk %}" class="btn btn-sm btn-info" title="Voir">
+                        <a href="{% url 'seances:seance-detail' seance.pk %}" class="btn btn-sm btn-info" title="Voir">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{% url 'seance-update' seance.pk %}" class="btn btn-sm btn-warning" title="Modifier">
+                        <a href="{% url 'seances:seance-update' seance.pk %}" class="btn btn-sm btn-warning" title="Modifier">
                             <i class="fas fa-edit"></i>
                         </a>
                         
                         {% if seance.can_start %}
-                        <form method="post" action="{% url 'seance-start' seance.pk %}" 
+                        <form method="post" action="{% url 'seances:start-session' seance.pk %}" 
                               style="display: inline;"
                               data-action="start"
                               data-seance-id="{{ seance.pk }}">
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         {% endif %}
                         
                         {% if seance.can_complete %}
-                        <form method="post" action="{% url 'seance-complete' seance.pk %}" 
+                        <form method="post" action="{% url 'seances:complete-session' seance.pk %}" 
                               style="display: inline;"
                               data-action="complete"
                               data-seance-id="{{ seance.pk }}">
@@ -247,11 +247,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         {% endif %}
                         
                         {% if seance.can_cancel %}
-                        <form method="post" action="{% url 'seance-cancel' seance.pk %}" 
+                        <form method="post" action="{% url 'seances:cancel-session' seance.pk %}" 
                               style="display: inline;"
                               data-action="cancel"
-                              data-seance-id="{{ seance.pk }}"
-                              onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette séance ?');">
+                              data-seance-id="{{ seance.pk }}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-cancel" title="Annuler la séance">
                                 <i class="fas fa-times"></i>
@@ -259,7 +258,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         </form>
                         {% endif %}
                         
-                        <a href="{% url 'seance-delete' seance.pk %}" class="btn btn-sm btn-danger" title="Supprimer">
+                        {% if filtre_absences %}
+                        <a href="{% url 'seances:absence_list' seance.pk %}" class="btn btn-sm btn-primary" title="Gérer les absences">
+                            <i class="fas fa-user-clock"></i>
+                        </a>
+                        <a href="{% url 'seances:absence_create' seance.pk %}" class="btn btn-sm btn-success" title="Signaler une absence">
+                            <i class="fas fa-user-plus"></i>
+                        </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'seances:seance-delete' seance.pk %}" class="btn btn-sm btn-danger" title="Supprimer">
                             <i class="fas fa-trash"></i>
                         </a>
                     </td>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if object.formateurid %}Modifier{% else %}Créer{% endif %} un Formateur - Formatrix{% endblock %}
+{% block title %}Inscription Formateur - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/theme.css' %}">
@@ -74,10 +74,10 @@
 <div class="form-container">
   <div class="form-header">
     <h2 class="form-title">
-      <i class="fas {% if object.formateurid %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
-      {% if object.formateurid %}Modifier{% else %}Créer{% endif %} un Formateur
+      <i class="fas fa-user-plus"></i>
+      Inscription Formateur
     </h2>
-    <a href="{% url 'formateurs:formateur-list' %}" class="btn btn-outline">
+    <a href="{% url 'home' %}" class="btn btn-outline">
       <i class="fas fa-arrow-left"></i>
       Retour
     </a>
@@ -103,15 +103,15 @@
   <div class="step-indicator">
     <div class="step active" id="step-indicator-1">
       1
-      <span class="step-title">Informations personnelles</span>
+      <span class="step-title">Compte</span>
     </div>
     <div class="step" id="step-indicator-2">
       2
-      <span class="step-title">Informations professionnelles</span>
+      <span class="step-title">Informations personnelles</span>
     </div>
     <div class="step" id="step-indicator-3">
       3
-      <span class="step-title">Statut et disponibilité</span>
+      <span class="step-title">Informations professionnelles</span>
     </div>
     <div class="step" id="step-indicator-4">
       4
@@ -122,8 +122,69 @@
   <form method="post" enctype="multipart/form-data" novalidate id="formateur-form">
     {% csrf_token %}
     
-    <!-- Étape 1: Informations personnelles -->
+    <!-- Étape 1: Création du compte -->
     <div class="form-step active" id="step-1">
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-user-lock"></i>
+          Création du compte
+        </h3>
+        
+        <div class="form-row">
+          <div class="form-group {% if form.username.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.username.id_for_label }}">
+              <i class="fas fa-user"></i>
+              Nom d'utilisateur
+            </label>
+            {{ form.username }}
+            {% include "includes/field_errors.html" with field=form.username %}
+          </div>
+
+          <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.email.id_for_label }}">
+              <i class="fas fa-envelope"></i>
+              Email
+            </label>
+            {{ form.email }}
+            {% include "includes/field_errors.html" with field=form.email %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group {% if form.password1.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.password1.id_for_label }}">
+              <i class="fas fa-lock"></i>
+              Mot de passe
+            </label>
+            {{ form.password1 }}
+            {% include "includes/field_errors.html" with field=form.password1 %}
+          </div>
+
+          <div class="form-group {% if form.password2.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.password2.id_for_label }}">
+              <i class="fas fa-lock"></i>
+              Confirmer le mot de passe
+            </label>
+            {{ form.password2 }}
+            {% include "includes/field_errors.html" with field=form.password2 %}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-navigation">
+        <button type="button" class="btn btn-outline">
+          <i class="fas fa-times"></i>
+          Annuler
+        </button>
+        <button type="button" class="btn btn-primary next-step" data-next="2">
+          Suivant
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Étape 2: Informations personnelles -->
+    <div class="form-step" id="step-2">
       <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-user"></i>
@@ -151,15 +212,6 @@
         </div>
 
         <div class="form-row">
-          <div class="form-group {% if form.email.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.email.id_for_label }}">
-              <i class="fas fa-envelope"></i>
-              Email
-            </label>
-            {{ form.email }}
-            {% include "includes/field_errors.html" with field=form.email %}
-          </div>
-
           <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
             <label class="form-label" for="{{ form.telephone.id_for_label }}">
               <i class="fas fa-phone"></i>
@@ -168,9 +220,7 @@
             {{ form.telephone }}
             {% include "includes/field_errors.html" with field=form.telephone %}
           </div>
-        </div>
 
-        <div class="form-row">
           <div class="form-group {% if form.date_naissance.errors %}has-error{% endif %}">
             <label class="form-label" for="{{ form.date_naissance.id_for_label }}">
               <i class="fas fa-calendar"></i>
@@ -179,7 +229,9 @@
             {{ form.date_naissance }}
             {% include "includes/field_errors.html" with field=form.date_naissance %}
           </div>
+        </div>
 
+        <div class="form-row">
           <div class="form-group {% if form.ville.errors %}has-error{% endif %}">
             <label class="form-label" for="{{ form.ville.id_for_label }}">
               <i class="fas fa-city"></i>
@@ -188,32 +240,32 @@
             {{ form.ville }}
             {% include "includes/field_errors.html" with field=form.ville %}
           </div>
-        </div>
 
-        <div class="form-group {% if form.adresse.errors %}has-error{% endif %}">
-          <label class="form-label" for="{{ form.adresse.id_for_label }}">
-            <i class="fas fa-map-marker-alt"></i>
-            Adresse
-          </label>
-          {{ form.adresse }}
-          {% include "includes/field_errors.html" with field=form.adresse %}
+          <div class="form-group {% if form.adresse.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.adresse.id_for_label }}">
+              <i class="fas fa-map-marker-alt"></i>
+              Adresse
+            </label>
+            {{ form.adresse }}
+            {% include "includes/field_errors.html" with field=form.adresse %}
+          </div>
         </div>
       </div>
 
       <div class="form-navigation">
-        <button type="button" class="btn btn-outline">
-          <i class="fas fa-times"></i>
-          Annuler
+        <button type="button" class="btn btn-outline prev-step" data-prev="1">
+          <i class="fas fa-arrow-left"></i>
+          Précédent
         </button>
-        <button type="button" class="btn btn-primary next-step" data-next="2">
+        <button type="button" class="btn btn-primary next-step" data-next="3">
           Suivant
           <i class="fas fa-arrow-right"></i>
         </button>
       </div>
     </div>
 
-    <!-- Étape 2: Informations professionnelles -->
-    <div class="form-step" id="step-2">
+    <!-- Étape 3: Informations professionnelles -->
+    <div class="form-step" id="step-3">
       <div class="form-section">
         <h3 class="section-title">
           <i class="fas fa-briefcase"></i>
@@ -241,64 +293,26 @@
         </div>
 
         <div class="form-row">
-          <div class="form-group {% if form.date_embauche.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.date_embauche.id_for_label }}">
-              <i class="fas fa-calendar-check"></i>
-              Date d'embauche
+          <div class="form-group {% if form.specialites.errors %}has-error{% endif %}">
+            <label class="form-label" for="{{ form.specialites.id_for_label }}">
+              <i class="fas fa-star"></i>
+              Spécialités
             </label>
-            {{ form.date_embauche }}
-            {% include "includes/field_errors.html" with field=form.date_embauche %}
+            {{ form.specialites }}
+            {% include "includes/field_errors.html" with field=form.specialites %}
           </div>
         </div>
 
-        <div class="form-group {% if form.specialites.errors %}has-error{% endif %}">
-          <label class="form-label" for="{{ form.specialites.id_for_label }}">
-            <i class="fas fa-star"></i>
-            Spécialités
+        <div class="form-group {% if form.disponibilite.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ form.disponibilite.id_for_label }}">
+            <i class="fas fa-clock"></i>
+            Disponibilité
           </label>
-          {{ form.specialites }}
-          {% include "includes/field_errors.html" with field=form.specialites %}
-        </div>
-      </div>
-
-      <div class="form-navigation">
-        <button type="button" class="btn btn-outline prev-step" data-prev="1">
-          <i class="fas fa-arrow-left"></i>
-          Précédent
-        </button>
-        <button type="button" class="btn btn-primary next-step" data-next="3">
-          Suivant
-          <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Étape 3: Statut et disponibilité -->
-    <div class="form-step" id="step-3">
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-clock"></i>
-          Statut et disponibilité
-        </h3>
-        
-        <div class="form-row">
-          <div class="form-group {% if form.statut.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.statut.id_for_label }}">
-              <i class="fas fa-toggle-on"></i>
-              Statut
-            </label>
-            {{ form.statut }}
-            {% include "includes/field_errors.html" with field=form.statut %}
-          </div>
-
-          <div class="form-group {% if form.disponibilite.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.disponibilite.id_for_label }}">
-              <i class="fas fa-calendar-alt"></i>
-              Disponibilité
-            </label>
-            {{ form.disponibilite }}
-            {% include "includes/field_errors.html" with field=form.disponibilite %}
-          </div>
+          {{ form.disponibilite }}
+          {% include "includes/field_errors.html" with field=form.disponibilite %}
+          <small class="form-text text-muted">
+            Précisez vos horaires de disponibilité
+          </small>
         </div>
       </div>
 
@@ -395,8 +409,8 @@
           Précédent
         </button>
         <button type="submit" class="btn btn-primary">
-          <i class="fas {% if object.formateurid %}fa-save{% else %}fa-plus{% endif %}"></i>
-          {% if object.formateurid %}Enregistrer les modifications{% else %}Soumettre{% endif %}
+          <i class="fas fa-save"></i>
+          S'inscrire
         </button>
       </div>
     </div>
