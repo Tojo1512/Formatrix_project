@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
-from .views import register_view, home_view
+from .views import register_view, home_view, admin_register_view
 from django.conf import settings
 from django.conf.urls.static import static
 from formateurs import urls as formateurs_urls
@@ -43,6 +43,7 @@ urlpatterns = [
     path('api/', include('presences.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('register/', register_view, name='register'),
+    path('admin-register/', admin_register_view, name='admin-register'),
     path('login/', auth_views.LoginView.as_view(template_name='auth/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='auth/logged_out.html'), name='logout'),
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset.html'), name='password_reset'),

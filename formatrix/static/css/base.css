@@ -1,0 +1,258 @@
+/* Styles de base pour la mise en page */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  width: 100%;
+  position: relative;
+}
+
+.guest-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-wrapper {
+  flex: 1 0 auto;
+}
+
+.main-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: calc(100% - 260px);
+  margin-left: 260px;
+  position: relative;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  height: calc(100vh - 60px - 50px);
+}
+
+.footer {
+  width: 100%;
+  background-color: #f8f9fa;
+  padding: 15px 0;
+  border-top: 1px solid #e9ecef;
+  height: 50px;
+}
+
+.main-header {
+  width: 100%;
+  height: 60px;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.sidebar {
+  width: 260px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 20;
+  height: 100vh;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+/* Media queries pour la mise en page responsive */
+@media (max-width: 991.98px) {
+  .main-panel {
+    width: 100%;
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+  }
+  
+  .sidebar {
+    transform: translateX(-260px);
+  }
+  
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+  
+  body.sidebar-open .main-panel {
+    margin-left: 260px;
+  }
+}
+
+/* Styles pour les éléments d'interface utilisateur */
+.user-profile .dropdown-menu {
+  min-width: 200px;
+}
+
+.nav-toggle {
+  display: flex;
+}
+
+.sidenav-toggler {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  .sidenav-toggler {
+    display: block;
+  }
+  
+  .toggle-sidebar {
+    display: none;
+  }
+  
+  .d-lg-block {
+    display: none !important;
+  }
+}
+
+/* Styles pour les cartes et composants */
+.card {
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+  border: none;
+}
+
+.card-header {
+  background-color: transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 15px 20px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* Couleurs et styles personnalisés */
+.text-primary-d {
+  color: #1f3984;
+}
+
+.bg-primary-gradient {
+  background: linear-gradient(135deg, #3f5efb 0%, #fc466b 100%);
+}
+
+/* Styles pour la mise en page principale */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.main-panel {
+  position: relative;
+  width: calc(100% - 260px);
+  height: 100vh;
+  min-height: 100%;
+  margin-left: 260px;
+  transition: all .3s;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 260px;
+  transition: all .3s;
+  z-index: 1000;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar-wrapper {
+  height: calc(100% - 70px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.sidebar-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.wrapper {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar-mini .main-panel {
+  width: calc(100% - 80px);
+  margin-left: 80px;
+}
+
+.sidebar-mini .sidebar {
+  width: 80px;
+}
+
+/* Styles pour la navbar */
+.main-header {
+  background-color: #fff;
+  height: 60px;
+  box-shadow: 0 0 20px 0 rgba(0,0,0,.1);
+  position: relative;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-header {
+  width: 100%;
+  height: 60px;
+  padding: 0 15px;
+}
+
+.user-name {
+  font-weight: 500;
+}
+
+/* Ajustements du contenu */
+.content {
+  padding: 20px;
+  padding-top: 15px;
+  height: calc(100vh - 60px - 50px); /* hauteur - navbar - footer */
+  position: relative;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Sidebar user panel */
+.user-panel {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 15px;
+}
+
+.user-panel .info {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.user-panel .user-name {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Badges personnalisés */
+.badge.bg-danger, .badge.bg-primary {
+  font-size: 0.8rem;
+  padding: 0.4rem 0.6rem;
+} 

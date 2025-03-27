@@ -54,10 +54,10 @@
                   <i class="fas fa-users"></i>
                 </div>
               </div>
-              <div class="col col-stats ml-3 ml-sm-0">
+              <div class="col col-stats ms-3 ms-sm-0">
                 <div class="numbers">
                   <p class="card-category">Apprenants</p>
-                  <h4 class="card-title">25</h4>
+                  <h4 class="card-title">{{ apprenants_count }}</h4>
                 </div>
               </div>
             </div>
@@ -73,10 +73,10 @@
                   <i class="fas fa-calendar-alt"></i>
                 </div>
               </div>
-              <div class="col col-stats ml-3 ml-sm-0">
+              <div class="col col-stats ms-3 ms-sm-0">
                 <div class="numbers">
                   <p class="card-category">Séances</p>
-                  <h4 class="card-title">8</h4>
+                  <h4 class="card-title">{{ seances_count }}</h4>
                 </div>
               </div>
             </div>
@@ -92,10 +92,10 @@
                   <i class="fas fa-book"></i>
                 </div>
               </div>
-              <div class="col col-stats ml-3 ml-sm-0">
+              <div class="col col-stats ms-3 ms-sm-0">
                 <div class="numbers">
                   <p class="card-category">Cours</p>
-                  <h4 class="card-title">12</h4>
+                  <h4 class="card-title">{{ cours_count }}</h4>
                 </div>
               </div>
             </div>
@@ -111,12 +111,109 @@
                   <i class="fas fa-building"></i>
                 </div>
               </div>
-              <div class="col col-stats ml-3 ml-sm-0">
+              <div class="col col-stats ms-3 ms-sm-0">
                 <div class="numbers">
                   <p class="card-category">Clients</p>
-                  <h4 class="card-title">5</h4>
+                  <h4 class="card-title">{{ clients_count }}</h4>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graphiques et données -->
+    <div class="row mt-4">
+      <div class="col-md-8">
+        <div class="card card-round">
+          <div class="card-header">
+            <div class="card-head-row">
+              <div class="card-title">Activité des formations</div>
+              <div class="card-tools">
+                <a href="#" class="btn btn-sm btn-outline-primary me-2">
+                  <i class="fa fa-download me-1"></i> Exporter
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="min-height: 375px">
+              <canvas id="statisticsChart"></canvas>
+            </div>
+            <div id="myChartLegend" class="mt-3 d-flex justify-content-center"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-primary card-round">
+          <div class="card-header">
+            <div class="card-head-row">
+              <div class="card-title text-white">Séances à venir</div>
+            </div>
+            <div class="card-category text-white opacity-75">Les 7 prochains jours</div>
+          </div>
+          <div class="card-body pb-0">
+            <div class="mb-4 mt-2">
+              <h2>{{ upcoming_seances_count }} séances</h2>
+            </div>
+            <div class="pull-in">
+              <canvas id="dailySalesChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card card-round">
+          <div class="card-body pb-0">
+            <div class="h1 fw-bold float-end text-primary">{{ percentage_completed }}%</div>
+            <h2 class="mb-2">{{ formateurs_count }}</h2>
+            <p class="text-muted">Formateurs actifs</p>
+            <div class="pull-in sparkline-fix">
+              <div id="lineChart"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des dernières inscriptions -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Dernières inscriptions</div>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Apprenant</th>
+                    <th scope="col">Formation</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for inscription in latest_inscriptions %}
+                  <tr>
+                    <td>{{ inscription.apprenant.nom }} {{ inscription.apprenant.prenom }}</td>
+                    <td>{{ inscription.seance.cours.titre }}</td>
+                    <td>{{ inscription.date_inscription|date:"d/m/Y" }}</td>
+                    <td>{{ inscription.client.nom }}</td>
+                    <td>
+                      <span class="badge {% if inscription.statut == 'confirmée' %}bg-success{% elif inscription.statut == 'en_attente' %}bg-warning{% else %}bg-danger{% endif %}">
+                        {{ inscription.get_statut_display }}
+                      </span>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="5" class="text-center">Aucune inscription récente</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -134,85 +231,97 @@
             <div class="row">
               {% if user.is_staff %}
                 <!-- Actions Administrateur -->
-                <div class="col-md-4">
-                  <div class="card card-dark bg-dark-gradient">
-                    <div class="card-body d-flex align-items-center">
-                      <div class="icon-box me-3">
-                        <i class="fas fa-users-cog text-white fa-2x"></i>
-                      </div>
-                      <div>
-                        <h5 class="card-title text-white mb-1">Gestion des Utilisateurs</h5>
-                        <p class="card-text text-white-50 small">Gérez les formateurs et les accès</p>
+                <div class="col-md-4 mb-3">
+                  <a href="{% url 'formateurs:formateur-list' %}" class="text-decoration-none">
+                    <div class="card card-dark bg-dark-gradient h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="icon-box me-3">
+                          <i class="fas fa-users-cog text-white fa-2x"></i>
+                        </div>
+                        <div>
+                          <h5 class="card-title text-white mb-1">Gestion des Utilisateurs</h5>
+                          <p class="card-text text-white-50 small">Gérez les formateurs et les accès</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
-                <div class="col-md-4">
-                  <div class="card card-dark bg-dark-gradient">
-                    <div class="card-body d-flex align-items-center">
-                      <div class="icon-box me-3">
-                        <i class="fas fa-chart-pie text-white fa-2x"></i>
-                      </div>
-                      <div>
-                        <h5 class="card-title text-white mb-1">Statistiques Globales</h5>
-                        <p class="card-text text-white-50 small">Analysez les performances</p>
+                <div class="col-md-4 mb-3">
+                  <a href="{% url 'cours:cours-list' %}" class="text-decoration-none">
+                    <div class="card card-dark bg-dark-gradient h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="icon-box me-3">
+                          <i class="fas fa-chart-pie text-white fa-2x"></i>
+                        </div>
+                        <div>
+                          <h5 class="card-title text-white mb-1">Statistiques Globales</h5>
+                          <p class="card-text text-white-50 small">Analysez les performances</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
-                <div class="col-md-4">
-                  <div class="card card-dark bg-dark-gradient">
-                    <div class="card-body d-flex align-items-center">
-                      <div class="icon-box me-3">
-                        <i class="fas fa-cogs text-white fa-2x"></i>
-                      </div>
-                      <div>
-                        <h5 class="card-title text-white mb-1">Configuration</h5>
-                        <p class="card-text text-white-50 small">Paramètres du système</p>
+                <div class="col-md-4 mb-3">
+                  <a href="/formatrix/admin/" class="text-decoration-none">
+                    <div class="card card-dark bg-dark-gradient h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="icon-box me-3">
+                          <i class="fas fa-cogs text-white fa-2x"></i>
+                        </div>
+                        <div>
+                          <h5 class="card-title text-white mb-1">Configuration</h5>
+                          <p class="card-text text-white-50 small">Paramètres du système</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
               {% else %}
                 <!-- Actions Formateur -->
-                <div class="col-md-4">
-                  <div class="card card-dark bg-dark-gradient">
-                    <div class="card-body d-flex align-items-center">
-                      <div class="icon-box me-3">
-                        <i class="fas fa-chalkboard-teacher text-white fa-2x"></i>
-                      </div>
-                      <div>
-                        <h5 class="card-title text-white mb-1">Mes Formations</h5>
-                        <p class="card-text text-white-50 small">Gérez vos sessions de formation</p>
+                <div class="col-md-4 mb-3">
+                  <a href="{% url 'seances:seance-list' %}" class="text-decoration-none">
+                    <div class="card card-dark bg-dark-gradient h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="icon-box me-3">
+                          <i class="fas fa-chalkboard-teacher text-white fa-2x"></i>
+                        </div>
+                        <div>
+                          <h5 class="card-title text-white mb-1">Mes Formations</h5>
+                          <p class="card-text text-white-50 small">Gérez vos sessions de formation</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
-                <div class="col-md-4">
-                  <div class="card card-dark bg-dark-gradient">
-                    <div class="card-body d-flex align-items-center">
-                      <div class="icon-box me-3">
-                        <i class="fas fa-user-graduate text-white fa-2x"></i>
-                      </div>
-                      <div>
-                        <h5 class="card-title text-white mb-1">Mes Apprenants</h5>
-                        <p class="card-text text-white-50 small">Suivez vos apprenants</p>
+                <div class="col-md-4 mb-3">
+                  <a href="{% url 'apprenants:apprenant-list' %}" class="text-decoration-none">
+                    <div class="card card-dark bg-dark-gradient h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="icon-box me-3">
+                          <i class="fas fa-user-graduate text-white fa-2x"></i>
+                        </div>
+                        <div>
+                          <h5 class="card-title text-white mb-1">Mes Apprenants</h5>
+                          <p class="card-text text-white-50 small">Suivez vos apprenants</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
-                <div class="col-md-4">
-                  <div class="card card-dark bg-dark-gradient">
-                    <div class="card-body d-flex align-items-center">
-                      <div class="icon-box me-3">
-                        <i class="fas fa-chart-line text-white fa-2x"></i>
-                      </div>
-                      <div>
-                        <h5 class="card-title text-white mb-1">Mes Rapports</h5>
-                        <p class="card-text text-white-50 small">Consultez vos statistiques</p>
+                <div class="col-md-4 mb-3">
+                  <a href="#" class="text-decoration-none">
+                    <div class="card card-dark bg-dark-gradient h-100">
+                      <div class="card-body d-flex align-items-center">
+                        <div class="icon-box me-3">
+                          <i class="fas fa-chart-line text-white fa-2x"></i>
+                        </div>
+                        <div>
+                          <h5 class="card-title text-white mb-1">Mes Rapports</h5>
+                          <p class="card-text text-white-50 small">Consultez vos statistiques</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </a>
                 </div>
               {% endif %}
             </div>
@@ -227,8 +336,8 @@
 {% block guest_content %}
 {% if not user.is_authenticated %}
 <!-- Page de bienvenue pour les utilisateurs non connectés -->
-<div class="container-fluid h-100">
-  <div class="row justify-content-center mt-5 mb-5 pb-5">
+<div class="container-fluid vh-100">
+  <div class="row justify-content-center mt-5 mb-5">
     <div class="col-md-10">
       <div class="card shadow-lg mb-5">
         <div class="card-body">
@@ -271,10 +380,10 @@
               <div class="card card-pricing bg-info-gradient h-100 shadow-lg">
                 <div class="card-body text-center p-5">
                   <i class="fas fa-info-circle text-white mb-4 fa-4x"></i>
-                  <h3 class="card-title text-white fw-bold">À propos</h3>
-                  <p class="card-text text-white opacity-9 mb-4 fs-5">Découvrez notre plateforme</p>
+                  <h3 class="card-title text-white fw-bold">En savoir plus</h3>
+                  <p class="card-text text-white opacity-9 mb-4 fs-5">Découvrez nos fonctionnalités</p>
                   <a href="#" class="btn btn-lg btn-light fw-bold">
-                    <i class="fas fa-info-circle me-2"></i>En savoir plus
+                    <i class="fas fa-info-circle me-2"></i>Découvrir
                   </a>
                 </div>
               </div>
@@ -286,4 +395,152 @@
   </div>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if user.is_authenticated %}
+    try {
+      // Configuration du graphique des statistiques
+      var ctx = document.getElementById('statisticsChart').getContext('2d');
+      if (ctx) {
+        var statisticsChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"],
+            datasets: [{
+              label: "Cours",
+              borderColor: '#1572E8',
+              pointBackgroundColor: '#1572E8',
+              pointRadius: 3,
+              pointBorderWidth: 2,
+              backgroundColor: 'rgba(21, 114, 232, 0.1)',
+              data: JSON.parse('{{ cours_mensuel|escapejs }}')
+            }, {
+              label: "Séances",
+              borderColor: '#F25961',
+              pointBackgroundColor: '#F25961',
+              pointRadius: 3,
+              pointBorderWidth: 2,
+              backgroundColor: 'rgba(242, 89, 97, 0.1)',
+              data: JSON.parse('{{ seances_mensuel|escapejs }}')
+            }, {
+              label: "Inscriptions",
+              borderColor: '#28A745',
+              pointBackgroundColor: '#28A745',
+              pointRadius: 3,
+              pointBorderWidth: 2,
+              backgroundColor: 'rgba(40, 167, 69, 0.1)',
+              data: JSON.parse('{{ inscriptions_mensuel|escapejs }}')
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20
+                }
+              },
+              tooltip: {
+                bodySpacing: 4,
+                mode: 'index',
+                intersect: false,
+                position: 'nearest',
+                callbacks: {
+                  label: function(context) {
+                    return ' ' + context.dataset.label + ': ' + context.parsed.y;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      // Configuration du graphique des séances
+      var dailyCtx = document.getElementById('dailySalesChart').getContext('2d');
+      if (dailyCtx) {
+        var dailySalesChart = new Chart(dailyCtx, {
+          type: 'bar',
+          data: {
+            labels: JSON.parse('{{ upcoming_days|escapejs }}'),
+            datasets: [{
+              label: "Séances",
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              borderColor: 'rgba(255, 255, 255, 0.8)',
+              borderWidth: 2,
+              barPercentage: 0.5,
+              data: JSON.parse('{{ upcoming_counts|escapejs }}')
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                bodyFont: { size: 11 },
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                titleColor: '#fff',
+                bodyColor: '#fff'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  display: false,
+                  color: 'rgba(255,255,255,0.1)'
+                },
+                ticks: {
+                  color: 'rgba(255,255,255,0.8)',
+                  stepSize: 1
+                }
+              },
+              x: {
+                grid: {
+                  display: false,
+                  color: 'rgba(255,255,255,0.1)'
+                },
+                ticks: {
+                  color: 'rgba(255,255,255,0.8)'
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Configuration du sparkline
+      var sparklineData = JSON.parse('{{ activite_formateurs|escapejs }}');
+      if ($('#lineChart').length && sparklineData) {
+        $('#lineChart').sparkline(sparklineData, {
+          type: 'line',
+          width: '100%',
+          height: '100',
+          lineColor: '#1572E8',
+          fillColor: 'rgba(21, 114, 232, 0.1)',
+          highlightSpotColor: '#1572E8',
+          highlightLineColor: '#1572E8',
+          spotRadius: 3
+        });
+      }
+    } catch (e) {
+      console.error("Erreur dans les graphiques:", e);
+    }
+    {% endif %}
+  });
+</script>
 {% endblock %}
