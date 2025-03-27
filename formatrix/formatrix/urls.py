@@ -65,6 +65,7 @@ urlpatterns = [
     
     # URLs pour les templates de lieux
     path('lieux/', include(('lieux.urls', 'lieux'))),
+]
 
 
 if settings.DEBUG:

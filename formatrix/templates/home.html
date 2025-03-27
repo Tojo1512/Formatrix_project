@@ -4,21 +4,25 @@
 {% block title %}Accueil - Formatrix{% endblock %}
 
 {% block content %}
-<div class="home-content">
-  <div class="text-center">
-      <h1 class="display-4 mb-4 fw-bold">
-        <i class="fas fa-graduation-cap text-primary me-3"></i>
-        Bienvenue sur Formatrix
-      </h1>
-      
-      {% if user.is_authenticated %}
-        <div class="card bg-dark text-light border-0 shadow-sm mb-4">
+<div class="page-inner py-4">
+  <div class="page-header">
+    <h4 class="page-title">Tableau de bord</h4>
+    <div class="page-category text-secondary">Bienvenue sur Formatrix</div>
+  </div>
+
+  {% if user.is_authenticated %}
+    <!-- Section de bienvenue -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card">
           <div class="card-body">
-            <div class="d-flex align-items-center justify-content-center mb-3">
-              <i class="fas fa-user-circle text-primary me-2 fa-2x"></i>
+            <div class="d-flex align-items-center mb-3">
+              <div class="avatar avatar-xl bg-primary text-white me-3">
+                <i class="fas fa-user-circle"></i>
+              </div>
               <div>
-                <h4 class="card-title mb-1">{{ user.username }}</h4>
-                <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} mb-2">
+                <h4 class="mb-1">Bonjour, {{ user.username }}</h4>
+                <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} me-2">
                   {% if user.is_staff %}
                     <i class="fas fa-user-shield me-1"></i>Administrateur
                   {% else %}
@@ -27,105 +31,259 @@
                 </span>
               </div>
             </div>
-            <p class="card-text mb-4">
+            <p class="text-muted">
               {% if user.is_staff %}
-                Vous avez accès à toutes les fonctionnalités d'administration.
+                Vous avez accès à toutes les fonctionnalités d'administration de la plateforme.
               {% else %}
                 Vous avez accès aux fonctionnalités de gestion des formations.
               {% endif %}
             </p>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-              <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-danger">
-                  <i class="fas fa-sign-out-alt me-2"></i>Se déconnecter
-                </button>
-              </form>
-            </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <!-- Quick Actions -->
-        <div class="row g-4 mt-2">
-          {% if user.is_staff %}
-            <!-- Actions Administrateur -->
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-users-cog text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Gestion des Utilisateurs</h5>
-                  <p class="card-text">Gérez les formateurs et les accès</p>
+    <!-- Cartes statistiques -->
+    <div class="row mt-4">
+      <div class="col-sm-6 col-md-3">
+        <div class="card card-stats card-round">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-icon">
+                <div class="icon-big text-center icon-primary bubble-shadow-small">
+                  <i class="fas fa-users"></i>
                 </div>
               </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-chart-pie text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Statistiques Globales</h5>
-                  <p class="card-text">Analysez les performances</p>
+              <div class="col col-stats ml-3 ml-sm-0">
+                <div class="numbers">
+                  <p class="card-category">Apprenants</p>
+                  <h4 class="card-title">25</h4>
                 </div>
               </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-cogs text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Configuration</h5>
-                  <p class="card-text">Paramètres du système</p>
-                </div>
-              </div>
-            </div>
-          {% else %}
-            <!-- Actions Formateur -->
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-chalkboard-teacher text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Mes Formations</h5>
-                  <p class="card-text">Gérez vos sessions de formation</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-user-graduate text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Mes Apprenants</h5>
-                  <p class="card-text">Suivez vos apprenants</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card bg-dark text-light border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <i class="fas fa-chart-line text-primary fa-2x mb-3"></i>
-                  <h5 class="card-title">Mes Rapports</h5>
-                  <p class="card-text">Consultez vos statistiques</p>
-                </div>
-              </div>
-            </div>
-          {% endif %}
-        </div>
-      {% else %}
-        <div class="card bg-dark text-light border-0 shadow-sm">
-          <div class="card-body py-5">
-            <h4 class="card-title mb-4">Connectez-vous pour accéder à votre espace</h4>
-            <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-              <a href="{% url 'login' %}" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
-              </a>
-              <a href="{% url 'formateurs:formateur-register' 'formateur_secret_key_2024' %}" class="btn btn-outline-light">
-                <i class="fas fa-user-plus me-2"></i>S'inscrire
-              </a>
-              <a href="{% url 'password_reset' %}" class="btn btn-link text-light">
-                <i class="fas fa-key me-2"></i>Mot de passe oublié ?
-              </a>
             </div>
           </div>
         </div>
-      {% endif %}
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="card card-stats card-round">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-icon">
+                <div class="icon-big text-center icon-info bubble-shadow-small">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+              </div>
+              <div class="col col-stats ml-3 ml-sm-0">
+                <div class="numbers">
+                  <p class="card-category">Séances</p>
+                  <h4 class="card-title">8</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="card card-stats card-round">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-icon">
+                <div class="icon-big text-center icon-success bubble-shadow-small">
+                  <i class="fas fa-book"></i>
+                </div>
+              </div>
+              <div class="col col-stats ml-3 ml-sm-0">
+                <div class="numbers">
+                  <p class="card-category">Cours</p>
+                  <h4 class="card-title">12</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="card card-stats card-round">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-icon">
+                <div class="icon-big text-center icon-secondary bubble-shadow-small">
+                  <i class="fas fa-building"></i>
+                </div>
+              </div>
+              <div class="col col-stats ml-3 ml-sm-0">
+                <div class="numbers">
+                  <p class="card-category">Clients</p>
+                  <h4 class="card-title">5</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accès rapides -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Accès rapides</div>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              {% if user.is_staff %}
+                <!-- Actions Administrateur -->
+                <div class="col-md-4">
+                  <div class="card card-dark bg-dark-gradient">
+                    <div class="card-body d-flex align-items-center">
+                      <div class="icon-box me-3">
+                        <i class="fas fa-users-cog text-white fa-2x"></i>
+                      </div>
+                      <div>
+                        <h5 class="card-title text-white mb-1">Gestion des Utilisateurs</h5>
+                        <p class="card-text text-white-50 small">Gérez les formateurs et les accès</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card card-dark bg-dark-gradient">
+                    <div class="card-body d-flex align-items-center">
+                      <div class="icon-box me-3">
+                        <i class="fas fa-chart-pie text-white fa-2x"></i>
+                      </div>
+                      <div>
+                        <h5 class="card-title text-white mb-1">Statistiques Globales</h5>
+                        <p class="card-text text-white-50 small">Analysez les performances</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card card-dark bg-dark-gradient">
+                    <div class="card-body d-flex align-items-center">
+                      <div class="icon-box me-3">
+                        <i class="fas fa-cogs text-white fa-2x"></i>
+                      </div>
+                      <div>
+                        <h5 class="card-title text-white mb-1">Configuration</h5>
+                        <p class="card-text text-white-50 small">Paramètres du système</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% else %}
+                <!-- Actions Formateur -->
+                <div class="col-md-4">
+                  <div class="card card-dark bg-dark-gradient">
+                    <div class="card-body d-flex align-items-center">
+                      <div class="icon-box me-3">
+                        <i class="fas fa-chalkboard-teacher text-white fa-2x"></i>
+                      </div>
+                      <div>
+                        <h5 class="card-title text-white mb-1">Mes Formations</h5>
+                        <p class="card-text text-white-50 small">Gérez vos sessions de formation</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card card-dark bg-dark-gradient">
+                    <div class="card-body d-flex align-items-center">
+                      <div class="icon-box me-3">
+                        <i class="fas fa-user-graduate text-white fa-2x"></i>
+                      </div>
+                      <div>
+                        <h5 class="card-title text-white mb-1">Mes Apprenants</h5>
+                        <p class="card-text text-white-50 small">Suivez vos apprenants</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card card-dark bg-dark-gradient">
+                    <div class="card-body d-flex align-items-center">
+                      <div class="icon-box me-3">
+                        <i class="fas fa-chart-line text-white fa-2x"></i>
+                      </div>
+                      <div>
+                        <h5 class="card-title text-white mb-1">Mes Rapports</h5>
+                        <p class="card-text text-white-50 small">Consultez vos statistiques</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block guest_content %}
+{% if not user.is_authenticated %}
+<!-- Page de bienvenue pour les utilisateurs non connectés -->
+<div class="container-fluid h-100">
+  <div class="row justify-content-center mt-5 mb-5 pb-5">
+    <div class="col-md-10">
+      <div class="card shadow-lg mb-5">
+        <div class="card-body">
+          <div class="text-center mb-5 mt-4">
+            <div class="avatar avatar-xxl mb-4">
+              <i class="fas fa-graduation-cap text-primary fa-5x"></i>
+            </div>
+            <h1 class="display-4 fw-bold">Bienvenue sur Formatrix</h1>
+            <p class="lead text-muted fs-4">Votre plateforme complète de gestion de formations</p>
+          </div>
+          
+          <div class="row mt-5 px-4 mb-5">
+            <div class="col-md-4 mb-4">
+              <div class="card card-pricing bg-primary-gradient h-100 shadow-lg">
+                <div class="card-body text-center p-5">
+                  <i class="fas fa-sign-in-alt text-white mb-4 fa-4x"></i>
+                  <h3 class="card-title text-white fw-bold">Connexion</h3>
+                  <p class="card-text text-white opacity-9 mb-4 fs-5">Accédez à votre espace personnel</p>
+                  <a href="{% url 'login' %}" class="btn btn-lg btn-light fw-bold">
+                    <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card card-pricing bg-success-gradient h-100 shadow-lg">
+                <div class="card-body text-center p-5">
+                  <i class="fas fa-user-plus text-white mb-4 fa-4x"></i>
+                  <h3 class="card-title text-white fw-bold">Inscription</h3>
+                  <p class="card-text text-white opacity-9 mb-4 fs-5">Rejoignez notre plateforme</p>
+                  <a href="{% url 'formateurs:formateur-register' 'formateur_secret_key_2024' %}" class="btn btn-lg btn-light fw-bold">
+                    <i class="fas fa-user-plus me-2"></i>S'inscrire
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+              <div class="card card-pricing bg-info-gradient h-100 shadow-lg">
+                <div class="card-body text-center p-5">
+                  <i class="fas fa-info-circle text-white mb-4 fa-4x"></i>
+                  <h3 class="card-title text-white fw-bold">À propos</h3>
+                  <p class="card-text text-white opacity-9 mb-4 fs-5">Découvrez notre plateforme</p>
+                  <a href="#" class="btn btn-lg btn-light fw-bold">
+                    <i class="fas fa-info-circle me-2"></i>En savoir plus
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+{% endif %}
 {% endblock %}
