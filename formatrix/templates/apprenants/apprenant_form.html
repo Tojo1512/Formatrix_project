@@ -1,216 +1,406 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if object.apprenant_id %}Edit{% else %}Add{% endif %} a Learner - Formatrix{% endblock %}
+{% block title %}{% if object.apprenant_id %}Modifier{% else %}Ajouter{% endif %} un Apprenant - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/theme.css' %}">
 <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/apprenants/add.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="form-container">
-  <div class="form-header">
-    <h2 class="form-title">
-      <i class="fas {% if object.apprenant_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
-      {% if object.apprenant_id %}Edit{% else %}Add{% endif %} a Learner
-    </h2>
-    <a href="{% url 'apprenant-list' %}" class="btn btn-outline">
-      <i class="fas fa-arrow-left"></i>
-      Back
-    </a>
+<div class="page-inner">
+  <div class="page-header mb-4 d-flex align-items-center">
+    <div>
+      <h1 class="page-title mb-1">
+        {% if object.apprenant_id %}Modifier{% else %}Ajouter{% endif %} un Apprenant
+      </h1>
+      <p class="text-muted small">Remplissez tous les champs obligatoires marqués d'un <span class="required-asterisk">*</span></p>
+    </div>
+    <div class="ms-auto">
+      <a href="{% url 'apprenants:apprenant-list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Retour
+      </a>
+    </div>
   </div>
 
   {% if messages %}
-    {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+        <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %} me-2"></i>
         {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
       </div>
-    {% endfor %}
-  {% endif %}
-
-  {% if form.non_field_errors %}
-    <div class="alert alert-danger">
-      {% for error in form.non_field_errors %}
-        {{ error }}
       {% endfor %}
     </div>
+  </div>
   {% endif %}
 
-  <form method="post" novalidate>
-    {% csrf_token %}
-    <div class="form-grid">
-      <!-- Personal Information -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-user"></i>
-          Personal Information
-        </h3>
-        
-        <div class="form-row">
-          <div class="form-group {% if form.nom_apprenant.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.nom_apprenant.id_for_label }}">
-              <i class="fas fa-user"></i>
-              Learner's Name
-            </label>
-            {{ form.nom_apprenant }}
-            {% include "includes/field_errors.html" with field=form.nom_apprenant %}
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header d-flex align-items-center">
+          <div class="me-2">
+            <i class="fas {% if object.apprenant_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
           </div>
-
-          <div class="form-group {% if form.autres_nom.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.autres_nom.id_for_label }}">
-              <i class="fas fa-user-tag"></i>
-              Other Names
-            </label>
-            {{ form.autres_nom }}
-            {% include "includes/field_errors.html" with field=form.autres_nom %}
+          <div>
+            <h4 class="card-title mb-0">
+              Informations de l'apprenant
+            </h4>
+            <small class="text-white-50">{% if object.apprenant_id %}Modification des informations existantes{% else %}Création d'un nouveau profil apprenant{% endif %}</small>
           </div>
         </div>
-
-        <div class="form-row">
-          <div class="form-group {% if form.cin.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.cin.id_for_label }}">
-              <i class="fas fa-id-card"></i>
-              ID Number
-            </label>
-            {{ form.cin }}
-            {% include "includes/field_errors.html" with field=form.cin %}
+        <div class="card-body">
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger d-flex align-items-center mb-4">
+            <i class="fas fa-exclamation-circle me-3"></i>
+            <div>
+              {% for error in form.non_field_errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
           </div>
+          {% endif %}
 
-          <div class="form-group {% if form.date_naissance.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.date_naissance.id_for_label }}">
-              <i class="fas fa-calendar-alt"></i>
-              Date of Birth
-            </label>
-            {{ form.date_naissance }}
-            {% include "includes/field_errors.html" with field=form.date_naissance %}
-          </div>
-        </div>
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <!-- Informations personnelles -->
+            <div class="card mb-4 form-section">
+              <div class="card-header bg-light d-flex align-items-center">
+                <h5 class="card-section-title mb-0">
+                  <i class="fas fa-user me-2"></i>Informations personnelles
+                </h5>
+                <span class="badge-section ms-auto">1/3</span>
+              </div>
+              <div class="card-body pt-4">
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.nom_apprenant.id_for_label }}">
+                        Nom de l'apprenant<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-user form-icon"></i>
+                        <input type="text" name="{{ form.nom_apprenant.html_name }}" id="{{ form.nom_apprenant.id_for_label }}" class="form-control input-with-icon {% if form.nom_apprenant.errors %}is-invalid{% endif %}" value="{{ form.nom_apprenant.value|default:'' }}" placeholder="Entrez le nom complet">
+                      </div>
+                      {% if form.nom_apprenant.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.nom_apprenant.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.autres_nom.id_for_label }}">
+                        Autres noms
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-user-tag form-icon"></i>
+                        <input type="text" name="{{ form.autres_nom.html_name }}" id="{{ form.autres_nom.id_for_label }}" class="form-control input-with-icon {% if form.autres_nom.errors %}is-invalid{% endif %}" value="{{ form.autres_nom.value|default:'' }}" placeholder="Autres noms (optionnel)">
+                      </div>
+                      {% if form.autres_nom.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.autres_nom.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
 
-        <div class="form-row">
-          <div class="form-group {% if form.sexe.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.sexe.id_for_label }}">
-              <i class="fas fa-venus-mars"></i>
-              Gender
-            </label>
-            {{ form.sexe }}
-            {% include "includes/field_errors.html" with field=form.sexe %}
-          </div>
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.cin.id_for_label }}">
+                        Numéro CIN<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-id-card form-icon"></i>
+                        <input type="text" name="{{ form.cin.html_name }}" id="{{ form.cin.id_for_label }}" class="form-control input-with-icon {% if form.cin.errors %}is-invalid{% endif %}" value="{{ form.cin.value|default:'' }}" placeholder="Format: 000 000 000 000">
+                      </div>
+                      {% if form.cin.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.cin.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.date_naissance.id_for_label }}">
+                        Date de naissance<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-calendar-alt form-icon"></i>
+                        <input type="date" name="{{ form.date_naissance.html_name }}" id="{{ form.date_naissance.id_for_label }}" class="form-control input-with-icon {% if form.date_naissance.errors %}is-invalid{% endif %}" value="{{ form.date_naissance.value|date:'Y-m-d'|default:'' }}">
+                      </div>
+                      {% if form.date_naissance.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.date_naissance.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
 
-          <div class="form-group {% if form.categorie_age.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.categorie_age.id_for_label }}">
-              <i class="fas fa-birthday-cake"></i>
-              Age Category
-            </label>
-            {{ form.categorie_age }}
-            {% include "includes/field_errors.html" with field=form.categorie_age %}
-          </div>
-        </div>
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.sexe.id_for_label }}">
+                        Genre<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-venus-mars form-icon"></i>
+                        <select name="{{ form.sexe.html_name }}" id="{{ form.sexe.id_for_label }}" class="form-select input-with-icon {% if form.sexe.errors %}is-invalid{% endif %}">
+                          <option value="" disabled {% if not form.sexe.value %}selected{% endif %}>Sélectionnez un genre</option>
+                          {% for option in form.sexe.field.choices %}
+                            <option value="{{ option.0 }}" {% if form.sexe.value == option.0 %}selected{% endif %}>{{ option.1 }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      {% if form.sexe.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.sexe.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.categorie_age.id_for_label }}">
+                        Catégorie d'âge<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-birthday-cake form-icon"></i>
+                        <select name="{{ form.categorie_age.html_name }}" id="{{ form.categorie_age.id_for_label }}" class="form-select input-with-icon {% if form.categorie_age.errors %}is-invalid{% endif %}">
+                          <option value="" disabled {% if not form.categorie_age.value %}selected{% endif %}>Sélectionnez une catégorie</option>
+                          {% for option in form.categorie_age.field.choices %}
+                            <option value="{{ option.0 }}" {% if form.categorie_age.value == option.0 %}selected{% endif %}>{{ option.1 }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      {% if form.categorie_age.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.categorie_age.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
 
-        <div class="form-group {% if form.adresse_rue.errors %}has-error{% endif %}">
-          <label class="form-label" for="{{ form.adresse_rue.id_for_label }}">
-            <i class="fas fa-map-marker-alt"></i>
-            Address
-          </label>
-          {{ form.adresse_rue }}
-          {% include "includes/field_errors.html" with field=form.adresse_rue %}
-        </div>
+                <div class="form-group mb-3">
+                  <label class="form-label" for="{{ form.adresse_rue.id_for_label }}">
+                    Adresse<span class="required-asterisk">*</span>
+                  </label>
+                  <div class="position-relative">
+                    <i class="fas fa-map-marker-alt form-icon" style="top: 1.2rem;"></i>
+                    <textarea name="{{ form.adresse_rue.html_name }}" id="{{ form.adresse_rue.id_for_label }}" class="form-control input-with-icon {% if form.adresse_rue.errors %}is-invalid{% endif %}" rows="3" placeholder="Adresse complète">{{ form.adresse_rue.value|default:'' }}</textarea>
+                  </div>
+                  {% if form.adresse_rue.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.adresse_rue.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
 
-        <div class="form-row">
-          <div class="form-group {% if form.localite.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.localite.id_for_label }}">
-              <i class="fas fa-map"></i>
-              Location
-            </label>
-            {{ form.localite }}
-            {% include "includes/field_errors.html" with field=form.localite %}
-          </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.localite.id_for_label }}">
+                        Localité<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-map form-icon"></i>
+                        <input type="text" name="{{ form.localite.html_name }}" id="{{ form.localite.id_for_label }}" class="form-control input-with-icon {% if form.localite.errors %}is-invalid{% endif %}" value="{{ form.localite.value|default:'' }}" placeholder="Entrez la localité">
+                      </div>
+                      {% if form.localite.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.localite.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.ville.id_for_label }}">
+                        Ville<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-city form-icon"></i>
+                        <input type="text" name="{{ form.ville.html_name }}" id="{{ form.ville.id_for_label }}" class="form-control input-with-icon {% if form.ville.errors %}is-invalid{% endif %}" value="{{ form.ville.value|default:'' }}" placeholder="Entrez la ville">
+                      </div>
+                      {% if form.ville.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.ville.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          <div class="form-group {% if form.ville.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.ville.id_for_label }}">
-              <i class="fas fa-city"></i>
-              City
-            </label>
-            {{ form.ville }}
-            {% include "includes/field_errors.html" with field=form.ville %}
-          </div>
-        </div>
-      </div>
+            <!-- Informations académiques -->
+            <div class="card mb-4 form-section">
+              <div class="card-header bg-light d-flex align-items-center">
+                <h5 class="card-section-title mb-0">
+                  <i class="fas fa-graduation-cap me-2"></i>Informations académiques
+                </h5>
+                <span class="badge-section ms-auto">2/3</span>
+              </div>
+              <div class="card-body pt-4">
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.niveau_academique.id_for_label }}">
+                        Niveau académique<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-layer-group form-icon"></i>
+                        <select name="{{ form.niveau_academique.html_name }}" id="{{ form.niveau_academique.id_for_label }}" class="form-select input-with-icon {% if form.niveau_academique.errors %}is-invalid{% endif %}">
+                          <option value="" disabled {% if not form.niveau_academique.value %}selected{% endif %}>Sélectionnez un niveau</option>
+                          {% for option in form.niveau_academique.field.choices %}
+                            <option value="{{ option.0 }}" {% if form.niveau_academique.value == option.0 %}selected{% endif %}>{{ option.1 }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      {% if form.niveau_academique.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.niveau_academique.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="form-label" for="{{ form.type_apprenant.id_for_label }}">
+                        Type d'apprenant
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-user-graduate form-icon"></i>
+                        <input type="text" name="{{ form.type_apprenant.html_name }}" id="{{ form.type_apprenant.id_for_label }}" class="form-control input-with-icon {% if form.type_apprenant.errors %}is-invalid{% endif %}" value="{{ form.type_apprenant.value|default:'' }}" placeholder="Ex: Régulier, à distance, etc.">
+                      </div>
+                      {% if form.type_apprenant.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.type_apprenant.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
 
-      <!-- Academic Information -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-graduation-cap"></i>
-          Academic Information
-        </h3>
-        
-        <div class="form-row">
-          <div class="form-group {% if form.niveau_academique.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.niveau_academique.id_for_label }}">
-              <i class="fas fa-layer-group"></i>
-              Academic Level
-            </label>
-            {{ form.niveau_academique }}
-            {% include "includes/field_errors.html" with field=form.niveau_academique %}
-          </div>
+                <div class="form-group">
+                  <label class="form-label" for="{{ form.besoins_speciaux.id_for_label }}">
+                    Besoins spéciaux
+                  </label>
+                  <div class="position-relative">
+                    <i class="fas fa-hand-holding-heart form-icon" style="top: 1.2rem;"></i>
+                    <textarea name="{{ form.besoins_speciaux.html_name }}" id="{{ form.besoins_speciaux.id_for_label }}" class="form-control input-with-icon {% if form.besoins_speciaux.errors %}is-invalid{% endif %}" rows="3" placeholder="Indiquez tout besoin spécial ou handicap">{{ form.besoins_speciaux.value|default:'' }}</textarea>
+                  </div>
+                  {% if form.besoins_speciaux.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.besoins_speciaux.errors %}
+                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
 
-          <div class="form-group {% if form.type_apprenant.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.type_apprenant.id_for_label }}">
-              <i class="fas fa-user-graduate"></i>
-              Learner Type
-            </label>
-            {{ form.type_apprenant }}
-            {% include "includes/field_errors.html" with field=form.type_apprenant %}
-          </div>
-        </div>
+            <!-- Contact d'urgence -->
+            <div class="card mb-4 form-section">
+              <div class="card-header bg-light d-flex align-items-center">
+                <h5 class="card-section-title mb-0">
+                  <i class="fas fa-phone-alt me-2"></i>Contact d'urgence
+                </h5>
+                <span class="badge-section ms-auto">3/3</span>
+              </div>
+              <div class="card-body pt-4">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group mb-3">
+                      <label class="form-label" for="{{ form.contact_urgence.id_for_label }}">
+                        Personne à contacter<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-user-friends form-icon"></i>
+                        <input type="text" name="{{ form.contact_urgence.html_name }}" id="{{ form.contact_urgence.id_for_label }}" class="form-control input-with-icon {% if form.contact_urgence.errors %}is-invalid{% endif %}" value="{{ form.contact_urgence.value|default:'' }}" placeholder="Nom complet du contact">
+                      </div>
+                      {% if form.contact_urgence.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.contact_urgence.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group mb-3">
+                      <label class="form-label" for="{{ form.telephone_urgence.id_for_label }}">
+                        Téléphone d'urgence<span class="required-asterisk">*</span>
+                      </label>
+                      <div class="position-relative">
+                        <i class="fas fa-phone form-icon"></i>
+                        <input type="text" name="{{ form.telephone_urgence.html_name }}" id="{{ form.telephone_urgence.id_for_label }}" class="form-control input-with-icon {% if form.telephone_urgence.errors %}is-invalid{% endif %}" value="{{ form.telephone_urgence.value|default:'' }}" placeholder="Ex: +261 xx xx xxx xx">
+                      </div>
+                      {% if form.telephone_urgence.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in form.telephone_urgence.errors %}
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                        {% endfor %}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <div class="form-group {% if form.besoins_speciaux.errors %}has-error{% endif %}">
-          <label class="form-label" for="{{ form.besoins_speciaux.id_for_label }}">
-            <i class="fas fa-hand-holding-heart"></i>
-            Special Needs
-          </label>
-          {{ form.besoins_speciaux }}
-          {% include "includes/field_errors.html" with field=form.besoins_speciaux %}
-        </div>
-      </div>
-
-      <!-- Emergency Contact -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-phone-alt"></i>
-          Emergency Contact
-        </h3>
-        
-        <div class="form-group {% if form.contact_urgence.errors %}has-error{% endif %}">
-          <label class="form-label" for="{{ form.contact_urgence.id_for_label }}">
-            <i class="fas fa-user-friends"></i>
-            Person to Contact
-          </label>
-          {{ form.contact_urgence }}
-          {% include "includes/field_errors.html" with field=form.contact_urgence %}
-        </div>
-
-        <div class="form-group {% if form.telephone_urgence.errors %}has-error{% endif %}">
-          <label class="form-label" for="{{ form.telephone_urgence.id_for_label }}">
-            <i class="fas fa-phone"></i>
-            Emergency Phone
-          </label>
-          {{ form.telephone_urgence }}
-          {% include "includes/field_errors.html" with field=form.telephone_urgence %}
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'apprenants:apprenant-list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-2"></i>Annuler
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas {% if object.apprenant_id %}fa-save{% else %}fa-plus-circle{% endif %} me-2"></i>
+                {% if object.apprenant_id %}Enregistrer{% else %}Ajouter l'apprenant{% endif %}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">
-        <i class="fas {% if object.apprenant_id %}fa-save{% else %}fa-plus-circle{% endif %}"></i>
-        {% if object.apprenant_id %}Save Changes{% else %}Add Learner{% endif %}
-      </button>
-      <a href="{% url 'apprenant-list' %}" class="btn btn-outline">
-        <i class="fas fa-times"></i>
-        Cancel
-      </a>
-    </div>
-  </form>
+  </div>
 </div>
-{% endblock content %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/apprenants/add.js' %}"></script>
+{% endblock %}

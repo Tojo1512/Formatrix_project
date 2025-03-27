@@ -76,7 +76,7 @@ white-color: #ffffff
 black-color: #191919
 transparent-bg : transparent
 default-color : #282a3c
-primary-color : #177dff
+primary-color : #9c0000
 secondary-color : #716aca
 info-color : #36a3f7
 success-color : #35cd3a
@@ -95,10 +95,10 @@ body, html {
   color: #2A2F5B; }
 
 a {
-  color: #1572E8;
+  color: #9c0000;
   text-decoration: none !important; }
   a:hover, a:focus {
-    color: #1269DB; }
+    color: #6e0000; }
 
 h1,
 .h1 {
@@ -161,9 +161,9 @@ b, .b, strong, .strong {
   margin-bottom: 25px; }
 
 .text-primary, .text-primary a {
-  color: #1572E8 !important; }
+  color: #9c0000 !important; }
   .text-primary:hover, .text-primary a:hover {
-    color: #1572E8 !important; }
+    color: #9c0000 !important; }
 
 .text-secondary, .text-secondary a {
   color: #6861CE !important; }

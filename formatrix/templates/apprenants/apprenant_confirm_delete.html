@@ -1,160 +1,79 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Delete learner {{ apprenant.nom_apprenant }} - Formatrix{% endblock %}
+{% block title %}Supprimer l'apprenant {{ apprenant.nom_apprenant }} - Formatrix{% endblock %}
 
 {% block content %}
-<div class="card">
-  <h2 class="mb-4">Confirm Deletion</h2>
-  
-  <div class="alert alert-danger">
-    <i class="fas fa-exclamation-triangle"></i>
-    Are you sure you want to delete the learner <strong>{{ apprenant.nom_apprenant }}</strong>?
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Confirmation de suppression</h1>
+    <div class="ms-auto">
+      <a href="{% url 'apprenants:apprenant-list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Retour
+      </a>
+    </div>
   </div>
-  
-  <div class="course-info mb-4">
-    <div class="info-row">
-      <div class="info-label">ID Number:</div>
-      <div class="info-value">{{ apprenant.cin }}</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">City:</div>
-      <div class="info-value">{{ apprenant.ville }}</div>
-    </div>
-    <div class="info-row">
-      <div class="info-label">Gender:</div>
-      <div class="info-value">
-        <span class="badge {% if apprenant.sexe == 'M' %}badge-info{% else %}badge-secondary{% endif %}">
-          {% for code, label in sexe_choices %}
-            {% if code == apprenant.sexe %}{{ label }}{% endif %}
-          {% endfor %}
-        </span>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="alert alert-danger d-flex align-items-center mb-4">
+            <i class="fas fa-exclamation-triangle me-3 fa-2x"></i>
+            <div>
+              <h4 class="alert-heading">Attention !</h4>
+              <p class="mb-0">Êtes-vous sûr de vouloir supprimer l'apprenant <strong>{{ apprenant.nom_apprenant }}</strong> ? Cette action est irréversible.</p>
+            </div>
+          </div>
+          
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Informations de l'apprenant</h5>
+            </div>
+            <div class="card-body">
+              <table class="table table-borderless">
+                <tbody>
+                  <tr>
+                    <th style="width: 150px;">Numéro CIN:</th>
+                    <td>{{ apprenant.cin }}</td>
+                  </tr>
+                  <tr>
+                    <th>Ville:</th>
+                    <td>{{ apprenant.ville }}</td>
+                  </tr>
+                  <tr>
+                    <th>Genre:</th>
+                    <td>
+                      <span class="badge {% if apprenant.sexe == 'M' %}bg-primary{% elif apprenant.sexe == 'F' %}bg-info{% else %}bg-secondary{% endif %}">
+                        {% for code, label in sexe_choices %}
+                          {% if code == apprenant.sexe %}{{ label }}{% endif %}
+                        {% endfor %}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Date de naissance:</th>
+                    <td>{{ apprenant.date_naissance|date:"d/m/Y" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'apprenants:apprenant-detail' apprenant.apprenant_id %}" class="btn btn-secondary">
+                <i class="fas fa-times me-2"></i>Annuler
+              </a>
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Confirmer la suppression
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-  
-  <form method="post">
-    {% csrf_token %}
-    <div class="form-actions">
-      <a href="{% url 'apprenant-list' %}" class="btn btn-outline">
-        <i class="fas fa-arrow-left"></i>
-        Cancel
-      </a>
-      <button type="submit" class="btn btn-danger">
-        <i class="fas fa-trash"></i>
-        Confirm Deletion
-      </button>
-    </div>
-  </form>
 </div>
-
-{% block extra_css %}
-<style>
-  .alert-danger {
-    background-color: var(--error-bg);
-    color: var(--error-color);
-    padding: 1rem;
-    border-radius: var(--radius-md);
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    border-left: 4px solid var(--error-color);
-  }
-  
-  .course-info {
-    background-color: var(--bg-secondary);
-    padding: 1.5rem;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
-  }
-  
-  .info-row {
-    display: flex;
-    margin-bottom: 0.75rem;
-  }
-  
-  .info-label {
-    font-weight: 600;
-    width: 150px;
-    color: var(--text-secondary);
-  }
-  
-  .info-value {
-    flex: 1;
-  }
-  
-  .btn-danger {
-    background-color: var(--error-color);
-    color: white;
-    border: none;
-    transition: all var(--transition-normal);
-    box-shadow: var(--elevation-1);
-    font-weight: 600;
-    min-width: 120px;
-    justify-content: center;
-  }
-  
-  .btn-danger:hover {
-    background-color: #b91c1c;
-    transform: translateY(-2px);
-    box-shadow: var(--elevation-2);
-  }
-  
-  .btn-danger:active {
-    transform: translateY(0);
-    box-shadow: var(--elevation-1);
-  }
-  
-  .badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  
-  .badge-info {
-    background-color: var(--info-color);
-    color: white;
-  }
-  
-  .badge-secondary {
-    background-color: var(--secondary-color);
-    color: white;
-  }
-  
-  .mb-4 {
-    margin-bottom: 1.5rem;
-  }
-  
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-  }
-  
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    text-decoration: none;
-  }
-  
-  .btn-outline {
-    background-color: transparent;
-    color: var(--primary-color);
-    border: 1px solid var(--primary-color);
-  }
-  
-  .btn-outline:hover {
-    background-color: rgba(212, 43, 30, 0.05);
-    transform: translateY(-2px);
-  }
-</style>
-{% endblock %}
 {% endblock %}

@@ -1,0 +1,551 @@
+:root {
+  --primary-color: #9c0000;
+  --primary-gradient: linear-gradient(135deg, #9c0000, #6e0000);
+  --secondary-color: #6c757d;
+  --success-color: #1cc88a;
+  --info-color: #36b9cc;
+  --warning-color: #f6c23e;
+  --danger-color: #e74a3b;
+  --light-color: #f8f9fc;
+  --dark-color: #5a5c69;
+  --input-focus-color: rgba(156, 0, 0, 0.25);
+}
+
+.card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: none;
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+}
+
+.card:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 5px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-5px);
+}
+
+.card-header {
+  background: var(--primary-gradient);
+  border-bottom: none;
+  color: white;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-header:before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bg-light {
+  background: var(--primary-gradient) !important;
+  color: white !important;
+  border-bottom: none;
+}
+
+.form-control:focus, .form-select:focus {
+  box-shadow: 0 0 0 0.25rem var(--input-focus-color);
+  border-color: var(--primary-color);
+}
+
+.form-group {
+  margin-bottom: 1.75rem;
+  position: relative;
+}
+
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #4a5568;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.form-control, .form-select {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #fff;
+  color: #2d3748;
+  height: auto;
+}
+
+.form-control:hover, .form-select:hover {
+  border-color: #cbd5e0;
+  background-color: #f7fafc;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #b50000, #7e0000);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-secondary, .btn-outline-secondary {
+  transition: all 0.3s ease;
+}
+
+.btn-outline-secondary {
+  color: #4a5568;
+  border: 2px solid #cbd5e0;
+  background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f8f9fc;
+  color: #2d3748;
+  border-color: #a0aec0;
+  transform: translateY(-2px);
+}
+
+.page-title {
+  color: #2d3748;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding-bottom: 0.75rem;
+  font-size: 1.75rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.page-title:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--primary-gradient);
+  border-radius: 4px;
+}
+
+.invalid-feedback {
+  font-size: 80%;
+  color: var(--danger-color);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.card-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0;
+  letter-spacing: 0.5px;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.card-header:hover .card-section-title {
+  transform: translateX(5px);
+}
+
+.form-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 1rem;
+  color: #a0aec0;
+  z-index: 2;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.input-with-icon {
+  padding-left: 2.75rem;
+}
+
+.required-asterisk {
+  color: var(--danger-color);
+  font-weight: 700;
+  margin-left: 0.25rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.section-divider {
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), transparent);
+  margin: 2rem 0;
+  border-radius: 2px;
+}
+
+.form-section {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-section:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.form-section:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.active .form-label {
+  color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.active .form-icon {
+  color: var(--primary-color);
+}
+
+.badge-section {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 50rem;
+  padding: 0.35rem 0.9rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  margin-left: 0.75rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-section:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.2), rgba(255,255,255,0));
+  transform: translateX(-100%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.card-body {
+  padding: 1.75rem;
+  background-color: #fff;
+}
+
+textarea.form-control {
+  resize: none;
+  min-height: 100px;
+}
+
+.page-inner {
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.is-invalid {
+  border-color: var(--danger-color) !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23e74a3b'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23e74a3b' stroke='none'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.btn-close:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+.alert {
+  border-radius: 0.5rem;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+.alert-danger {
+  background-color: #fdf2f2;
+  color: #9b2c2c;
+  border-left: 4px solid var(--danger-color);
+}
+
+.alert-success {
+  background-color: #f0fff4;
+  color: #276749;
+  border-left: 4px solid var(--success-color);
+}
+
+select.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a0aec0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  padding-right: 2.5rem;
+}
+
+.form-control::placeholder, .form-select::placeholder {
+  color: #a0aec0;
+  opacity: 0.7;
+}
+
+.form-control:focus::placeholder, .form-select:focus::placeholder {
+  opacity: 0.5;
+}
+
+/* Hover effects for cards */
+.card.form-section::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-gradient);
+  transform: scaleY(0);
+  transform-origin: 0 100%;
+  transition: transform 0.5s ease-out;
+  border-radius: 0.75rem;
+  opacity: 0.05;
+}
+
+.card.form-section:hover::before {
+  transform: scaleY(1);
+}
+
+/* Enhance focus styles */
+.form-control:focus, .form-select:focus {
+  box-shadow: 0 0 0 0.25rem var(--input-focus-color), 0 5px 15px rgba(156, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Add depth to elements */
+.page-header, .form-section, .btn {
+  position: relative;
+  z-index: 1;
+}
+
+/* Animation for form submission button */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease-in-out;
+}
+
+.btn-primary:hover::after {
+  transform: translateX(50%);
+}
+
+/* Custom checkbox and radio styles */
+.form-check-input {
+  width: 1.2em;
+  height: 1.2em;
+  margin-top: 0.15em;
+  vertical-align: top;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  border: 2px solid #cbd5e0;
+  appearance: none;
+  color-adjust: exact;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.form-check-input:focus {
+  border-color: var(--primary-color);
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem var(--input-focus-color);
+}
+
+/* Add subtle animations to icons */
+.fas {
+  transition: all 0.3s ease;
+}
+
+.form-group:hover .fas {
+  transform: scale(1.1);
+}
+
+/* Ajouter les styles pour l'effet de ripple sur les boutons */
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.6);
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+  animation: ripple 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Effet de pulse pour les badges de section */
+.pulse-effect {
+  animation: pulse-animation 1s ease-in-out;
+}
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Transition de l'ombre pour les cartes */
+.shadow-transition {
+  transition: box-shadow 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Améliorer les transitions pour les champs de formulaire */
+.form-control, .form-select {
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Ajouter un style spécifique pour les champs avec valeur */
+.has-value .form-label {
+  color: #9c0000;
+  font-weight: 600;
+}
+
+.has-value .form-icon {
+  color: #ce0000;
+}
+
+/* Animation pour les icônes au survol des groupes de formulaire */
+.form-group:hover .form-icon {
+  animation: bounceIcon 0.5s ease;
+}
+
+@keyframes bounceIcon {
+  0%, 100% {
+    transform: translateY(-50%);
+  }
+  50% {
+    transform: translateY(-60%);
+  }
+}
+
+/* Effet de focus amélioré pour les champs textarea */
+textarea.form-control:focus {
+  background-color: #f8faff;
+  border-left: 3px solid var(--primary-color);
+}
+
+/* Animation plus fluide pour les alertes */
+.alert {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+/* Ajouter un effet de hover sur les boutons d'action */
+.btn-primary, .btn-outline-secondary {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:active, .btn-outline-secondary:active {
+  transform: scale(0.95);
+}
+
+/* Ajouter un effet de pulsation au marqueur d'astérisque requis */
+@keyframes requiredPulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.required-asterisk:hover {
+  animation: requiredPulse 1s infinite;
+  cursor: help;
+} 
