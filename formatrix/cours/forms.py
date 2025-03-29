@@ -45,7 +45,6 @@ class CoursForm(forms.ModelForm):
             'materiel_requis',
             'horaire',
             'statut_approbation',
-            'formateurs',
             'start_time'
         ]
         widgets = {

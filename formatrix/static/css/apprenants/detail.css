@@ -1,0 +1,39 @@
+.info-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+
+.info-card-header {
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 600;
+}
+
+.info-card-body {
+  padding: 1rem;
+}
+
+.info-item {
+  margin-bottom: 1rem;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.info-value {
+  font-weight: 500;
+}
+
+.badge {
+  font-weight: 500;
+  padding: 0.4em 0.8em;
+}
+
+.btn-action {
+  margin: 0 0.25rem;
+}

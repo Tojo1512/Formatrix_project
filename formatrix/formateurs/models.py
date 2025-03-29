@@ -23,15 +23,16 @@ class Formateur(models.Model):
     ]
 
     formateurid = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='formateur_profile')
+    # Nous commentons temporairement cette relation pour éviter les erreurs
+    # user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='formateur_profile')
     nom = models.CharField(max_length=100, verbose_name="Nom")
     prenom = models.CharField(max_length=100, verbose_name="Prénom")
     email = models.EmailField(unique=True, verbose_name="Email")
-    telephone = models.CharField(max_length=20, verbose_name="Téléphone")
-    date_naissance = models.DateField(verbose_name="Date de naissance")
-    adresse = models.TextField(verbose_name="Adresse")
-    ville = models.CharField(max_length=100, verbose_name="Ville")
-    specialites = models.TextField(verbose_name="Spécialités" ,null=True, blank=True)
+    telephone = models.CharField(max_length=20, verbose_name="Téléphone", null=True, blank=True)
+    date_naissance = models.DateField(verbose_name="Date de naissance", null=True, blank=True)
+    adresse = models.TextField(verbose_name="Adresse", null=True, blank=True)
+    ville = models.CharField(max_length=100, verbose_name="Ville", null=True, blank=True)
+    specialites = models.TextField(verbose_name="Spécialités", null=True, blank=True)
     niveau_expertise = models.CharField(
         max_length=20, 
         choices=NIVEAU_CHOICES,
@@ -56,7 +57,7 @@ class Formateur(models.Model):
         blank=True,
         verbose_name="Photo"
     )
-    date_embauche = models.DateField(verbose_name="Date d'embauche")
+    date_embauche = models.DateField(verbose_name="Date d'embauche", null=True, blank=True)
     statut = models.CharField(
         max_length=20,
         choices=STATUT_CHOICES,
@@ -96,4 +97,4 @@ class Formateur(models.Model):
         return self.cours_assignes.filter(statut_approbation='approuve')
 
     def est_disponible(self):
-        return self.statut == 'actif' 
+        return self.statut == 'actif'

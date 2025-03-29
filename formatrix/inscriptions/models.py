@@ -32,6 +32,8 @@ class Inscription(models.Model):
     type_inscription = models.CharField(max_length=20, choices=TYPE_INSCRIPTION_CHOICES, default='individuelle')
     statut_inscription = models.CharField(max_length=20, choices=STATUT_CHOICES, default='en_cours')
     sponsor = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='inscriptions_sponsorisees')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     
     class Meta:
         db_table = 'inscription'

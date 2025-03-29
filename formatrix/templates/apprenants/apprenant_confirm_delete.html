@@ -3,6 +3,10 @@
 
 {% block title %}Supprimer l'apprenant {{ apprenant.nom_apprenant }} - Formatrix{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apprenants/delete.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="page-inner">
   <div class="page-header mb-4">
@@ -14,65 +18,71 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-body">
-          <div class="alert alert-danger d-flex align-items-center mb-4">
-            <i class="fas fa-exclamation-triangle me-3 fa-2x"></i>
-            <div>
-              <h4 class="alert-heading">Attention !</h4>
-              <p class="mb-0">Êtes-vous sûr de vouloir supprimer l'apprenant <strong>{{ apprenant.nom_apprenant }}</strong> ? Cette action est irréversible.</p>
-            </div>
-          </div>
-          
-          <div class="card mb-4">
-            <div class="card-header">
-              <h5 class="mb-0">Informations de l'apprenant</h5>
-            </div>
-            <div class="card-body">
-              <table class="table table-borderless">
-                <tbody>
-                  <tr>
-                    <th style="width: 150px;">Numéro CIN:</th>
-                    <td>{{ apprenant.cin }}</td>
-                  </tr>
-                  <tr>
-                    <th>Ville:</th>
-                    <td>{{ apprenant.ville }}</td>
-                  </tr>
-                  <tr>
-                    <th>Genre:</th>
-                    <td>
-                      <span class="badge {% if apprenant.sexe == 'M' %}bg-primary{% elif apprenant.sexe == 'F' %}bg-info{% else %}bg-secondary{% endif %}">
-                        {% for code, label in sexe_choices %}
-                          {% if code == apprenant.sexe %}{{ label }}{% endif %}
-                        {% endfor %}
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Date de naissance:</th>
-                    <td>{{ apprenant.date_naissance|date:"d/m/Y" }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          
-          <form method="post">
-            {% csrf_token %}
-            <div class="d-flex justify-content-between">
-              <a href="{% url 'apprenants:apprenant-detail' apprenant.apprenant_id %}" class="btn btn-secondary">
-                <i class="fas fa-times me-2"></i>Annuler
-              </a>
-              <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash me-2"></i>Confirmer la suppression
-              </button>
-            </div>
-          </form>
+  <div class="delete-card">
+    <div class="p-4">
+      <div class="alert-warning-custom d-flex">
+        <div class="me-3">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <div>
+          <h4 class="mb-2">Attention !</h4>
+          <p class="mb-0">Êtes-vous sûr de vouloir supprimer l'apprenant <strong>{{ apprenant.nom_apprenant }}</strong> ? Cette action est irréversible.</p>
         </div>
       </div>
+      
+      <h5 class="mb-3">Informations de l'apprenant</h5>
+      <table class="info-table mb-4">
+        <tbody>
+          <tr>
+            <th>Nom complet :</th>
+            <td>{{ apprenant.nom_apprenant }}</td>
+          </tr>
+          <tr>
+            <th>Numéro CIN :</th>
+            <td>{{ apprenant.cin }}</td>
+          </tr>
+          <tr>
+            <th>Ville :</th>
+            <td>{{ apprenant.ville }}</td>
+          </tr>
+          <tr>
+            <th>Genre :</th>
+            <td>
+              <span class="badge {% if apprenant.sexe == 'M' %}bg-primary{% elif apprenant.sexe == 'F' %}bg-info{% else %}bg-secondary{% endif %}">
+                {% for code, label in sexe_choices %}
+                  {% if code == apprenant.sexe %}{{ label }}{% endif %}
+                {% endfor %}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <th>Date de naissance :</th>
+            <td>{{ apprenant.date_naissance|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <th>Niveau académique :</th>
+            <td>
+              <span class="badge bg-success">
+                {% for code, label in niveau_choices %}
+                  {% if code == apprenant.niveau_academique %}{{ label }}{% endif %}
+                {% endfor %}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <form method="post" action="{% url 'apprenants:apprenant-delete' apprenant.apprenant_id %}">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'apprenants:apprenant-detail' apprenant.apprenant_id %}" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i>Annuler
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash me-2"></i>Confirmer la suppression
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

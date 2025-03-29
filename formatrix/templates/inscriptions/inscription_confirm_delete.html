@@ -1,98 +1,73 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Supprimer l'Inscription - Formatrix{% endblock %}
+{% block title %}Supprimer l'inscription #{{ object.inscription_id }} - Formatrix{% endblock %}
 
 {% block extra_css %}
-<style>
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .alert-warning {
-    margin-bottom: 20px;
-  }
-  
-  .info-section {
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-  }
-  
-  .info-row {
-    display: flex;
-    margin-bottom: 10px;
-  }
-  
-  .info-label {
-    font-weight: 600;
-    width: 200px;
-  }
-  
-  .info-value {
-    flex: 1;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/delete.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="card-header">
-    <h2 class="card-title">Supprimer l'Inscription</h2>
-    <a href="{% url 'inscription-list' %}" class="btn btn-outline">
-      <i class="fas fa-arrow-left"></i> Retour à la liste
-    </a>
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Confirmation de suppression</h1>
+    <div class="ms-auto">
+      <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Retour
+      </a>
+    </div>
   </div>
-  
-  <div class="card-body">
-    <div class="alert alert-warning">
-      <i class="fas fa-exclamation-triangle"></i> Attention ! Cette action est irréversible.
+
+  <div class="delete-card">
+    <div class="p-4">
+      <div class="alert-warning-custom d-flex">
+        <div class="me-3">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <div>
+          <h4 class="mb-2">Attention !</h4>
+          <p class="mb-0">Êtes-vous sûr de vouloir supprimer l'inscription <strong>#{{ object.inscription_id }}</strong> ? Cette action est irréversible.</p>
+        </div>
+      </div>
+      
+      <h5 class="mb-3">Informations de l'inscription</h5>
+      <table class="info-table mb-4">
+        <tbody>
+          <tr>
+            <th>ID :</th>
+            <td>{{ object.inscription_id }}</td>
+          </tr>
+          <tr>
+            <th>Apprenant :</th>
+            <td>{{ object.apprenant.nom }} {{ object.apprenant.prenom }}</td>
+          </tr>
+          <tr>
+            <th>Séance :</th>
+            <td>{{ object.seance.cours.nom_cours }} - {{ object.seance.date|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <th>Client :</th>
+            <td>{{ object.client.nom }}</td>
+          </tr>
+          <tr>
+            <th>Date d'inscription :</th>
+            <td>{{ object.date_inscription|date:"d/m/Y H:i" }}</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'inscriptions:inscription-detail' object.inscription_id %}" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i>Annuler
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash me-2"></i>Confirmer la suppression
+          </button>
+        </div>
+      </form>
     </div>
-    
-    <p>Êtes-vous sûr de vouloir supprimer l'inscription suivante ?</p>
-    
-    <div class="info-section">
-      <div class="info-row">
-        <div class="info-label">ID d'inscription</div>
-        <div class="info-value">{{ object.inscription_id }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Apprenant</div>
-        <div class="info-value">{{ object.apprenant.nom }} {{ object.apprenant.prenom }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Séance</div>
-        <div class="info-value">{{ object.seance.cours.nom_cours }} - {{ object.seance.date|date:"d/m/Y" }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Client</div>
-        <div class="info-value">{{ object.client.nom }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Date d'inscription</div>
-        <div class="info-value">{{ object.date_inscription|date:"d/m/Y H:i" }}</div>
-      </div>
-    </div>
-    
-    <form method="post">
-      {% csrf_token %}
-      <div class="form-group">
-        <button type="submit" class="btn btn-danger">
-          <i class="fas fa-trash"></i> Confirmer la suppression
-        </button>
-        <a href="{% url 'inscription-detail' object.inscription_id %}" class="btn btn-outline-secondary">
-          <i class="fas fa-times"></i> Annuler
-        </a>
-      </div>
-    </form>
   </div>
 </div>
 {% endblock %}

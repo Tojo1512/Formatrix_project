@@ -29,18 +29,28 @@ urlpatterns = [
     # URLs pour les templates de formateurs - déplacé en haut pour priorité
     path('formateurs/', include((formateurs_urls.urlpatterns, 'formateurs'))),
     
-    path('api/', include('cours.urls')),
+    # API URLs - using REST framework
+    path('api/', include(('cours.urls', 'api_cours'))),
     path('api/', include('modules.urls')),
     path('api/', include('documents.urls')),
     path('api/', include('renouvellements.urls')),
     # path('api/', include('seances.urls')),  # Commenté car nous utilisons maintenant des vues basées sur des classes
     path('api/seances/', include('seances.api_urls')),  # Nouvelle URL pour l'API des séances
-    path('api/', include('clients.urls')),
+    path('api/', include(('clients.urls', 'clients'))),  # Ajout du namespace 'clients'
     path('api/', include('lieux.urls')),
     path('api/', include('apprenants.urls')),
     path('api/', include(('inscriptions.urls', 'api'), namespace='api')),
     path('api/', include('evaluations.urls')),
     path('api/', include('presences.urls')),
+    
+    # URLs pour les templates
+    path('cours/', include(('cours.urls', 'cours'))),
+    path('seances/', include(('seances.urls', 'seances'))),
+    path('apprenants/', include(('apprenants.template_urls', 'apprenants'))),
+    path('clients/', include(('clients.urls', 'clients'))),
+    path('inscriptions/', include(('inscriptions.urls', 'inscriptions'))),
+    path('lieux/', include(('lieux.urls', 'lieux'))),  # Ajout de l'URL pour les templates de lieux
+    
     path('accounts/', include('django.contrib.auth.urls')),
     path('register/', register_view, name='register'),
     path('admin-register/', admin_register_view, name='admin-register'),
@@ -51,21 +61,6 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='auth/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='auth/password_reset_complete.html'), name='password_reset_complete'),
     path('', home_view, name='home'),
-    
-    # URLs pour les templates de cours
-    path('cours/', include(('cours.urls', 'cours'))),
-    
-    # URLs pour les templates de clients
-    path('clients/', include(('clients.urls', 'clients'))),
-    
-    # URLs pour les templates d'apprenants
-    path('apprenants/', include(('apprenants.template_urls', 'apprenants'))),
-    
-    # URLs pour les templates de séances
-    path('seances/', include(('seances.urls', 'seances'))),
-    
-    # URLs pour les templates de lieux
-    path('lieux/', include(('lieux.urls', 'lieux'))),
 ]
 
 

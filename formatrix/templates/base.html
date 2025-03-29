@@ -37,6 +37,80 @@
   <link rel="stylesheet" href="{% static 'css/base.css' %}" />
   <link rel="stylesheet" href="{% static 'css/file-upload.css' %}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* Custom sidebar styles */
+    .sidebar {
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sidebar-wrapper {
+      padding: 10px 0;
+    }
+    
+    .nav-item {
+      margin-bottom: 3px;
+    }
+    
+    .nav-item > a {
+      padding: 12px 15px;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-item > a:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .nav-item > a > i {
+      font-size: 1rem;
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .nav-item > a > p {
+      font-size: 0.9rem;
+      margin: 0;
+      font-weight: 500;
+    }
+    
+    .nav-item.active > a {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-section {
+      margin-top: 15px;
+      padding: 0 15px;
+    }
+    
+    .text-section {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 10px;
+    }
+    
+    .nav-collapse li {
+      margin-bottom: 5px;
+    }
+    
+    .nav-collapse a {
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-collapse a:hover, 
+    .nav-collapse a.active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+  
   {% block splash %}{% endblock %}
   {% block extra_css %}{% endblock %}
 </head>
@@ -66,28 +140,35 @@
       <div class="sidebar-wrapper scrollbar scrollbar-inner">
         <div class="sidebar-content">
           <ul class="nav nav-secondary">
-            <li class="nav-item">
+            <li class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
               <a href="{% url 'home' %}">
                 <i class="fas fa-home"></i>
                 <p>Accueil</p>
               </a>
             </li>
             
-            <li class="nav-item">
-              <a data-bs-toggle="collapse" href="#coursesMenu">
+            <li class="nav-section">
+              <span class="sidebar-mini-icon">
+                <i class="fa fa-ellipsis-h"></i>
+              </span>
+              <h4 class="text-section">Gestion de formation</h4>
+            </li>
+            
+            <li class="nav-item {% if 'cours' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#coursesMenu" {% if 'cours' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'cours' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-book"></i>
                 <p>Cours</p>
                 <span class="caret"></span>
               </a>
-              <div class="collapse" id="coursesMenu">
+              <div class="collapse {% if 'cours' in request.resolver_match.url_name %}show{% endif %}" id="coursesMenu">
                 <ul class="nav nav-collapse">
                   <li>
-                    <a href="{% url 'cours:cours-list' %}">
+                    <a href="{% url 'cours:cours-list' %}" class="{% if request.resolver_match.url_name == 'cours-list' %}active{% endif %}">
                       <span class="sub-item">Tous les cours</span>
                     </a>
                   </li>
                   <li>
-                    <a href="{% url 'cours:cours-create' %}">
+                    <a href="{% url 'cours:cours-create' %}" class="{% if request.resolver_match.url_name == 'cours-create' %}active{% endif %}">
                       <span class="sub-item">Ajouter un cours</span>
                     </a>
                   </li>
@@ -95,29 +176,26 @@
               </div>
             </li>
             
-            <li class="nav-item">
-              <a data-bs-toggle="collapse" href="#seancesMenu"
-                class="{% if 'seance' in request.resolver_match.url_name or 'inscription' in request.resolver_match.url_name %}active{% endif %}">
+            <li class="nav-item {% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#seancesMenu" {% if 'seance' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-calendar-alt"></i>
                 <p>Séances</p>
                 <span class="caret"></span>
               </a>
-              <div class="collapse" id="seancesMenu">
+              <div class="collapse {% if 'seance' in request.resolver_match.url_name %}show{% endif %}" id="seancesMenu">
                 <ul class="nav nav-collapse">
                   <li>
-                    <a href="{% url 'seances:seance-list' %}"
-                      class="{% if request.resolver_match.url_name == 'seance-list' %}active{% endif %}">
+                    <a href="{% url 'seances:seance-list' %}" class="{% if request.resolver_match.url_name == 'seance-list' %}active{% endif %}">
                       <span class="sub-item">Toutes les séances</span>
                     </a>
                   </li>
                   <li>
-                    <a href="{% url 'seances:seance-create' %}"
-                      class="{% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
+                    <a href="{% url 'seances:seance-create' %}" class="{% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
                       <span class="sub-item">Ajouter une séance</span>
                     </a>
                   </li>
                   <li>
-                    <a href="{% url 'seances:seance-list' %}?filtre=absences">
+                    <a href="{% url 'seances:seance-list' %}?filtre=absences" class="{% if request.resolver_match.url_name == 'seance-list' and request.GET.filtre == 'absences' %}active{% endif %}">
                       <span class="sub-item">Gestion des absences</span>
                     </a>
                   </li>
@@ -125,24 +203,55 @@
               </div>
             </li>
             
-            <li class="nav-item">
-              <a data-bs-toggle="collapse" href="#apprenantsMenu"
-                class="{% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
+            <li class="nav-item {% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#inscriptionsMenu" {% if 'inscription' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i>
+                <p>Inscriptions</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'inscription' in request.resolver_match.url_name %}show{% endif %}" id="inscriptionsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'inscriptions:inscription-list' %}" class="{% if request.resolver_match.url_name == 'inscription-list' %}active{% endif %}">
+                      <span class="sub-item">Toutes les inscriptions</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'inscriptions:inscription-create' %}" class="{% if request.resolver_match.url_name == 'inscription-create' %}active{% endif %}">
+                      <span class="sub-item">Ajouter une inscription</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'inscriptions:inscription-multiple' %}" class="{% if request.resolver_match.url_name == 'inscription-multiple' %}active{% endif %}">
+                      <span class="sub-item">Inscription multiple</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            <li class="nav-section">
+              <span class="sidebar-mini-icon">
+                <i class="fa fa-ellipsis-h"></i>
+              </span>
+              <h4 class="text-section">Gestion des personnes</h4>
+            </li>
+            
+            <li class="nav-item {% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#apprenantsMenu" {% if 'apprenant' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-user-graduate"></i>
                 <p>Apprenants</p>
                 <span class="caret"></span>
               </a>
-              <div class="collapse" id="apprenantsMenu">
+              <div class="collapse {% if 'apprenant' in request.resolver_match.url_name %}show{% endif %}" id="apprenantsMenu">
                 <ul class="nav nav-collapse">
                   <li>
-                    <a href="{% url 'apprenants:apprenant-list' %}"
-                      class="{% if request.resolver_match.url_name == 'apprenant-list' %}active{% endif %}">
+                    <a href="{% url 'apprenants:apprenant-list' %}" class="{% if request.resolver_match.url_name == 'apprenant-list' %}active{% endif %}">
                       <span class="sub-item">Tous les apprenants</span>
                     </a>
                   </li>
                   <li>
-                    <a href="{% url 'apprenants:apprenant-create' %}"
-                      class="{% if request.resolver_match.url_name == 'apprenant-create' %}active{% endif %}">
+                    <a href="{% url 'apprenants:apprenant-create' %}" class="{% if request.resolver_match.url_name == 'apprenant-create' %}active{% endif %}">
                       <span class="sub-item">Ajouter un apprenant</span>
                     </a>
                   </li>
@@ -150,24 +259,21 @@
               </div>
             </li>
             
-            <li class="nav-item">
-              <a data-bs-toggle="collapse" href="#clientsMenu"
-                class="{% if 'client' in request.resolver_match.url_name %}active{% endif %}">
+            <li class="nav-item {% if 'client' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#clientsMenu" {% if 'client' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'client' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-users"></i>
                 <p>Clients</p>
                 <span class="caret"></span>
               </a>
-              <div class="collapse" id="clientsMenu">
+              <div class="collapse {% if 'client' in request.resolver_match.url_name %}show{% endif %}" id="clientsMenu">
                 <ul class="nav nav-collapse">
                   <li>
-                    <a href="{% url 'clients:client-list' %}"
-                      class="{% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
+                    <a href="/clients/liste/" class="{% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
                       <span class="sub-item">Tous les clients</span>
                     </a>
                   </li>
                   <li>
-                    <a href="{% url 'clients:client-create' %}"
-                      class="{% if request.resolver_match.url_name == 'client-create' %}active{% endif %}">
+                    <a href="/clients/creer/" class="{% if request.resolver_match.url_name == 'client-create' %}active{% endif %}">
                       <span class="sub-item">Ajouter un client</span>
                     </a>
                   </li>
@@ -175,24 +281,21 @@
               </div>
             </li>
             
-            <li class="nav-item">
-              <a data-bs-toggle="collapse" href="#formateursMenu"
-                class="{% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
+            <li class="nav-item {% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#formateursMenu" {% if 'formateur' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-chalkboard-teacher"></i>
                 <p>Formateurs</p>
                 <span class="caret"></span>
               </a>
-              <div class="collapse" id="formateursMenu">
+              <div class="collapse {% if 'formateur' in request.resolver_match.url_name %}show{% endif %}" id="formateursMenu">
                 <ul class="nav nav-collapse">
                   <li>
-                    <a href="{% url 'formateurs:formateur-list' %}"
-                      class="{% if request.resolver_match.url_name == 'formateur-list' %}active{% endif %}">
+                    <a href="{% url 'formateurs:formateur-list' %}" class="{% if request.resolver_match.url_name == 'formateur-list' %}active{% endif %}">
                       <span class="sub-item">Tous les formateurs</span>
                     </a>
                   </li>
                   <li>
-                    <a href="{% url 'formateurs:formateur-create' %}"
-                      class="{% if request.resolver_match.url_name == 'formateur-create' %}active{% endif %}">
+                    <a href="{% url 'formateurs:formateur-create' %}" class="{% if request.resolver_match.url_name == 'formateur-create' %}active{% endif %}">
                       <span class="sub-item">Ajouter un formateur</span>
                     </a>
                   </li>
@@ -282,7 +385,7 @@
               </ul>
             </nav>
             <div class="copyright">
-              &copy; 2025 Formatrix. Tous droits réservés.
+              &copy; {% now "Y" %} Formatrix. Tous droits réservés.
             </div>
           </div>
         </div>
@@ -342,7 +445,7 @@
             </ul>
           </nav>
           <div class="copyright">
-            &copy; 2025 Formatrix. Tous droits réservés.
+            &copy; {% now "Y" %} Formatrix. Tous droits réservés.
           </div>
         </div>
       </div>

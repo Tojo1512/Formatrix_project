@@ -1,32 +1,85 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Supprimer le cours - Formatrix{% endblock %}
+{% block title %}Supprimer le cours {{ object.nom_cours }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apprenants/delete.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header">
-            <h2>Confirmer la suppression</h2>
-        </div>
-        <div class="card-body">
-            <p>Êtes-vous sûr de vouloir supprimer le cours "{{ object.nom_cours }}" ?</p>
-            <p class="text-danger">Cette action est irréversible.</p>
-            
-            <form method="post">
-                {% csrf_token %}
-                <div class="d-flex justify-content-end mt-3">
-                    <a href="{% url 'cours-detail' object.pk %}" class="btn btn-outline-secondary me-2">
-                        <i class="fas fa-times"></i>
-                        Annuler
-                    </a>
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash"></i>
-                        Confirmer la suppression
-                    </button>
-                </div>
-            </form>
-        </div>
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Confirmation de suppression</h1>
+    <div class="ms-auto">
+      <a href="{% url 'cours:cours-list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Retour
+      </a>
     </div>
+  </div>
+
+  <div class="delete-card">
+    <div class="p-4">
+      <div class="alert-warning-custom d-flex">
+        <div class="me-3">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <div>
+          <h4 class="mb-2">Attention !</h4>
+          <p class="mb-0">Êtes-vous sûr de vouloir supprimer le cours <strong>{{ object.nom_cours }}</strong> ? Cette action est irréversible.</p>
+        </div>
+      </div>
+      
+      <h5 class="mb-3">Informations du cours</h5>
+      <table class="info-table mb-4">
+        <tbody>
+          <tr>
+            <th>Nom du cours :</th>
+            <td>{{ object.nom_cours }}</td>
+          </tr>
+          <tr>
+            <th>Type de cours :</th>
+            <td>
+              <span class="badge {% if object.type_cours == 'presentiel' %}bg-primary{% elif object.type_cours == 'en_ligne' %}bg-info{% else %}bg-secondary{% endif %}">
+                {{ object.get_type_cours_display }}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <th>Durée :</th>
+            <td>{{ object.duree_heures }} heures</td>
+          </tr>
+          <tr>
+            <th>Niveau :</th>
+            <td>
+              <span class="badge bg-success">
+                {{ object.get_niveau_display }}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <th>Statut :</th>
+            <td>
+              <span class="badge {% if object.statut_approbation == 'approuve' %}bg-success{% elif object.statut_approbation == 'en_attente' %}bg-warning{% elif object.statut_approbation == 'refuse' %}bg-danger{% else %}bg-secondary{% endif %}">
+                {{ object.get_statut_approbation_display }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <form method="post" action="{% url 'cours:cours-delete' object.pk %}">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'cours:cours-detail' object.pk %}" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i>Annuler
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash me-2"></i>Confirmer la suppression
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}

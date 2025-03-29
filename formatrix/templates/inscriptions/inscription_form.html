@@ -1,153 +1,274 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ title }} - Formatrix{% endblock %}
+{% block title %}{% if object.inscription_id %}Modifier{% else %}Ajouter{% endif %} une Inscription - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/forms.css' %}">
-<style>
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-  
-  .form-group label {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    display: block;
-  }
-  
-  .form-help {
-    font-size: 0.875rem;
-    color: #6c757d;
-    margin-top: 0.25rem;
-  }
-  
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="card-header">
-    <h2 class="card-title">{{ title }}</h2>
-    <a href="{% url 'inscription-list' %}" class="btn btn-outline">
-      <i class="fas fa-arrow-left"></i> Retour à la liste
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas {% if object.inscription_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+      {% if object.inscription_id %}Modifier{% else %}Ajouter{% endif %} une Inscription
+    </h1>
+    <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour
     </a>
   </div>
-  
-  <div class="card-body">
-    <form method="post">
-      {% csrf_token %}
-      
-      <div class="form-group">
-        <label for="{{ form.client.id_for_label }}">Client</label>
-        {{ form.client }}
-        {% if form.client.errors %}
-          <div class="invalid-feedback">
-            {{ form.client.errors }}
-          </div>
-        {% endif %}
-        <div class="form-help">Sélectionnez le client qui effectue l'inscription.</div>
-      </div>
-      
-      <div class="form-group">
-        <label for="{{ form.seance.id_for_label }}">Séance</label>
-        {{ form.seance }}
-        {% if form.seance.errors %}
-          <div class="invalid-feedback">
-            {{ form.seance.errors }}
-          </div>
-        {% endif %}
-        <div class="form-help">Sélectionnez la séance pour laquelle vous souhaitez inscrire l'apprenant.</div>
-      </div>
-      
-      <div class="form-group">
-        <label for="{{ form.apprenant.id_for_label }}">Apprenant</label>
-        {{ form.apprenant }}
-        {% if form.apprenant.errors %}
-          <div class="invalid-feedback">
-            {{ form.apprenant.errors }}
-          </div>
-        {% endif %}
-        <div class="form-help">Sélectionnez l'apprenant à inscrire.</div>
-      </div>
-      
-      <div class="form-group">
-        <label for="{{ form.type_inscription.id_for_label }}">Type d'inscription</label>
-        {{ form.type_inscription }}
-        {% if form.type_inscription.errors %}
-          <div class="invalid-feedback">
-            {{ form.type_inscription.errors }}
-          </div>
-        {% endif %}
-        <div class="form-help">Sélectionnez le type d'inscription.</div>
-      </div>
-      
-      <div class="form-group">
-        <label for="{{ form.statut_inscription.id_for_label }}">Statut de l'inscription</label>
-        {{ form.statut_inscription }}
-        {% if form.statut_inscription.errors %}
-          <div class="invalid-feedback">
-            {{ form.statut_inscription.errors }}
-          </div>
-        {% endif %}
-        <div class="form-help">Sélectionnez le statut actuel de l'inscription.</div>
-      </div>
-      
-      <div class="form-group">
-        <label for="{{ form.sponsor.id_for_label }}">Sponsor (optionnel)</label>
-        {{ form.sponsor }}
-        {% if form.sponsor.errors %}
-          <div class="invalid-feedback">
-            {{ form.sponsor.errors }}
-          </div>
-        {% endif %}
-        <div class="form-help">Sélectionnez un sponsor si l'inscription est sponsorisée.</div>
-      </div>
-      
-      <div class="form-group">
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-save"></i> Enregistrer
-        </button>
-        <a href="{% url 'inscription-list' %}" class="btn btn-outline-secondary">
-          <i class="fas fa-times"></i> Annuler
-        </a>
-      </div>
-    </form>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
   </div>
+  {% endif %}
+
+  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Informations sur la séance -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-calendar-alt"></i>
+        Informations sur la séance
+      </h3>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label for="{{ form.seance.id_for_label }}">Séance <span class="text-danger">*</span></label>
+            {{ form.seance }}
+            {% if form.seance.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.seance.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Sélectionnez la séance pour laquelle vous souhaitez inscrire l'apprenant.</small>
+          </div>
+        </div>
+      </div>
+      
+      <div id="seance-details" class="mt-3 p-3 bg-light rounded d-none">
+        <h5>Détails de la séance</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Cours:</strong> <span id="seance-cours"></span></p>
+            <p><strong>Date:</strong> <span id="seance-date"></span></p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Horaires:</strong> <span id="seance-horaires"></span></p>
+            <p><strong>Places disponibles:</strong> <span id="seance-places" class="badge bg-info"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Informations sur l'apprenant et le client -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-user-graduate"></i>
+        Informations sur l'apprenant et le client
+      </h3>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="{{ form.apprenant.id_for_label }}">Apprenant <span class="text-danger">*</span></label>
+            {{ form.apprenant }}
+            {% if form.apprenant.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.apprenant.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Sélectionnez l'apprenant à inscrire.</small>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="{{ form.client.id_for_label }}">Client <span class="text-danger">*</span></label>
+            {{ form.client }}
+            {% if form.client.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.client.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Sélectionnez le client qui effectue l'inscription.</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="{{ form.sponsor.id_for_label }}">Sponsor (optionnel)</label>
+            {{ form.sponsor }}
+            {% if form.sponsor.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.sponsor.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Sélectionnez un sponsor si l'inscription est sponsorisée.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Informations sur l'inscription -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-clipboard-list"></i>
+        Informations sur l'inscription
+      </h3>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="{{ form.type_inscription.id_for_label }}">Type d'inscription <span class="text-danger">*</span></label>
+            {{ form.type_inscription }}
+            {% if form.type_inscription.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.type_inscription.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Sélectionnez le type d'inscription.</small>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="{{ form.statut_inscription.id_for_label }}">Statut de l'inscription <span class="text-danger">*</span></label>
+            {{ form.statut_inscription }}
+            {% if form.statut_inscription.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.statut_inscription.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Sélectionnez le statut actuel de l'inscription.</small>
+          </div>
+        </div>
+      </div>
+      
+      {% if form.commentaires %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label for="{{ form.commentaires.id_for_label }}">Commentaires</label>
+            {{ form.commentaires }}
+            {% if form.commentaires.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.commentaires.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <small class="form-text text-muted">Ajoutez des commentaires ou des notes concernant cette inscription.</small>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> Enregistrer
+      </button>
+      <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-secondary">
+        <i class="fas fa-times"></i> Annuler
+      </a>
+    </div>
+  </form>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  $(document).ready(function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // Ajouter des classes Bootstrap aux champs du formulaire
-    $('select, input, textarea').addClass('form-control');
+    const formControls = document.querySelectorAll('select, input, textarea');
+    formControls.forEach(element => {
+      element.classList.add('form-control');
+    });
     
     // Vérifier les places disponibles lors du changement de séance
-    $('#id_seance').on('change', function() {
-      const seanceId = $(this).val();
-      if (seanceId) {
-        $.ajax({
-          url: `/seances/api/seances/${seanceId}/`,
-          type: 'GET',
-          success: function(data) {
-            if (data.places_disponibles <= 0) {
-              alert('Attention: Cette séance n\'a plus de places disponibles.');
-            } else {
-              console.log(`Places disponibles: ${data.places_disponibles}`);
-            }
-          },
-          error: function() {
-            console.error('Erreur lors de la récupération des informations de la séance');
-          }
-        });
+    const seanceSelect = document.getElementById('{{ form.seance.id_for_label }}');
+    const seanceDetails = document.getElementById('seance-details');
+    const seanceCours = document.getElementById('seance-cours');
+    const seanceDate = document.getElementById('seance-date');
+    const seanceHoraires = document.getElementById('seance-horaires');
+    const seancePlaces = document.getElementById('seance-places');
+    
+    if (seanceSelect) {
+      seanceSelect.addEventListener('change', function() {
+        const seanceId = this.value;
+        if (seanceId) {
+          fetch(`/api/seances/${seanceId}/`)
+            .then(response => response.json())
+            .then(data => {
+              seanceDetails.classList.remove('d-none');
+              seanceCours.textContent = data.cours.nom_cours;
+              
+              // Formater la date
+              const date = new Date(data.date);
+              const options = { year: 'numeric', month: 'long', day: 'numeric' };
+              seanceDate.textContent = date.toLocaleDateString('fr-FR', options);
+              
+              seanceHoraires.textContent = `${data.heure_debut} - ${data.heure_fin}`;
+              seancePlaces.textContent = data.places_disponibles;
+              
+              // Avertissement si plus de places disponibles
+              if (data.places_disponibles <= 0) {
+                seancePlaces.classList.remove('bg-info', 'bg-warning');
+                seancePlaces.classList.add('bg-danger');
+                alert('Attention: Cette séance n\'a plus de places disponibles.');
+              } else if (data.places_disponibles <= 5) {
+                seancePlaces.classList.remove('bg-info', 'bg-danger');
+                seancePlaces.classList.add('bg-warning');
+              } else {
+                seancePlaces.classList.remove('bg-warning', 'bg-danger');
+                seancePlaces.classList.add('bg-info');
+              }
+            })
+            .catch(error => {
+              console.error('Erreur lors de la récupération des informations de la séance:', error);
+            });
+        } else {
+          seanceDetails.classList.add('d-none');
+        }
+      });
+      
+      // Déclencher l'événement au chargement si une valeur est déjà sélectionnée
+      if (seanceSelect.value) {
+        const event = new Event('change');
+        seanceSelect.dispatchEvent(event);
       }
-    });
+    }
   });
 </script>
 {% endblock %}

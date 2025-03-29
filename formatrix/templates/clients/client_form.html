@@ -4,401 +4,298 @@
 {% block title %}{% if object.clientid %}Modifier{% else %}Créer{% endif %} un client - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/theme.css' %}">
-<link rel="stylesheet" href="{% static 'css/forms.css' %}">
-<style>
-  .form-container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-  }
-
-  .form-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .form-title {
-    font-size: 1.5rem;
-    color: var(--primary);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .form-grid {
-    display: grid;
-    gap: 2rem;
-    padding: 2rem;
-  }
-
-  .form-section {
-    background: var(--surface);
-    border-radius: var(--radius-md);
-    padding: 1.5rem;
-    border: 1px solid var(--border);
-  }
-
-  .section-title {
-    font-size: 1.1rem;
-    color: var(--primary);
-    margin: 0 0 1.5rem 0;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .form-group {
-    margin-bottom: 1rem;
-  }
-
-  .form-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: var(--text-primary);
-  }
-
-  .form-control {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    transition: all 0.2s;
-  }
-
-  .form-control:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
-    outline: none;
-  }
-
-  select.form-control {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1rem;
-    padding-right: 2.5rem;
-  }
-
-  .form-actions {
-    padding: 1.5rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius-sm);
-    font-weight: 500;
-    font-size: 0.875rem;
-    transition: all 0.2s;
-    cursor: pointer;
-  }
-
-  .btn-primary {
-    background: var(--primary);
-    color: white;
-    border: none;
-  }
-
-  .btn-primary:hover {
-    background: var(--primary-dark);
-  }
-
-  .btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-  }
-
-  .btn-outline:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-
-  .has-error .form-control {
-    border-color: var(--danger);
-  }
-
-  .error-message {
-    color: var(--danger);
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="form-container">
   <div class="form-header">
-    <h2 class="form-title">
-      <i class="fas {% if object.clientid %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+    <h1 class="form-title">
+      <i class="fas {% if object.clientid %}fa-edit{% else %}fa-building-user{% endif %}"></i>
       {% if object.clientid %}Modifier{% else %}Créer{% endif %} un client
-    </h2>
-    <a href="{% url 'client-list' %}" class="btn btn-outline">
-      <i class="fas fa-arrow-left"></i>
-      Retour
+    </h1>
+    <a href="/clients/liste" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour
     </a>
   </div>
 
   {% if messages %}
+  <div>
     {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
-        {{ message }}
-      </div>
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
     {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
   {% endif %}
 
   <form method="post" novalidate>
     {% csrf_token %}
-    <div class="form-grid">
-      <!-- Informations de l'entité -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-building"></i>
-          Informations de l'entité
-        </h3>
-        
-        <div class="form-group">
-          <label class="form-label" for="{{ form.nom_entite.id_for_label }}">
-            <i class="fas fa-signature"></i>
-            Nom de l'entité
-          </label>
-          {{ form.nom_entite }}
-          {% if form.nom_entite.errors %}
+    
+    <!-- Informations de l'entité -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-building"></i>
+        Informations de l'entité
+      </h3>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.nom_entite.errors %}has-error{% endif %}">
+            <label for="{{ form.nom_entite.id_for_label }}" class="form-label {% if form.nom_entite.field.required %}required-field{% endif %}">
+              Nom de l'entité
+            </label>
+            {{ form.nom_entite }}
+            {% if form.nom_entite.errors %}
             <div class="error-message">{{ form.nom_entite.errors.0 }}</div>
-          {% endif %}
+            {% endif %}
+          </div>
         </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="{{ form.sigle.id_for_label }}">
-              <i class="fas fa-tag"></i>
+        <div class="col-md-6">
+          <div class="form-group {% if form.sigle.errors %}has-error{% endif %}">
+            <label for="{{ form.sigle.id_for_label }}" class="form-label">
               Sigle/Acronyme
             </label>
             {{ form.sigle }}
             {% if form.sigle.errors %}
-              <div class="error-message">{{ form.sigle.errors.0 }}</div>
+            <div class="error-message">{{ form.sigle.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted">Optionnel. Exemple: ONU, UNESCO, etc.</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.secteur_activite.errors %}has-error{% endif %}">
+            <label for="{{ form.secteur_activite.id_for_label }}" class="form-label {% if form.secteur_activite.field.required %}required-field{% endif %}">
+              Secteur d'activité
+            </label>
+            {{ form.secteur_activite }}
+            {% if form.secteur_activite.errors %}
+            <div class="error-message">{{ form.secteur_activite.errors.0 }}</div>
             {% endif %}
           </div>
-
-          <div class="form-group">
-            <label class="form-label" for="{{ form.typeclientid.id_for_label }}">
-              <i class="fas fa-users"></i>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group {% if form.typeclientid.errors %}has-error{% endif %}">
+            <label for="{{ form.typeclientid.id_for_label }}" class="form-label">
               Type de client
             </label>
-            <select name="typeclientid" id="{{ form.typeclientid.id_for_label }}" class="form-control">
-              <option value="">Sélectionnez un type</option>
-              {% for type in form.typeclientid.field.queryset %}
-                <option value="{{ type.typeclientid }}" {% if form.typeclientid.value|stringformat:"s" == type.typeclientid|stringformat:"s" %}selected{% endif %}>
-                  {{ type.typeclient }}
-                </option>
-              {% endfor %}
-            </select>
+            {{ form.typeclientid }}
             {% if form.typeclientid.errors %}
-              <div class="error-message">{{ form.typeclientid.errors.0 }}</div>
+            <div class="error-message">{{ form.typeclientid.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted">Ce champ est optionnel. Vous pourrez définir le type plus tard.</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group {% if form.description.errors %}has-error{% endif %}">
+            <label for="{{ form.description.id_for_label }}" class="form-label">
+              Description
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <div class="error-message">{{ form.description.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-label" for="{{ form.secteur_activite.id_for_label }}">
-            <i class="fas fa-industry"></i>
-            Secteur d'activité
-          </label>
-          <select name="secteur_activite" id="{{ form.secteur_activite.id_for_label }}" class="form-control">
-            <option value="">Sélectionnez un secteur</option>
-            {% for value, label in form.fields.secteur_activite.choices %}
-              <option value="{{ value }}" {% if form.secteur_activite.value == value %}selected{% endif %}>
-                {{ label }}
-              </option>
-            {% endfor %}
-          </select>
-          {% if form.secteur_activite.errors %}
-            <div class="error-message">{{ form.secteur_activite.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="{{ form.site_web.id_for_label }}">
-            <i class="fas fa-globe"></i>
-            Site web
-          </label>
-          {{ form.site_web }}
-          {% if form.site_web.errors %}
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.site_web.errors %}has-error{% endif %}">
+            <label for="{{ form.site_web.id_for_label }}" class="form-label">
+              Site web
+            </label>
+            {{ form.site_web }}
+            {% if form.site_web.errors %}
             <div class="error-message">{{ form.site_web.errors.0 }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Informations de contact -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-address-card"></i>
-          Informations de contact
-        </h3>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="{{ form.email.id_for_label }}">
-              <i class="fas fa-envelope"></i>
-              Email
-            </label>
-            {{ form.email }}
-            {% if form.email.errors %}
-              <div class="error-message">{{ form.email.errors.0 }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="{{ form.telephone.id_for_label }}">
-              <i class="fas fa-phone"></i>
-              Téléphone
-            </label>
-            {{ form.telephone }}
-            {% if form.telephone.errors %}
-              <div class="error-message">{{ form.telephone.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
-
-        <div class="form-group">
-          <label class="form-label" for="{{ form.adresse_siege.id_for_label }}">
-            <i class="fas fa-map-marker-alt"></i>
-            Adresse du siège
-          </label>
-          {{ form.adresse_siege }}
-          {% if form.adresse_siege.errors %}
-            <div class="error-message">{{ form.adresse_siege.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="{{ form.ville.id_for_label }}">
-              <i class="fas fa-city"></i>
-              Ville
+        <div class="col-md-6">
+          <div class="form-group {% if form.numero_immatriculation.errors %}has-error{% endif %}">
+            <label for="{{ form.numero_immatriculation.id_for_label }}" class="form-label">
+              Numéro d'immatriculation
             </label>
-            {{ form.ville }}
-            {% if form.ville.errors %}
-              <div class="error-message">{{ form.ville.errors.0 }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="{{ form.localite.id_for_label }}">
-              <i class="fas fa-map"></i>
-              Quartier/Zone
-            </label>
-            {{ form.localite }}
-            {% if form.localite.errors %}
-              <div class="error-message">{{ form.localite.errors.0 }}</div>
-            {% endif %}
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="{{ form.numero_immatriculation.id_for_label }}">
-            <i class="fas fa-id-card"></i>
-            N° RCS/STAT/NIF
-          </label>
-          {{ form.numero_immatriculation }}
-          {% if form.numero_immatriculation.errors %}
+            {{ form.numero_immatriculation }}
+            {% if form.numero_immatriculation.errors %}
             <div class="error-message">{{ form.numero_immatriculation.errors.0 }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Personne de contact -->
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-user-tie"></i>
-          Personne de contact
-        </h3>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="{{ form.personne_contact.id_for_label }}">
-              <i class="fas fa-user"></i>
-              Nom
-            </label>
-            {{ form.personne_contact }}
-            {% if form.personne_contact.errors %}
-              <div class="error-message">{{ form.personne_contact.errors.0 }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="{{ form.fonction_contact.id_for_label }}">
-              <i class="fas fa-briefcase"></i>
-              Fonction
-            </label>
-            {{ form.fonction_contact }}
-            {% if form.fonction_contact.errors %}
-              <div class="error-message">{{ form.fonction_contact.errors.0 }}</div>
-            {% endif %}
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="{{ form.email_contact.id_for_label }}">
-              <i class="fas fa-envelope"></i>
-              Email de contact
-            </label>
-            {{ form.email_contact }}
-            {% if form.email_contact.errors %}
-              <div class="error-message">{{ form.email_contact.errors.0 }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="{{ form.telephone_contact.id_for_label }}">
-              <i class="fas fa-phone"></i>
-              Téléphone de contact
-            </label>
-            {{ form.telephone_contact }}
-            {% if form.telephone_contact.errors %}
-              <div class="error-message">{{ form.telephone_contact.errors.0 }}</div>
             {% endif %}
           </div>
         </div>
       </div>
     </div>
-
+    
+    <!-- Adresse et localisation -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-map-marker-alt"></i>
+        Adresse et localisation
+      </h3>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group {% if form.adresse_siege.errors %}has-error{% endif %}">
+            <label for="{{ form.adresse_siege.id_for_label }}" class="form-label">
+              Adresse du siège
+            </label>
+            {{ form.adresse_siege }}
+            {% if form.adresse_siege.errors %}
+            <div class="error-message">{{ form.adresse_siege.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.ville.errors %}has-error{% endif %}">
+            <label for="{{ form.ville.id_for_label }}" class="form-label">
+              Ville
+            </label>
+            {{ form.ville }}
+            {% if form.ville.errors %}
+            <div class="error-message">{{ form.ville.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group {% if form.localite.errors %}has-error{% endif %}">
+            <label for="{{ form.localite.id_for_label }}" class="form-label">
+              Localité
+            </label>
+            {{ form.localite }}
+            {% if form.localite.errors %}
+            <div class="error-message">{{ form.localite.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Informations de contact -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-address-card"></i>
+        Informations de contact
+      </h3>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+            <label for="{{ form.email.id_for_label }}" class="form-label">
+              Email
+            </label>
+            {{ form.email }}
+            {% if form.email.errors %}
+            <div class="error-message">{{ form.email.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
+            <label for="{{ form.telephone.id_for_label }}" class="form-label">
+              Téléphone
+            </label>
+            {{ form.telephone }}
+            {% if form.telephone.errors %}
+            <div class="error-message">{{ form.telephone.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.personne_contact.errors %}has-error{% endif %}">
+            <label for="{{ form.personne_contact.id_for_label }}" class="form-label">
+              Personne de contact
+            </label>
+            {{ form.personne_contact }}
+            {% if form.personne_contact.errors %}
+            <div class="error-message">{{ form.personne_contact.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group {% if form.fonction_contact.errors %}has-error{% endif %}">
+            <label for="{{ form.fonction_contact.id_for_label }}" class="form-label">
+              Fonction du contact
+            </label>
+            {{ form.fonction_contact }}
+            {% if form.fonction_contact.errors %}
+            <div class="error-message">{{ form.fonction_contact.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.email_contact.errors %}has-error{% endif %}">
+            <label for="{{ form.email_contact.id_for_label }}" class="form-label">
+              Email du contact
+            </label>
+            {{ form.email_contact }}
+            {% if form.email_contact.errors %}
+            <div class="error-message">{{ form.email_contact.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group {% if form.telephone_contact.errors %}has-error{% endif %}">
+            <label for="{{ form.telephone_contact.id_for_label }}" class="form-label">
+              Téléphone du contact
+            </label>
+            {{ form.telephone_contact }}
+            {% if form.telephone_contact.errors %}
+            <div class="error-message">{{ form.telephone_contact.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Notes -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-sticky-note"></i>
+        Notes
+      </h3>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group {% if form.notes.errors %}has-error{% endif %}">
+            <label for="{{ form.notes.id_for_label }}" class="form-label">
+              Notes
+            </label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+            <div class="error-message">{{ form.notes.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <div class="form-actions">
-      <a href="{% url 'client-list' %}" class="btn btn-outline">
-        <i class="fas fa-times"></i>
-        Annuler
+      <a href="{% url 'clients:client-list' %}" class="btn btn-outline">
+        <i class="fas fa-times"></i> Annuler
       </a>
       <button type="submit" class="btn btn-primary">
-        <i class="fas {% if object.clientid %}fa-save{% else %}fa-plus{% endif %}"></i>
-        {% if object.clientid %}Enregistrer{% else %}Créer{% endif %}
+        <i class="fas fa-save"></i> Enregistrer
       </button>
     </div>
   </form>

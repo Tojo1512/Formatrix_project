@@ -3,10 +3,14 @@
 
 {% block title %}{{ apprenant.nom_apprenant }} - Formatrix{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/apprenants/detail.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="page-inner">
   <div class="page-header mb-4">
-    <h1 class="page-title">Détails de l'apprenant</h1>
+    <h1 class="page-title">{{ apprenant.nom_apprenant }}</h1>
     <div class="ms-auto">
       <div class="btn-group">
         <a href="{% url 'apprenants:apprenant-update' apprenant.apprenant_id %}" class="btn btn-warning">
@@ -20,185 +24,186 @@
   </div>
 
   <div class="row">
-    <div class="col-md-12">
-      <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h4 class="card-title mb-0">{{ apprenant.nom_apprenant }}</h4>
-          <div>
-            <span class="badge {% if apprenant.sexe == 'M' %}bg-primary{% elif apprenant.sexe == 'F' %}bg-info{% else %}bg-secondary{% endif %} me-2">
-              {% for code, label in sexe_choices %}
-                {% if code == apprenant.sexe %}{{ label }}{% endif %}
-              {% endfor %}
-            </span>
-            <span class="badge bg-secondary me-2">
-              {% for code, label in age_choices %}
-                {% if code == apprenant.categorie_age %}{{ label }}{% endif %}
-              {% endfor %}
-            </span>
-            <span class="badge bg-success">
-              {% for code, label in niveau_choices %}
-                {% if code == apprenant.niveau_academique %}{{ label }}{% endif %}
-              {% endfor %}
-            </span>
-          </div>
+    <!-- Colonne de gauche -->
+    <div class="col-md-6">
+      <!-- Informations personnelles -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-user me-2"></i>Informations personnelles
         </div>
-        
-        <div class="card-body">
+        <div class="info-card-body">
           <div class="row">
-            <!-- Informations personnelles -->
             <div class="col-md-6">
-              <div class="card mb-4">
-                <div class="card-header bg-light py-2">
-                  <h5 class="mb-0">
-                    <i class="fas fa-user me-2"></i>Informations personnelles
-                  </h5>
-                </div>
-                <div class="card-body">
-                  <table class="table table-borderless table-sm mb-0">
-                    <tbody>
-                      <tr>
-                        <th class="text-secondary" style="width: 40%">Nom complet:</th>
-                        <td>{{ apprenant.nom_apprenant }}</td>
-                      </tr>
-                      {% if apprenant.autres_nom %}
-                      <tr>
-                        <th class="text-secondary">Autres noms:</th>
-                        <td>{{ apprenant.autres_nom }}</td>
-                      </tr>
-                      {% endif %}
-                      <tr>
-                        <th class="text-secondary">Numéro CIN:</th>
-                        <td>{{ apprenant.cin }}</td>
-                      </tr>
-                      <tr>
-                        <th class="text-secondary">Date de naissance:</th>
-                        <td>{{ apprenant.date_naissance|date:"d F Y" }}</td>
-                      </tr>
-                      <tr>
-                        <th class="text-secondary">Genre:</th>
-                        <td>
-                          {% for code, label in sexe_choices %}
-                            {% if code == apprenant.sexe %}{{ label }}{% endif %}
-                          {% endfor %}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th class="text-secondary">Catégorie d'âge:</th>
-                        <td>
-                          {% for code, label in age_choices %}
-                            {% if code == apprenant.categorie_age %}{{ label }}{% endif %}
-                          {% endfor %}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div class="info-item">
+                <div class="info-label">Nom complet</div>
+                <div class="info-value">{{ apprenant.nom_apprenant }}</div>
               </div>
-
-              <div class="card mb-4">
-                <div class="card-header bg-light py-2">
-                  <h5 class="mb-0">
-                    <i class="fas fa-map-marker-alt me-2"></i>Adresse
-                  </h5>
-                </div>
-                <div class="card-body">
-                  <table class="table table-borderless table-sm mb-0">
-                    <tbody>
-                      <tr>
-                        <th class="text-secondary" style="width: 40%">Rue:</th>
-                        <td>{{ apprenant.adresse_rue }}</td>
-                      </tr>
-                      <tr>
-                        <th class="text-secondary">Localité:</th>
-                        <td>{{ apprenant.localite }}</td>
-                      </tr>
-                      <tr>
-                        <th class="text-secondary">Ville:</th>
-                        <td>{{ apprenant.ville }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+            </div>
+            
+            {% if apprenant.autres_nom %}
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Autres noms</div>
+                <div class="info-value">{{ apprenant.autres_nom }}</div>
+              </div>
+            </div>
+            {% endif %}
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Numéro CIN</div>
+                <div class="info-value">{{ apprenant.cin }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Date de naissance</div>
+                <div class="info-value">{{ apprenant.date_naissance|date:"d F Y" }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Genre</div>
+                <div class="info-value">
+                  <span class="badge {% if apprenant.sexe == 'M' %}bg-primary{% elif apprenant.sexe == 'F' %}bg-info{% else %}bg-secondary{% endif %}">
+                    {% for code, label in sexe_choices %}
+                      {% if code == apprenant.sexe %}{{ label }}{% endif %}
+                    {% endfor %}
+                  </span>
                 </div>
               </div>
             </div>
             
-            <!-- Informations académiques et contact d'urgence -->
             <div class="col-md-6">
-              <div class="card mb-4">
-                <div class="card-header bg-light py-2">
-                  <h5 class="mb-0">
-                    <i class="fas fa-graduation-cap me-2"></i>Informations académiques
-                  </h5>
-                </div>
-                <div class="card-body">
-                  <table class="table table-borderless table-sm mb-0">
-                    <tbody>
-                      <tr>
-                        <th class="text-secondary" style="width: 40%">Niveau académique:</th>
-                        <td>
-                          {% for code, label in niveau_choices %}
-                            {% if code == apprenant.niveau_academique %}{{ label }}{% endif %}
-                          {% endfor %}
-                        </td>
-                      </tr>
-                      {% if apprenant.type_apprenant %}
-                      <tr>
-                        <th class="text-secondary">Type d'apprenant:</th>
-                        <td>{{ apprenant.type_apprenant }}</td>
-                      </tr>
-                      {% endif %}
-                      {% if apprenant.besoins_speciaux %}
-                      <tr>
-                        <th class="text-secondary">Besoins spéciaux:</th>
-                        <td>{{ apprenant.besoins_speciaux }}</td>
-                      </tr>
-                      {% endif %}
-                    </tbody>
-                  </table>
+              <div class="info-item">
+                <div class="info-label">Catégorie d'âge</div>
+                <div class="info-value">
+                  <span class="badge bg-secondary">
+                    {% for code, label in age_choices %}
+                      {% if code == apprenant.categorie_age %}{{ label }}{% endif %}
+                    {% endfor %}
+                  </span>
                 </div>
               </div>
-
-              <div class="card mb-4">
-                <div class="card-header bg-light py-2">
-                  <h5 class="mb-0">
-                    <i class="fas fa-phone-alt me-2"></i>Contact d'urgence
-                  </h5>
-                </div>
-                <div class="card-body">
-                  <table class="table table-borderless table-sm mb-0">
-                    <tbody>
-                      <tr>
-                        <th class="text-secondary" style="width: 40%">Personne à contacter:</th>
-                        <td>{{ apprenant.contact_urgence }}</td>
-                      </tr>
-                      <tr>
-                        <th class="text-secondary">Téléphone d'urgence:</th>
-                        <td>{{ apprenant.telephone_urgence }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="card-footer">
-          <div class="d-flex justify-content-between">
-            <a href="{% url 'apprenants:apprenant-list' %}" class="btn btn-secondary">
-              <i class="fas fa-arrow-left me-2"></i>Retour à la liste
-            </a>
-            <div>
-              <a href="{% url 'apprenants:apprenant-update' apprenant.apprenant_id %}" class="btn btn-warning me-2">
-                <i class="fas fa-edit me-2"></i>Modifier
-              </a>
-              <a href="{% url 'apprenants:apprenant-delete' apprenant.apprenant_id %}" class="btn btn-danger">
-                <i class="fas fa-trash me-2"></i>Supprimer
-              </a>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Adresse -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-map-marker-alt me-2"></i>Adresse
+        </div>
+        <div class="info-card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="info-item">
+                <div class="info-label">Rue</div>
+                <div class="info-value">{{ apprenant.adresse_rue }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Localité</div>
+                <div class="info-value">{{ apprenant.localite }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Ville</div>
+                <div class="info-value">{{ apprenant.ville }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Colonne de droite -->
+    <div class="col-md-6">
+      <!-- Informations académiques -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-graduation-cap me-2"></i>Informations académiques
+        </div>
+        <div class="info-card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Niveau académique</div>
+                <div class="info-value">
+                  <span class="badge bg-success">
+                    {% for code, label in niveau_choices %}
+                      {% if code == apprenant.niveau_academique %}{{ label }}{% endif %}
+                    {% endfor %}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {% if apprenant.type_apprenant %}
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Type d'apprenant</div>
+                <div class="info-value">{{ apprenant.type_apprenant }}</div>
+              </div>
+            </div>
+            {% endif %}
+            
+            {% if apprenant.besoins_speciaux %}
+            <div class="col-md-12">
+              <div class="info-item">
+                <div class="info-label">Besoins spéciaux</div>
+                <div class="info-value">{{ apprenant.besoins_speciaux }}</div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact d'urgence -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-phone-alt me-2"></i>Contact d'urgence
+        </div>
+        <div class="info-card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Personne à contacter</div>
+                <div class="info-value">{{ apprenant.contact_urgence }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Téléphone d'urgence</div>
+                <div class="info-value">{{ apprenant.telephone_urgence }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="d-flex justify-content-between mt-3">
+    <a href="{% url 'apprenants:apprenant-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+    </a>
+    <div>
+      <a href="{% url 'apprenants:apprenant-update' apprenant.apprenant_id %}" class="btn btn-warning btn-action">
+        <i class="fas fa-edit me-2"></i>Modifier
+      </a>
+      <a href="{% url 'apprenants:apprenant-delete' apprenant.apprenant_id %}" class="btn btn-danger btn-action">
+        <i class="fas fa-trash me-2"></i>Supprimer
+      </a>
     </div>
   </div>
 </div>

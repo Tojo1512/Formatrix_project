@@ -3,213 +3,298 @@
 
 {% block title %}Accueil - Formatrix{% endblock %}
 
+{% block extra_css %}
+<style>
+  .dashboard-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 100%;
+  }
+  
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  
+  .dashboard-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .stats-card {
+    border-left: 4px solid;
+    transition: transform 0.2s;
+  }
+  
+  .stats-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  .stats-card.primary {
+    border-left-color: var(--bs-primary);
+  }
+  
+  .stats-card.success {
+    border-left-color: var(--bs-success);
+  }
+  
+  .stats-card.info {
+    border-left-color: var(--bs-info);
+  }
+  
+  .stats-card.warning {
+    border-left-color: var(--bs-warning);
+  }
+  
+  .welcome-card {
+    background: linear-gradient(to right, #f5f7fa, #ffffff);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  
+  .welcome-avatar {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+    color: white;
+    font-size: 2rem;
+  }
+  
+  .welcome-content {
+    padding: 0 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #333;
+    position: relative;
+    padding-left: 15px;
+  }
+  
+  .section-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #4e73df 0%, #224abe 100%);
+    border-radius: 4px;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="page-inner py-4">
-  <div class="page-header">
+  <div class="page-header mb-4">
     <h4 class="page-title">Tableau de bord</h4>
-    <div class="page-category text-secondary">Bienvenue sur Formatrix</div>
   </div>
 
   {% if user.is_authenticated %}
     <!-- Section de bienvenue -->
-    <div class="row mt-4">
+    <div class="row mb-4">
       <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex align-items-center mb-3">
-              <div class="avatar avatar-xl bg-primary text-white me-3">
-                <i class="fas fa-user-circle"></i>
+        <div class="card welcome-card">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center">
+              <div class="welcome-avatar me-4">
+                {% if user.is_staff %}
+                  <i class="fas fa-user-shield"></i>
+                {% else %}
+                  <i class="fas fa-chalkboard-teacher"></i>
+                {% endif %}
               </div>
-              <div>
-                <h4 class="mb-1">Bonjour, {{ user.username }}</h4>
-                <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} me-2">
-                  {% if user.is_staff %}
-                    <i class="fas fa-user-shield me-1"></i>Administrateur
-                  {% else %}
-                    <i class="fas fa-chalkboard-teacher me-1"></i>Formateur
+              <div class="welcome-content">
+                <h4 class="fw-bold mb-1">Bonjour, {{ user.username }}</h4>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} px-3 py-2 rounded-pill">
+                    {% if user.is_staff %}
+                      <i class="fas fa-user-shield me-1"></i>Administrateur
+                    {% else %}
+                      <i class="fas fa-chalkboard-teacher me-1"></i>Formateur
+                    {% endif %}
+                  </span>
+                  {% if user.email %}
+                    <span class="text-muted ms-3"><i class="fas fa-envelope me-1"></i>{{ user.email }}</span>
                   {% endif %}
-                </span>
-              </div>
-            </div>
-            <p class="text-muted">
-              {% if user.is_staff %}
-                Vous avez accès à toutes les fonctionnalités d'administration de la plateforme.
-              {% else %}
-                Vous avez accès aux fonctionnalités de gestion des formations.
-              {% endif %}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Cartes statistiques -->
-    <div class="row mt-4">
-      <div class="col-sm-6 col-md-3">
-        <div class="card card-stats card-round">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-icon">
-                <div class="icon-big text-center icon-primary bubble-shadow-small">
-                  <i class="fas fa-users"></i>
                 </div>
+                <p class="text-muted mb-0">
+                  {% if user.is_staff %}
+                    Vous avez accès à toutes les fonctionnalités d'administration de la plateforme.
+                  {% else %}
+                    Vous avez accès aux fonctionnalités de gestion des formations.
+                  {% endif %}
+                </p>
               </div>
-              <div class="col col-stats ms-3 ms-sm-0">
-                <div class="numbers">
-                  <p class="card-category">Apprenants</p>
-                  <h4 class="card-title">{{ apprenants_count }}</h4>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-md-3">
-        <div class="card card-stats card-round">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-icon">
-                <div class="icon-big text-center icon-info bubble-shadow-small">
-                  <i class="fas fa-calendar-alt"></i>
-                </div>
-              </div>
-              <div class="col col-stats ms-3 ms-sm-0">
-                <div class="numbers">
-                  <p class="card-category">Séances</p>
-                  <h4 class="card-title">{{ seances_count }}</h4>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-md-3">
-        <div class="card card-stats card-round">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-icon">
-                <div class="icon-big text-center icon-success bubble-shadow-small">
-                  <i class="fas fa-book"></i>
-                </div>
-              </div>
-              <div class="col col-stats ms-3 ms-sm-0">
-                <div class="numbers">
-                  <p class="card-category">Cours</p>
-                  <h4 class="card-title">{{ cours_count }}</h4>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-md-3">
-        <div class="card card-stats card-round">
-          <div class="card-body">
-            <div class="row align-items-center">
-              <div class="col-icon">
-                <div class="icon-big text-center icon-secondary bubble-shadow-small">
-                  <i class="fas fa-building"></i>
-                </div>
-              </div>
-              <div class="col col-stats ms-3 ms-sm-0">
-                <div class="numbers">
-                  <p class="card-category">Clients</p>
-                  <h4 class="card-title">{{ clients_count }}</h4>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Graphiques et données -->
-    <div class="row mt-4">
-      <div class="col-md-8">
-        <div class="card card-round">
-          <div class="card-header">
-            <div class="card-head-row">
-              <div class="card-title">Activité des formations</div>
-              <div class="card-tools">
-                <a href="#" class="btn btn-sm btn-outline-primary me-2">
-                  <i class="fa fa-download me-1"></i> Exporter
+              <div class="ms-auto">
+                <a href="#" class="btn btn-sm btn-outline-primary rounded-pill">
+                  <i class="fas fa-user-cog me-1"></i>Mon profil
                 </a>
               </div>
             </div>
           </div>
-          <div class="card-body">
-            <div class="chart-container" style="min-height: 375px">
-              <canvas id="statisticsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graphiques d'activité - Mis en avant -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="section-title">Activité de la plateforme</h5>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-gradient-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 text-white">Séances à venir</h5>
+              <span class="badge bg-light text-primary">{{ upcoming_seances_count }} séances dans les 7 prochains jours</span>
             </div>
-            <div id="myChartLegend" class="mt-3 d-flex justify-content-center"></div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height: 300px">
+              <canvas id="upcomingSessionsChart"></canvas>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card card-primary card-round">
-          <div class="card-header">
-            <div class="card-head-row">
-              <div class="card-title text-white">Séances à venir</div>
-            </div>
-            <div class="card-category text-white opacity-75">Les 7 prochains jours</div>
-          </div>
-          <div class="card-body pb-0">
-            <div class="mb-4 mt-2">
-              <h2>{{ upcoming_seances_count }} séances</h2>
-            </div>
-            <div class="pull-in">
-              <canvas id="dailySalesChart"></canvas>
+      
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-header bg-gradient-info text-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 text-white">Activité des formateurs</h5>
+              <span class="badge bg-light text-info">{{ formateurs_count }} formateurs actifs</span>
             </div>
           </div>
-        </div>
-        <div class="card card-round">
-          <div class="card-body pb-0">
-            <div class="h1 fw-bold float-end text-primary">{{ percentage_completed }}%</div>
-            <h2 class="mb-2">{{ formateurs_count }}</h2>
-            <p class="text-muted">Formateurs actifs</p>
-            <div class="pull-in sparkline-fix">
-              <div id="lineChart"></div>
+          <div class="card-body">
+            <div class="chart-container" style="height: 300px">
+              <canvas id="formateursActivityChart"></canvas>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Liste des dernières inscriptions -->
-    <div class="row mt-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Dernières inscriptions</div>
+    <!-- Statistiques rapides -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="section-title">Statistiques</h5>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card primary">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="me-3">
+                <i class="fas fa-users fa-2x text-primary"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1">Apprenants</h6>
+                <h4 class="mb-0">{{ apprenants_count }}</h4>
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card success">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="me-3">
+                <i class="fas fa-calendar-alt fa-2x text-success"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1">Séances</h6>
+                <h4 class="mb-0">{{ seances_count }}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card info">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="me-3">
+                <i class="fas fa-book fa-2x text-info"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1">Cours</h6>
+                <h4 class="mb-0">{{ cours_count }}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card warning">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="me-3">
+                <i class="fas fa-building fa-2x text-warning"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1">Clients</h6>
+                <h4 class="mb-0">{{ clients_count }}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dernières inscriptions -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="section-title">Dernières inscriptions</h5>
+      </div>
+      <div class="col-md-12">
+        <div class="card shadow-sm">
           <div class="card-body p-0">
             <div class="table-responsive">
               <table class="table table-hover">
-                <thead>
+                <thead class="table-light">
                   <tr>
                     <th scope="col">Apprenant</th>
                     <th scope="col">Formation</th>
                     <th scope="col">Date</th>
                     <th scope="col">Client</th>
                     <th scope="col">Statut</th>
+                    <th scope="col" class="text-end">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for inscription in latest_inscriptions %}
                   <tr>
-                    <td>{{ inscription.apprenant.nom }} {{ inscription.apprenant.prenom }}</td>
-                    <td>{{ inscription.seance.cours.titre }}</td>
+                    <td>{{ inscription.apprenant.nom_apprenant }}</td>
+                    <td>{{ inscription.seance.cours.nom_cours|truncatechars:30 }}</td>
                     <td>{{ inscription.date_inscription|date:"d/m/Y" }}</td>
-                    <td>{{ inscription.client.nom }}</td>
+                    <td>{{ inscription.client.nom_entite|truncatechars:20 }}</td>
                     <td>
-                      <span class="badge {% if inscription.statut == 'confirmée' %}bg-success{% elif inscription.statut == 'en_attente' %}bg-warning{% else %}bg-danger{% endif %}">
-                        {{ inscription.get_statut_display }}
+                      <span class="badge {% if inscription.statut_inscription == 'validee' %}bg-success{% elif inscription.statut_inscription == 'en_cours' %}bg-warning{% elif inscription.statut_inscription == 'annulee' %}bg-danger{% else %}bg-secondary{% endif %}">
+                        {{ inscription.get_statut_inscription_display }}
                       </span>
+                    </td>
+                    <td class="text-end">
+                      <a href="{% url 'inscriptions:inscription-detail' inscription.inscription_id %}" class="btn btn-sm btn-info">
+                        <i class="fas fa-eye"></i>
+                      </a>
                     </td>
                   </tr>
                   {% empty %}
                   <tr>
-                    <td colspan="5" class="text-center">Aucune inscription récente</td>
+                    <td colspan="6" class="text-center py-4">
+                      <i class="fas fa-info-circle text-muted me-2"></i> Aucune inscription récente
+                    </td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -220,110 +305,137 @@
       </div>
     </div>
 
-    <!-- Accès rapides -->
-    <div class="row mt-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Accès rapides</div>
+    <!-- Sections principales du tableau de bord -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="section-title">Gestion de la plateforme</h5>
+      </div>
+      <!-- Gestion des Cours -->
+      <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body text-center p-4">
+            <div class="dashboard-icon text-primary">
+              <i class="fas fa-book"></i>
+            </div>
+            <h5 class="card-title">Gestion des Cours</h5>
+            <p class="card-text">Créez et gérez vos cours, programmes et matériels pédagogiques.</p>
+            <div class="mt-4">
+              <a href="{% url 'cours:cours-list' %}" class="btn btn-primary">
+                <i class="fas fa-list me-1"></i> Liste des cours
+              </a>
+              <a href="{% url 'cours:cours-create' %}" class="btn btn-outline-primary mt-2">
+                <i class="fas fa-plus me-1"></i> Nouveau cours
+              </a>
+            </div>
           </div>
-          <div class="card-body">
-            <div class="row">
-              {% if user.is_staff %}
-                <!-- Actions Administrateur -->
-                <div class="col-md-4 mb-3">
-                  <a href="{% url 'formateurs:formateur-list' %}" class="text-decoration-none">
-                    <div class="card card-dark bg-dark-gradient h-100">
-                      <div class="card-body d-flex align-items-center">
-                        <div class="icon-box me-3">
-                          <i class="fas fa-users-cog text-white fa-2x"></i>
-                        </div>
-                        <div>
-                          <h5 class="card-title text-white mb-1">Gestion des Utilisateurs</h5>
-                          <p class="card-text text-white-50 small">Gérez les formateurs et les accès</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <a href="{% url 'cours:cours-list' %}" class="text-decoration-none">
-                    <div class="card card-dark bg-dark-gradient h-100">
-                      <div class="card-body d-flex align-items-center">
-                        <div class="icon-box me-3">
-                          <i class="fas fa-chart-pie text-white fa-2x"></i>
-                        </div>
-                        <div>
-                          <h5 class="card-title text-white mb-1">Statistiques Globales</h5>
-                          <p class="card-text text-white-50 small">Analysez les performances</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <a href="/formatrix/admin/" class="text-decoration-none">
-                    <div class="card card-dark bg-dark-gradient h-100">
-                      <div class="card-body d-flex align-items-center">
-                        <div class="icon-box me-3">
-                          <i class="fas fa-cogs text-white fa-2x"></i>
-                        </div>
-                        <div>
-                          <h5 class="card-title text-white mb-1">Configuration</h5>
-                          <p class="card-text text-white-50 small">Paramètres du système</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              {% else %}
-                <!-- Actions Formateur -->
-                <div class="col-md-4 mb-3">
-                  <a href="{% url 'seances:seance-list' %}" class="text-decoration-none">
-                    <div class="card card-dark bg-dark-gradient h-100">
-                      <div class="card-body d-flex align-items-center">
-                        <div class="icon-box me-3">
-                          <i class="fas fa-chalkboard-teacher text-white fa-2x"></i>
-                        </div>
-                        <div>
-                          <h5 class="card-title text-white mb-1">Mes Formations</h5>
-                          <p class="card-text text-white-50 small">Gérez vos sessions de formation</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <a href="{% url 'apprenants:apprenant-list' %}" class="text-decoration-none">
-                    <div class="card card-dark bg-dark-gradient h-100">
-                      <div class="card-body d-flex align-items-center">
-                        <div class="icon-box me-3">
-                          <i class="fas fa-user-graduate text-white fa-2x"></i>
-                        </div>
-                        <div>
-                          <h5 class="card-title text-white mb-1">Mes Apprenants</h5>
-                          <p class="card-text text-white-50 small">Suivez vos apprenants</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <a href="#" class="text-decoration-none">
-                    <div class="card card-dark bg-dark-gradient h-100">
-                      <div class="card-body d-flex align-items-center">
-                        <div class="icon-box me-3">
-                          <i class="fas fa-chart-line text-white fa-2x"></i>
-                        </div>
-                        <div>
-                          <h5 class="card-title text-white mb-1">Mes Rapports</h5>
-                          <p class="card-text text-white-50 small">Consultez vos statistiques</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              {% endif %}
+        </div>
+      </div>
+      
+      <!-- Inscriptions -->
+      <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body text-center p-4">
+            <div class="dashboard-icon text-success">
+              <i class="fas fa-user-graduate"></i>
+            </div>
+            <h5 class="card-title">Inscriptions</h5>
+            <p class="card-text">Gérez les inscriptions des apprenants aux différentes formations.</p>
+            <div class="mt-4">
+              <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-success">
+                <i class="fas fa-list me-1"></i> Liste des inscriptions
+              </a>
+              <a href="{% url 'inscriptions:inscription-multiple' %}" class="btn btn-outline-success mt-2">
+                <i class="fas fa-users me-1"></i> Inscription multiple
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Formateurs -->
+      <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body text-center p-4">
+            <div class="dashboard-icon text-info">
+              <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <h5 class="card-title">Formateurs</h5>
+            <p class="card-text">Gérez l'équipe de formateurs et leurs disponibilités.</p>
+            <div class="mt-4">
+              <a href="{% url 'formateurs:formateur-list' %}" class="btn btn-info">
+                <i class="fas fa-list me-1"></i> Liste des formateurs
+              </a>
+              <a href="{% url 'formateurs:formateur-create' %}" class="btn btn-outline-info mt-2">
+                <i class="fas fa-plus me-1"></i> Nouveau formateur
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="section-title">Administration</h5>
+      </div>
+      <!-- Facturation -->
+      <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body text-center p-4">
+            <div class="dashboard-icon text-warning">
+              <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <h5 class="card-title">Facturation</h5>
+            <p class="card-text">Gérez les factures, paiements et suivez les transactions financières.</p>
+            <div class="mt-4">
+              <a href="#" class="btn btn-warning">
+                <i class="fas fa-list me-1"></i> Liste des factures
+              </a>
+              <a href="#" class="btn btn-outline-warning mt-2">
+                <i class="fas fa-plus me-1"></i> Nouvelle facture
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Rapports -->
+      <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body text-center p-4">
+            <div class="dashboard-icon text-danger">
+              <i class="fas fa-chart-bar"></i>
+            </div>
+            <h5 class="card-title">Rapports</h5>
+            <p class="card-text">Consultez les statistiques et générez des rapports détaillés.</p>
+            <div class="mt-4">
+              <a href="#" class="btn btn-danger">
+                <i class="fas fa-chart-pie me-1"></i> Rapports démographiques
+              </a>
+              <a href="#" class="btn btn-outline-danger mt-2">
+                <i class="fas fa-file-export me-1"></i> Exporter les données
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Paramètres -->
+      <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body text-center p-4">
+            <div class="dashboard-icon text-secondary">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <h5 class="card-title">Paramètres</h5>
+            <p class="card-text">Configurez les paramètres de la plateforme et gérez les accès utilisateurs.</p>
+            <div class="mt-4">
+              <a href="#" class="btn btn-secondary">
+                <i class="fas fa-user-cog me-1"></i> Gestion des utilisateurs
+              </a>
+              <a href="#" class="btn btn-outline-secondary mt-2">
+                <i class="fas fa-cog me-1"></i> Configuration
+              </a>
             </div>
           </div>
         </div>
@@ -335,56 +447,37 @@
 
 {% block guest_content %}
 {% if not user.is_authenticated %}
-<!-- Page de bienvenue pour les utilisateurs non connectés -->
-<div class="container-fluid vh-100">
-  <div class="row justify-content-center mt-5 mb-5">
-    <div class="col-md-10">
-      <div class="card shadow-lg mb-5">
-        <div class="card-body">
-          <div class="text-center mb-5 mt-4">
-            <div class="avatar avatar-xxl mb-4">
-              <i class="fas fa-graduation-cap text-primary fa-5x"></i>
-            </div>
-            <h1 class="display-4 fw-bold">Bienvenue sur Formatrix</h1>
-            <p class="lead text-muted fs-4">Votre plateforme complète de gestion de formations</p>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-lg border-0 mt-5">
+        <div class="card-body p-5">
+          <div class="text-center mb-5">
+            <h1 class="h3 mb-3">Formatrix</h1>
+            <p class="text-muted">Plateforme de gestion de formations professionnelles</p>
           </div>
-          
-          <div class="row mt-5 px-4 mb-5">
-            <div class="col-md-4 mb-4">
-              <div class="card card-pricing bg-primary-gradient h-100 shadow-lg">
-                <div class="card-body text-center p-5">
-                  <i class="fas fa-sign-in-alt text-white mb-4 fa-4x"></i>
-                  <h3 class="card-title text-white fw-bold">Connexion</h3>
-                  <p class="card-text text-white opacity-9 mb-4 fs-5">Accédez à votre espace personnel</p>
-                  <a href="{% url 'login' %}" class="btn btn-lg btn-light fw-bold">
-                    <i class="fas fa-sign-in-alt me-2"></i>Se connecter
-                  </a>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card mb-4 border-0 bg-light">
+                <div class="card-body p-4 text-center">
+                  <div class="mb-3">
+                    <i class="fas fa-user-shield fa-3x text-primary"></i>
+                  </div>
+                  <h5 class="card-title">Administrateur</h5>
+                  <p class="card-text">Accédez à toutes les fonctionnalités d'administration de la plateforme.</p>
+                  <a href="{% url 'login' %}" class="btn btn-primary">Connexion</a>
                 </div>
               </div>
             </div>
-            
-            <div class="col-md-4 mb-4">
-              <div class="card card-pricing bg-success-gradient h-100 shadow-lg">
-                <div class="card-body text-center p-5">
-                  <i class="fas fa-user-plus text-white mb-4 fa-4x"></i>
-                  <h3 class="card-title text-white fw-bold">Inscription</h3>
-                  <p class="card-text text-white opacity-9 mb-4 fs-5">Rejoignez notre plateforme</p>
-                  <a href="{% url 'formateurs:formateur-register' 'formateur_secret_key_2024' %}" class="btn btn-lg btn-light fw-bold">
-                    <i class="fas fa-user-plus me-2"></i>S'inscrire
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            <div class="col-md-4 mb-4">
-              <div class="card card-pricing bg-info-gradient h-100 shadow-lg">
-                <div class="card-body text-center p-5">
-                  <i class="fas fa-info-circle text-white mb-4 fa-4x"></i>
-                  <h3 class="card-title text-white fw-bold">En savoir plus</h3>
-                  <p class="card-text text-white opacity-9 mb-4 fs-5">Découvrez nos fonctionnalités</p>
-                  <a href="#" class="btn btn-lg btn-light fw-bold">
-                    <i class="fas fa-info-circle me-2"></i>Découvrir
-                  </a>
+            <div class="col-md-6">
+              <div class="card mb-4 border-0 bg-light">
+                <div class="card-body p-4 text-center">
+                  <div class="mb-3">
+                    <i class="fas fa-chalkboard-teacher fa-3x text-success"></i>
+                  </div>
+                  <h5 class="card-title">Formateur</h5>
+                  <p class="card-text">Gérez vos cours et suivez vos apprenants.</p>
+                  <a href="{% url 'login' %}" class="btn btn-success">Connexion</a>
                 </div>
               </div>
             </div>
@@ -401,145 +494,67 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     {% if user.is_authenticated %}
-    try {
-      // Configuration du graphique des statistiques
-      var ctx = document.getElementById('statisticsChart').getContext('2d');
-      if (ctx) {
-        var statisticsChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"],
-            datasets: [{
-              label: "Cours",
-              borderColor: '#1572E8',
-              pointBackgroundColor: '#1572E8',
-              pointRadius: 3,
-              pointBorderWidth: 2,
-              backgroundColor: 'rgba(21, 114, 232, 0.1)',
-              data: JSON.parse('{{ cours_mensuel|escapejs }}')
-            }, {
-              label: "Séances",
-              borderColor: '#F25961',
-              pointBackgroundColor: '#F25961',
-              pointRadius: 3,
-              pointBorderWidth: 2,
-              backgroundColor: 'rgba(242, 89, 97, 0.1)',
-              data: JSON.parse('{{ seances_mensuel|escapejs }}')
-            }, {
-              label: "Inscriptions",
-              borderColor: '#28A745',
-              pointBackgroundColor: '#28A745',
-              pointRadius: 3,
-              pointBorderWidth: 2,
-              backgroundColor: 'rgba(40, 167, 69, 0.1)',
-              data: JSON.parse('{{ inscriptions_mensuel|escapejs }}')
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: {
-                  usePointStyle: true,
-                  padding: 20
-                }
-              },
-              tooltip: {
-                bodySpacing: 4,
-                mode: 'index',
-                intersect: false,
-                position: 'nearest',
-                callbacks: {
-                  label: function(context) {
-                    return ' ' + context.dataset.label + ': ' + context.parsed.y;
-                  }
-                }
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true
-              }
+    // Graphique des séances à venir
+    var upcomingCtx = document.getElementById('upcomingSessionsChart').getContext('2d');
+    var upcomingChart = new Chart(upcomingCtx, {
+      type: 'bar',
+      data: {
+        labels: {{ upcoming_days|safe }},
+        datasets: [{
+          label: 'Séances programmées',
+          data: {{ upcoming_counts|safe }},
+          backgroundColor: 'rgba(54, 162, 235, 0.5)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
             }
           }
-        });
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
       }
-
-      // Configuration du graphique des séances
-      var dailyCtx = document.getElementById('dailySalesChart').getContext('2d');
-      if (dailyCtx) {
-        var dailySalesChart = new Chart(dailyCtx, {
-          type: 'bar',
-          data: {
-            labels: JSON.parse('{{ upcoming_days|escapejs }}'),
-            datasets: [{
-              label: "Séances",
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              borderColor: 'rgba(255, 255, 255, 0.8)',
-              borderWidth: 2,
-              barPercentage: 0.5,
-              data: JSON.parse('{{ upcoming_counts|escapejs }}')
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                bodyFont: { size: 11 },
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                titleColor: '#fff',
-                bodyColor: '#fff'
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                grid: {
-                  display: false,
-                  color: 'rgba(255,255,255,0.1)'
-                },
-                ticks: {
-                  color: 'rgba(255,255,255,0.8)',
-                  stepSize: 1
-                }
-              },
-              x: {
-                grid: {
-                  display: false,
-                  color: 'rgba(255,255,255,0.1)'
-                },
-                ticks: {
-                  color: 'rgba(255,255,255,0.8)'
-                }
-              }
+    });
+    
+    // Graphique d'activité des formateurs
+    var formateursCtx = document.getElementById('formateursActivityChart').getContext('2d');
+    var formateursChart = new Chart(formateursCtx, {
+      type: 'line',
+      data: {
+        labels: ['2 semaines', '10 jours', '1 semaine', '5 jours', '4 jours', '3 jours', '2 jours', 'Hier', 'Aujourd\'hui'],
+        datasets: [{
+          label: 'Activité des formateurs',
+          data: {{ activite_formateurs|default:"[1, 3, 2, 5, 4, 6, 3, 4, 5]"|safe }},
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 2,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
             }
           }
-        });
+        }
       }
-
-      // Configuration du sparkline
-      var sparklineData = JSON.parse('{{ activite_formateurs|escapejs }}');
-      if ($('#lineChart').length && sparklineData) {
-        $('#lineChart').sparkline(sparklineData, {
-          type: 'line',
-          width: '100%',
-          height: '100',
-          lineColor: '#1572E8',
-          fillColor: 'rgba(21, 114, 232, 0.1)',
-          highlightSpotColor: '#1572E8',
-          highlightLineColor: '#1572E8',
-          spotRadius: 3
-        });
-      }
-    } catch (e) {
-      console.error("Erreur dans les graphiques:", e);
-    }
+    });
     {% endif %}
   });
 </script>

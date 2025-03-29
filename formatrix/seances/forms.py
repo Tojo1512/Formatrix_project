@@ -4,12 +4,7 @@ from formateurs.models import Formateur
 from django.core.exceptions import ValidationError
 
 class SeanceForm(forms.ModelForm):
-    formateurs = forms.ModelMultipleChoiceField(
-        queryset=Formateur.objects.filter(statut='actif'),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control', 'size': '5'}),
-        required=True,
-        help_text="Sélectionnez au moins deux formateurs pour cette séance."
-    )
+    # Nous allons définir le champ formateurs dans __init__
     
     class Meta:
         model = Seance
@@ -51,26 +46,33 @@ class SeanceForm(forms.ModelForm):
             'prix': 'Prix',
             'statut': 'Statut'
         }
-        help_texts = {
-            'nombre_places': 'Nombre total de places disponibles',
-            'prix': 'Prix par personne'
-        }
     
-    def clean(self):
-        cleaned_data = super().clean()
-        date_debut = cleaned_data.get('date_debut')
-        date_fin = cleaned_data.get('date_fin')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
-        if date_debut and date_fin and date_fin < date_debut:
-            raise forms.ValidationError("La date de fin ne peut pas être antérieure à la date de début.")
-        
-        return cleaned_data
-
+        # Utiliser directement la queryset sans essayer de précharger
+        self.fields['formateurs'] = forms.ModelMultipleChoiceField(
+            queryset=Formateur.objects.filter(statut='actif'),
+            widget=forms.SelectMultiple(attrs={'class': 'form-control', 'size': '5'}),
+            required=True,
+            help_text="Sélectionnez au moins deux formateurs pour cette séance."
+        )
+    
     def clean_formateurs(self):
         formateurs = self.cleaned_data.get('formateurs')
         if formateurs and len(formateurs) < 2:
-            raise ValidationError("Vous devez sélectionner au moins deux formateurs pour chaque séance.")
-        return formateurs 
+            raise ValidationError("Vous devez sélectionner au moins deux formateurs pour cette séance.")
+        return formateurs
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        nombre_places = cleaned_data.get('nombre_places')
+        
+        if nombre_places is not None and nombre_places < 1:
+            self.add_error('nombre_places', "Le nombre de places doit être au moins 1.")
+        
+        return cleaned_data
+
 
 class AbsenceForm(forms.ModelForm):
     class Meta:
@@ -96,7 +98,7 @@ class AbsenceForm(forms.ModelForm):
             }),
             'formateur_remplacant': forms.Select(attrs={'class': 'form-control'})
         }
-        
+    
     def __init__(self, *args, seance=None, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -120,9 +122,7 @@ class AbsenceForm(forms.ModelForm):
         formateur_absent = cleaned_data.get('formateur_absent')
         formateur_remplacant = cleaned_data.get('formateur_remplacant')
         
-        # Vérifications de cohérence
-        if formateur_absent and formateur_remplacant:
-            if formateur_absent.formateurid == formateur_remplacant.formateurid:
-                self.add_error('formateur_remplacant', "Le formateur remplaçant ne peut pas être le même que le formateur absent.")
+        if formateur_absent and formateur_remplacant and formateur_absent == formateur_remplacant:
+            self.add_error('formateur_remplacant', "Le formateur remplaçant ne peut pas être le même que le formateur absent.")
         
-        return cleaned_data 
+        return cleaned_data
