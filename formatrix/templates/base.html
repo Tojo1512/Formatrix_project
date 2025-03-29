@@ -1,665 +1,521 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
+
 <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
   {% load static %}
-  <link rel="stylesheet" href="{% static 'css/variables.css' %}">
-  <link rel="stylesheet" href="{% static 'css/base.css' %}">
-  <link rel="stylesheet" href="{% static 'css/file-upload.css' %}">
-  {% block splash %}{% endblock %}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  {% block extra_css %}{% endblock %}
   <title>{% block title %}Formatrix{% endblock %}</title>
+  <link rel="icon" href="{% static 'img/kaiadmin/favicon.ico' %}" type="image/x-icon" />
+
+  <!-- Fonts and icons -->
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+  <script>
+    WebFont.load({
+      google: { families: ["Public Sans:300,400,500,600,700"] },
+      custom: {
+        families: [
+          "Font Awesome 5 Solid",
+          "Font Awesome 5 Regular",
+          "Font Awesome 5 Brands",
+          "simple-line-icons",
+        ],
+        urls: ["{% static 'css/fonts.min.css' %}"],
+      },
+      active: function () {
+        sessionStorage.fonts = true;
+      },
+    });
+  </script>
+
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/plugins.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/kaiadmin.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/variables.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/file-upload.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
-    /* Styles for the sidebar */
-    .app-container {
-      display: flex;
-      min-height: 100vh;
-    }
-    
+    /* Custom sidebar styles */
     .sidebar {
-      width: var(--sidebar-width);
-      background-color: var(--sidebar-bg);
-      box-shadow: var(--elevation-2);
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      display: flex;
-      flex-direction: column;
-      transition: all var(--transition-normal);
-      z-index: 1000;
-      border-right: 1px solid var(--sidebar-border);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
     }
     
-    .sidebar-header {
-      height: var(--header-height);
-      display: flex;
-      align-items: center;
-      padding: 0 var(--spacing-lg);
-      border-bottom: 1px solid var(--sidebar-border);
-      background: linear-gradient(to right, var(--sidebar-bg), var(--sidebar-bg));
-      position: relative;
-      overflow: hidden;
+    .sidebar-wrapper {
+      padding: 10px 0;
     }
     
-    .sidebar-header::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: linear-gradient(90deg, var(--sidebar-accent), transparent);
-      transform: translateY(1px);
+    .nav-item {
+      margin-bottom: 3px;
     }
     
-    .brand {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--sidebar-accent);
-      text-decoration: none;
-      letter-spacing: -0.5px;
-      transition: var(--transition-normal);
-      display: flex;
-      align-items: center;
-    }
-    
-    .brand::before {
-      content: '\f5fd'; /* fa-book-open */
-      font-family: 'Font Awesome 6 Free';
-      font-weight: 900;
-      margin-right: 0.5rem;
-      transition: var(--transition-bounce);
-    }
-    
-    .brand:hover {
-      transform: translateY(-1px);
-    }
-    
-    .brand:hover::before {
-      transform: rotate(5deg) scale(1.1);
-    }
-    
-    .sidebar-nav {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: var(--spacing-md) 0;
-      overflow-y: auto;
-    }
-    
-    .sidebar-menu {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .sidebar-item {
-      margin-bottom: var(--spacing-xs);
-      position: relative;
-    }
-    
-    .sidebar-link {
-      display: flex;
-      align-items: center;
-      padding: var(--spacing-md) var(--spacing-lg);
-      color: var(--sidebar-text);
-      text-decoration: none;
-      border-radius: 0;
-      margin: 0;
-      transition: all var(--transition-normal);
-      position: relative;
-      border-left: 3px solid transparent;
-      overflow: hidden;
-    }
-    
-    .sidebar-link::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--primary-color-lighter);
-      opacity: 0;
-      transform: translateX(-100%);
-      transition: transform var(--transition-normal), opacity var(--transition-normal);
-      z-index: -1;
-    }
-    
-    .sidebar-link i {
-      font-size: 1.1rem;
-      min-width: 1.5rem;
-      color: var(--sidebar-text-light);
-      transition: all var(--transition-normal);
-    }
-    
-    .sidebar-link span {
-      margin-left: var(--spacing-md);
+    .nav-item > a {
+      padding: 12px 15px;
+      border-radius: 5px;
       font-weight: 500;
-      font-size: 0.95rem;
+      transition: all 0.2s ease;
     }
     
-    .sidebar-link:hover {
-      background-color: var(--sidebar-hover);
-      border-left: 3px solid var(--sidebar-accent);
-      transform: translateX(2px);
+    .nav-item > a:hover {
+      background-color: rgba(255, 255, 255, 0.05);
     }
     
-    .sidebar-link:hover::after {
-      opacity: 0.05;
-      transform: translateX(0);
+    .nav-item > a > i {
+      font-size: 1rem;
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
     }
     
-    .sidebar-link:hover i {
-      color: var(--sidebar-accent);
-      transform: scale(1.1);
+    .nav-item > a > p {
+      font-size: 0.9rem;
+      margin: 0;
+      font-weight: 500;
     }
     
-    .sidebar-link.active {
-      background-color: var(--sidebar-active);
-      border-left: 3px solid var(--sidebar-accent);
-      font-weight: 600;
-      box-shadow: var(--shadow-sm);
+    .nav-item.active > a {
+      background-color: rgba(255, 255, 255, 0.1);
     }
     
-    .sidebar-link.active i {
-      color: var(--sidebar-accent);
+    .nav-section {
+      margin-top: 15px;
+      padding: 0 15px;
     }
     
-    .submenu-icon {
-      margin-left: auto;
+    .text-section {
       font-size: 0.75rem;
-      transition: transform 0.2s ease;
-      color: var(--sidebar-text-light);
-    }
-    
-    .has-submenu.active .submenu-icon {
-      transform: rotate(90deg);
-      color: var(--sidebar-accent);
-    }
-    
-    .submenu {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-      background-color: var(--sidebar-hover);
-    }
-    
-    .has-submenu.active .submenu {
-      max-height: 500px;
-    }
-    
-    .submenu-link {
-      display: flex;
-      align-items: center;
-      padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-sm) calc(var(--spacing-lg) + 1.5rem);
-      color: var(--sidebar-text-light);
-      text-decoration: none;
-      transition: all 0.2s ease;
-      font-size: 0.9rem;
-      border-left: 3px solid transparent;
-    }
-    
-    .submenu-link i {
-      font-size: 0.85rem;
-      min-width: 1.25rem;
-      color: var(--sidebar-text-light);
-    }
-    
-    .submenu-link span {
-      margin-left: var(--spacing-sm);
-    }
-    
-    .submenu-link:hover {
-      color: var(--sidebar-accent);
-      background-color: var(--sidebar-hover);
-      border-left: 3px solid var(--sidebar-accent);
-      transform: translateX(2px);
-    }
-    
-    .submenu-link:hover i {
-      color: var(--sidebar-accent);
-      transform: scale(1.1);
-    }
-    
-    .sidebar-footer {
-      padding: var(--spacing-md) var(--spacing-lg);
-      border-top: 1px solid var(--sidebar-border);
-      margin-top: auto;
-      background-color: var(--sidebar-bg);
-    }
-    
-    .user-info {
-      display: flex;
-      align-items: center;
-    }
-    
-    .user-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background-color: var(--sidebar-accent);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      box-shadow: var(--shadow-sm);
-      transition: all var(--transition-normal);
-    }
-    
-    .user-info:hover .user-avatar {
-      transform: scale(1.05);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .user-details {
-      margin-left: var(--spacing-md);
-      flex: 1;
-    }
-    
-    .username {
       font-weight: 600;
-      display: block;
-      margin-bottom: 2px;
-      color: var(--sidebar-text);
-      font-size: 0.9rem;
-    }
-    
-    .logout-btn {
-      background: none;
-      border: none;
-      color: var(--sidebar-text-light);
-      padding: 0;
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      transition: color 0.2s ease;
-    }
-    
-    .logout-btn:hover {
-      color: var(--sidebar-accent);
-    }
-    
-    .logout-btn i {
-      margin-right: var(--spacing-xs);
-      font-size: 0.8rem;
-    }
-    
-    /* Section dividers */
-    .sidebar-section {
-      padding: var(--spacing-sm) var(--spacing-lg);
       text-transform: uppercase;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--sidebar-text-light);
-      letter-spacing: 1px;
-      margin-top: var(--spacing-md);
-      margin-bottom: var(--spacing-xs);
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 10px;
     }
     
-    .auth-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+    .nav-collapse li {
+      margin-bottom: 5px;
     }
     
-    .auth-btn {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      background-color: var(--bg-secondary);
-      color: var(--text-primary);
-      text-decoration: none;
-      border-radius: 0.5rem;
+    .nav-collapse a {
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-size: 0.85rem;
       transition: all 0.2s ease;
     }
     
-    .auth-btn:hover {
-      background-color: var(--accent-primary);
-      color: white;
-    }
-    
-    .auth-btn i {
-      margin-right: 0.75rem;
-    }
-    
-    .main-content {
-      flex: 1;
-      margin-left: var(--sidebar-width);
-      padding: 2rem;
-      transition: all var(--transition-normal);
-      animation: fadeIn 0.5s ease-in-out;
-    }
-    
-    .main-content.no-sidebar {
-      margin-left: 0;
-    }
-    
-    .auth-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      background-color: var(--bg-primary);
-      box-shadow: var(--elevation-1);
-      margin-bottom: 2rem;
-      border-radius: var(--radius-md);
-    }
-    
-    .auth-logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-    
-    .auth-actions {
-      display: flex;
-      gap: 1rem;
-    }
-    
-    .auth-btn-header {
-      display: flex;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      color: var(--text-primary);
-      font-weight: 500;
-      transition: all var(--transition-normal);
-    }
-    
-    .auth-btn-header i {
-      margin-right: 0.5rem;
-    }
-    
-    .auth-btn-header:hover {
-      background-color: var(--bg-secondary);
-      transform: translateY(-2px);
-    }
-    
-    .auth-btn-primary {
-      background-color: var(--primary-color);
-      color: white;
-    }
-    
-    .auth-btn-primary:hover {
-      background-color: var(--primary-color-dark);
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* Style pour le bouton de thème */
-    .theme-toggle {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      margin-top: 1rem;
-      width: 100%;
-      background: transparent;
-      border: 1px solid var(--sidebar-border);
-      border-radius: var(--radius-md);
-      color: var(--sidebar-text);
-      cursor: pointer;
-      transition: all var(--transition-normal);
-    }
-    
-    .theme-toggle:hover {
-      background: var(--sidebar-hover);
-      border-color: var(--sidebar-accent);
-      color: var(--sidebar-accent);
-    }
-    
-    .theme-toggle i {
-      font-size: 1rem;
-      transition: transform var(--transition-bounce);
-    }
-    
-    .theme-toggle:hover i {
-      transform: rotate(15deg);
+    .nav-collapse a:hover, 
+    .nav-collapse a.active {
+      background-color: rgba(255, 255, 255, 0.1);
     }
   </style>
+  
+  {% block splash %}{% endblock %}
+  {% block extra_css %}{% endblock %}
 </head>
+
 <body>
-  <div class="app-container">
-    <!-- Sidebar - visible only for authenticated users -->
-    {% if user.is_authenticated %}
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <a href="{% url 'home' %}" class="brand">Formatrix</a>
+  {% if user.is_authenticated %}
+  <div class="wrapper">
+    <!-- Sidebar pour les utilisateurs connectés -->
+    <div class="sidebar" data-background-color="blue">
+      <div class="sidebar-logo">
+        <!-- Logo Header -->
+        <div class="logo-header" data-background-color="blue">
+          <a href="{% url 'home' %}" class="logo">
+            <span class="text-white">Formatrix</span>
+          </a>
+          <div class="nav-toggle">
+            <button class="btn btn-toggle toggle-sidebar">
+              <i class="fas fa-bars"></i>
+            </button>
+            <button class="btn btn-toggle sidenav-toggler">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+        </div>
+        <!-- End Logo Header -->
       </div>
-      
-      <nav class="sidebar-nav">
-        <ul class="sidebar-menu">
-          <li class="sidebar-item">
-            <a href="{% url 'home' %}" class="sidebar-link">
-              <i class="fas fa-home"></i>
-              <span>Home</span>
-            </a>
-          </li>
-          
-          <li class="sidebar-item has-submenu">
-            <a href="#" class="sidebar-link">
-              <i class="fas fa-book"></i>
-              <span>Courses</span>
-              <i class="fas fa-chevron-right submenu-icon"></i>
-            </a>
-            <ul class="submenu">
-              <li class="submenu-item">
-              </li>
-              <li class="submenu-item">
-                <a href="{% url 'cours:cours-list' %}" class="submenu-link">
-                  <i class="fas fa-list"></i>
-                  <span>All courses </span>
+      <div class="sidebar-wrapper scrollbar scrollbar-inner">
+        <div class="sidebar-content">
+          <ul class="nav nav-secondary">
+            <li class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+              <a href="{% url 'home' %}">
+                <i class="fas fa-home"></i>
+                <p>Accueil</p>
+              </a>
+            </li>
+            
+            <li class="nav-section">
+              <span class="sidebar-mini-icon">
+                <i class="fa fa-ellipsis-h"></i>
+              </span>
+              <h4 class="text-section">Gestion de formation</h4>
+            </li>
+            
+            <li class="nav-item {% if 'cours' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#coursesMenu" {% if 'cours' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'cours' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-book"></i>
+                <p>Cours</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'cours' in request.resolver_match.url_name %}show{% endif %}" id="coursesMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'cours:cours-list' %}" class="{% if request.resolver_match.url_name == 'cours-list' %}active{% endif %}">
+                      <span class="sub-item">Tous les cours</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'cours:cours-create' %}" class="{% if request.resolver_match.url_name == 'cours-create' %}active{% endif %}">
+                      <span class="sub-item">Ajouter un cours</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            <li class="nav-item {% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#seancesMenu" {% if 'seance' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-calendar-alt"></i>
+                <p>Séances</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'seance' in request.resolver_match.url_name %}show{% endif %}" id="seancesMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'seances:seance-list' %}" class="{% if request.resolver_match.url_name == 'seance-list' %}active{% endif %}">
+                      <span class="sub-item">Toutes les séances</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'seances:seance-create' %}" class="{% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
+                      <span class="sub-item">Ajouter une séance</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'seances:seance-list' %}?filtre=absences" class="{% if request.resolver_match.url_name == 'seance-list' and request.GET.filtre == 'absences' %}active{% endif %}">
+                      <span class="sub-item">Gestion des absences</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            <li class="nav-item {% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#inscriptionsMenu" {% if 'inscription' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i>
+                <p>Inscriptions</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'inscription' in request.resolver_match.url_name %}show{% endif %}" id="inscriptionsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'inscriptions:inscription-list' %}" class="{% if request.resolver_match.url_name == 'inscription-list' %}active{% endif %}">
+                      <span class="sub-item">Toutes les inscriptions</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'inscriptions:inscription-create' %}" class="{% if request.resolver_match.url_name == 'inscription-create' %}active{% endif %}">
+                      <span class="sub-item">Ajouter une inscription</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'inscriptions:inscription-multiple' %}" class="{% if request.resolver_match.url_name == 'inscription-multiple' %}active{% endif %}">
+                      <span class="sub-item">Inscription multiple</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            <li class="nav-section">
+              <span class="sidebar-mini-icon">
+                <i class="fa fa-ellipsis-h"></i>
+              </span>
+              <h4 class="text-section">Gestion des personnes</h4>
+            </li>
+            
+            <li class="nav-item {% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#apprenantsMenu" {% if 'apprenant' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-user-graduate"></i>
+                <p>Apprenants</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'apprenant' in request.resolver_match.url_name %}show{% endif %}" id="apprenantsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'apprenants:apprenant-list' %}" class="{% if request.resolver_match.url_name == 'apprenant-list' %}active{% endif %}">
+                      <span class="sub-item">Tous les apprenants</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'apprenants:apprenant-create' %}" class="{% if request.resolver_match.url_name == 'apprenant-create' %}active{% endif %}">
+                      <span class="sub-item">Ajouter un apprenant</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            <li class="nav-item {% if 'client' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#clientsMenu" {% if 'client' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'client' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-users"></i>
+                <p>Clients</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'client' in request.resolver_match.url_name %}show{% endif %}" id="clientsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="/clients/liste/" class="{% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
+                      <span class="sub-item">Tous les clients</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/clients/creer/" class="{% if request.resolver_match.url_name == 'client-create' %}active{% endif %}">
+                      <span class="sub-item">Ajouter un client</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            <li class="nav-item {% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#formateursMenu" {% if 'formateur' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <p>Formateurs</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'formateur' in request.resolver_match.url_name %}show{% endif %}" id="formateursMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'formateurs:formateur-list' %}" class="{% if request.resolver_match.url_name == 'formateur-list' %}active{% endif %}">
+                      <span class="sub-item">Tous les formateurs</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'formateurs:formateur-create' %}" class="{% if request.resolver_match.url_name == 'formateur-create' %}active{% endif %}">
+                      <span class="sub-item">Ajouter un formateur</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            {% if user.is_staff %}
+              <li class="nav-item">
+                <a href="{% url 'admin:index' %}">
+                  <i class="fas fa-cog"></i>
+                  <p>Administration</p>
                 </a>
               </li>
-                <a href="{% url 'cours:cours-create' %}" class="submenu-link">
-                  <i class="fas fa-plus"></i>
-                  <span>Add course</span>
-                </a>
-            </ul>
-          </li>
-          
-          <li class="sidebar-item has-submenu">
-            <a href="#" class="sidebar-link {% if 'seance' in request.resolver_match.url_name or 'inscription' in request.resolver_match.url_name %}active{% endif %}">
-              <i class="fas fa-calendar-alt"></i>
-              <span>Séances</span>
-              <i class="fas fa-chevron-right submenu-icon"></i>
-            </a>
-            <ul class="submenu">
-              <li>
-                <a href="{% url 'seances:seance-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'seance-list' %}active{% endif %}">
-                  <i class="fas fa-list"></i>
-                  <span>Toutes les séances</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'seances:seance-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
-                  <i class="fas fa-plus"></i>
-                  <span>Ajouter une séance</span>
-                </a>
-              </li>
-              <li class="submenu-separator"></li>
-              <li>
-                <a href="{% url 'seances:seance-list' %}?filtre=absences" class="submenu-link submenu-section">
-                  <i class="fas fa-user-clock"></i>
-                  <span>Gestion des absences</span>
-                </a>
-              </li>
-            </ul>
-          </li>
-          
-          <li class="sidebar-item has-submenu">
-            <a href="#" class="sidebar-link {% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
-              <i class="fas fa-user-graduate"></i>
-              <span>Students</span>
-              <i class="fas fa-chevron-right submenu-icon"></i>
-            </a>
-            <ul class="submenu">
-              <li>
-                <a href="{% url 'apprenants:apprenant-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'apprenant-list' %}active{% endif %}">
-                  <i class="fas fa-list"></i>
-                  <span>All Students</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'apprenants:apprenant-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'apprenant-create' %}active{% endif %}">
-                  <i class="fas fa-plus"></i>
-                  <span>Add a Student</span>
-                </a>
-              </li>
-            </ul>
-          </li>
-          
-          <li class="sidebar-item has-submenu">
-            <a href="#" class="sidebar-link {% if 'client' in request.resolver_match.url_name %}active{% endif %}">
-              <i class="fas fa-users"></i>
-              <span>Clients</span>
-              <i class="fas fa-chevron-right submenu-icon"></i>
-            </a>
-            <ul class="submenu">
-              <li>
-                <a href="{% url 'clients:client-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
-                  <i class="fas fa-list"></i>
-                  <span>All Clients</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'clients:client-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'client-create' %}active{% endif %}">
-                  <i class="fas fa-plus"></i>
-                  <span>Add New Client</span>
-                </a>
-              </li>
-            </ul>
-          </li>
-          
-          <li class="sidebar-item has-submenu">
-            <a href="#" class="sidebar-link {% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
-              <i class="fas fa-chalkboard-teacher"></i>
-              <span>Trainers</span>
-              <i class="fas fa-chevron-right submenu-icon"></i>
-            </a>
-            <ul class="submenu">
-              <li>
-                <a href="{% url 'formateurs:formateur-list' %}" class="submenu-link {% if request.resolver_match.url_name == 'formateur-list' %}active{% endif %}">
-                  <i class="fas fa-list"></i>
-                  <span>All Trainers</span>
-                </a>
-              </li>
-              <li>
-                <a href="{% url 'formateurs:formateur-create' %}" class="submenu-link {% if request.resolver_match.url_name == 'formateur-create' %}active{% endif %}">
-                  <i class="fas fa-plus"></i>
-                  <span>Add New Trainer</span>
-                </a>
-              </li>
-            </ul>
-          </li>
-          
-          {% if user.is_staff %}
-          <li class="sidebar-item">
-            <a href="{% url 'admin:index' %}" class="sidebar-link">
-              <i class="fas fa-cog"></i>
-              <span>Administration</span>
-            </a>
-          </li>
-          {% endif %}
-        </ul>
-        
-        <div class="sidebar-footer">
-          <div class="user-info">
-            <div class="user-avatar">
-              <i class="fas fa-user"></i>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- End Sidebar -->
+
+    <div class="main-panel">
+      <!-- Navbar simplifiée pour les utilisateurs connectés -->
+      <div class="main-header">
+        <nav class="navbar navbar-header navbar-expand-lg">
+          <div class="container-fluid">
+            <div class="d-flex align-items-center">
+              <button class="navbar-toggler sidenav-toggler" type="button">
+                <span class="navbar-toggler-icon">
+                  <i class="fas fa-bars"></i>
+                </span>
+              </button>
+              <h4 class="page-title mb-0 ms-2 d-none d-lg-block">Formatrix</h4>
             </div>
-            <div class="user-details">
-              <span class="username">{{ user.username }}</span>
-              <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{% url 'home' %}">
-                <button type="submit" class="logout-btn">
-                  <i class="fas fa-sign-out-alt"></i>
-                  <span>Logout</span>
-                </button>
-              </form>
+            
+            <!-- Informations utilisateur et déconnexion à droite -->
+            <ul class="navbar-nav ms-auto align-items-center">
+              <li class="nav-item">
+                <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} me-3">
+                  {% if user.is_staff %}
+                    <i class="fas fa-user-shield me-1"></i>Administrateur
+                  {% else %}
+                    <i class="fas fa-chalkboard-teacher me-1"></i>Formateur
+                  {% endif %}
+                </span>
+              </li>
+              <li class="nav-item dropdown user-profile">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="user-name me-1">{{ user.username }}</span>
+                  <i class="fas fa-user-circle"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  <a class="dropdown-item" href="#">
+                    <i class="fas fa-user-cog me-2"></i>Profil
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <form method="post" action="{% url 'logout' %}" class="px-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm w-100">
+                      <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                    </button>
+                  </form>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Content -->
+      <div class="content">
+        {% block content %}{% endblock %}
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="container-fluid">
+          <div class="d-flex justify-content-between align-items-center">
+            <nav>
+              <ul class="nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Aide</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Mentions légales</a>
+                </li>
+              </ul>
+            </nav>
+            <div class="copyright">
+              &copy; {% now "Y" %} Formatrix. Tous droits réservés.
             </div>
           </div>
-
         </div>
-      </nav>
-    </aside>
+      </footer>
+    </div>
+  </div>
+  {% else %}
+  <!-- Page non-authentifiée -->
+  <div class="guest-wrapper">
+    {% if not show_splash %}
+    <div class="main-header shadow-sm">
+      <div class="container-fluid">
+        <div class="row align-items-center">
+          <div class="col-6">
+            <div class="logo py-3">
+              <a href="{% url 'home' %}" class="logo d-flex align-items-center text-primary text-decoration-none">
+                <i class="fas fa-graduation-cap me-2 fa-lg"></i>
+                <span class="fw-bold fs-4">Formatrix</span>
+              </a>
+            </div>
+          </div>
+          <div class="col-6 text-end">
+            <div class="auth-actions">
+              <a href="{% url 'login' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-sign-in-alt me-1"></i>
+                <span>Connexion</span>
+              </a>
+              <a href="{% url 'formateurs:formateur-register' 'formateur_secret_key_2024' %}" class="btn btn-primary">
+                <i class="fas fa-user-plus me-1"></i>
+                <span>Inscription</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     {% endif %}
 
-    <!-- Main Content -->
-    <main class="main-content fade-in {% if not user.is_authenticated %}no-sidebar{% endif %}">
-      {% if not user.is_authenticated and not show_splash %}
-      <header class="auth-header">
-        <div class="auth-logo">
-          <a href="{% url 'home' %}" class="brand">Formatrix</a>
-        </div>
-        <div class="auth-actions">
-          <a href="{% url 'login' %}" class="auth-btn-header">
-            <i class="fas fa-sign-in-alt"></i>
-            <span>Login</span>
-          </a>
-          <a href="{% url 'formateurs:formateur-register' 'formateur_secret_key_2024' %}" class="auth-btn-header auth-btn-primary">
-            <i class="fas fa-user-plus"></i>
-            <span>Register</span>
-          </a>
-        </div>
-      </header>
-      {% endif %}
-      {% block content %}{% endblock %}
-    </main>
-  </div>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2025 Formatrix. All rights reserved.</p>
+    <div class="content content-wrapper">
+      <div class="container-fluid p-0">
+        {% block guest_content %}{% endblock %}
+      </div>
     </div>
-  </footer>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center">
+          <nav>
+            <ul class="nav">
+              <li class="nav-item">
+                <a class="nav-link" href="#">Aide</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Mentions légales</a>
+              </li>
+            </ul>
+          </nav>
+          <div class="copyright">
+            &copy; {% now "Y" %} Formatrix. Tous droits réservés.
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+  {% endif %}
+
+  <!-- Core JS Files -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
+
+  <!-- jQuery UI -->
+  <script src="{% static 'js/plugin/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+  <script src="{% static 'js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js' %}"></script>
+
+  <!-- jQuery Scrollbar -->
+  <script src="{% static 'js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
+
+  <!-- Bootstrap Notify -->
+  <script src="{% static 'js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
+
+  <!-- Kaiadmin JS -->
+  <script src="{% static 'js/kaiadmin.min.js' %}"></script>
+  <script src="{% static 'js/file-upload.js' %}"></script>
   
   {% block extra_js %}
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Handle sidebar submenus
-      const submenuItems = document.querySelectorAll('.has-submenu');
-      
-      submenuItems.forEach(item => {
-        const link = item.querySelector('.sidebar-link');
-        
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          item.classList.toggle('active');
+    document.addEventListener('DOMContentLoaded', function () {
+      // Gestion de la sidebar en mode mobile
+      const sidenavTogglers = document.querySelectorAll('.sidenav-toggler');
+      sidenavTogglers.forEach(function(toggler) {
+        toggler.addEventListener('click', function() {
+          document.body.classList.toggle('sidebar-open');
         });
       });
       
-      // Automatically activate submenu based on current URL
-      const currentPath = window.location.pathname;
-      
-      document.querySelectorAll('.submenu-link').forEach(link => {
-        if (link.getAttribute('href') === currentPath) {
-          link.classList.add('active');
-          link.closest('.has-submenu').classList.add('active');
+      // Initialiser les menus déroulants
+      var navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(function (item) {
+        var link = item.querySelector('[data-bs-toggle="collapse"]');
+        if (link) {
+          var menu = document.querySelector(link.getAttribute('href'));
+          if (menu) {
+            // Vérifier si le menu doit être ouvert
+            var shouldBeActive = item.classList.contains('active') ||
+              menu.querySelectorAll('.active').length > 0 ||
+              window.location.pathname.includes(link.getAttribute('href').substring(1));
+
+            if (shouldBeActive) {
+              item.classList.add('active');
+              menu.classList.add('show');
+            }
+          }
         }
       });
-      
-      // Le code de gestion du thème sombre a été supprimé
-      // S'assurer que le mode sombre est désactivé
-      document.documentElement.classList.remove('dark-theme');
-      localStorage.removeItem('theme');
+
+      // Pour le nouveau template - activer les éléments du sous-menu
+      $(".nav-collapse a").each(function () {
+        if ($(this).attr('href') === window.location.pathname) {
+          $(this).addClass('active');
+          $(this).closest('.collapse').addClass('show');
+          $(this).closest('.nav-item').addClass('active');
+        }
+      });
     });
   </script>
-  <script src="{% static 'js/file-upload.js' %}"></script>
   {% endblock %}
 </body>
+
 </html>

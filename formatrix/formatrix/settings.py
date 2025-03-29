@@ -19,7 +19,7 @@ import os
 
 # Clés d'inscription sécurisées
 FORMATEUR_REGISTRATION_KEY = "formateur_secret_key_2024"
-ADMIN_REGISTRATION_KEY = "admin_secret_key_2024"
+ADMIN_REGISTRATION_KEY = "admin_secret_code_2024"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'templates/assets'),
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -111,8 +112,8 @@ DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.postgresql'),
         'NAME': os.environ.get('DATABASE_NAME', 'formatrix'),
-        'USER': os.environ.get('DATABASE_USER', 'formatrix'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'formatrix'),
+        'USER': os.environ.get('DATABASE_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'root'),
         'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
         'PORT': os.environ.get('DATABASE_PORT', '5432'),
     }

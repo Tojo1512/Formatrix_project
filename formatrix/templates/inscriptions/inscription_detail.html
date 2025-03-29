@@ -1,221 +1,230 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Détail de l'Inscription - Formatrix{% endblock %}
+{% block title %}Inscription #{{ inscription.inscription_id }} - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/detail.css' %}">
-<style>
-  .status-badge {
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-weight: 600;
-  }
-  
-  .status-en_cours {
-    background-color: #ffc107;
-    color: #000;
-  }
-  
-  .status-validee {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .status-annulee {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .info-section {
-    margin-bottom: 20px;
-  }
-  
-  .info-section h3 {
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .info-row {
-    display: flex;
-    margin-bottom: 10px;
-  }
-  
-  .info-label {
-    font-weight: 600;
-    width: 200px;
-  }
-  
-  .info-value {
-    flex: 1;
-  }
-  
-  .action-buttons {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/detail.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="card-header">
-    <h2 class="card-title">Détail de l'Inscription #{{ inscription.inscription_id }}</h2>
-    <a href="{% url 'inscription-list' %}" class="btn btn-outline">
-      <i class="fas fa-arrow-left"></i> Retour à la liste
-    </a>
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Inscription #{{ inscription.inscription_id }}</h1>
+    <div class="ms-auto">
+      <div class="btn-group">
+        <a href="{% url 'inscriptions:inscription-update' inscription.inscription_id %}" class="btn btn-warning">
+          <i class="fas fa-edit me-2"></i>Modifier
+        </a>
+        <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i>Retour
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Colonne de gauche -->
+    <div class="col-md-6">
+      <!-- Informations générales -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-info-circle me-2"></i>Informations générales
+        </div>
+        <div class="info-card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Date d'inscription</div>
+                <div class="info-value">{{ inscription.date_inscription|date:"d F Y H:i" }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Statut</div>
+                <div class="info-value">
+                  <span class="badge {% if inscription.statut_inscription == 'validee' %}bg-success{% elif inscription.statut_inscription == 'en_cours' %}bg-warning{% elif inscription.statut_inscription == 'annulee' %}bg-danger{% else %}bg-secondary{% endif %}">
+                    {% for code, label in status_choices %}
+                      {% if code == inscription.statut_inscription %}{{ label }}{% endif %}
+                    {% endfor %}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Type d'inscription</div>
+                <div class="info-value">
+                  {% for code, label in type_choices %}
+                    {% if code == inscription.type_inscription %}{{ label }}{% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            
+            {% if inscription.commentaires %}
+            <div class="col-md-12">
+              <div class="info-item">
+                <div class="info-label">Commentaires</div>
+                <div class="info-value">{{ inscription.commentaires }}</div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations sur l'apprenant -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-user-graduate me-2"></i>Informations sur l'apprenant
+        </div>
+        <div class="info-card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="info-item">
+                <div class="info-label">Nom complet</div>
+                <div class="info-value">{{ inscription.apprenant.nom }} {{ inscription.apprenant.prenom }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value">{{ inscription.apprenant.email }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Téléphone</div>
+                <div class="info-value">{{ inscription.apprenant.telephone }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Colonne de droite -->
+    <div class="col-md-6">
+      <!-- Informations sur la séance -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-calendar-alt me-2"></i>Informations sur la séance
+        </div>
+        <div class="info-card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="info-item">
+                <div class="info-label">Cours</div>
+                <div class="info-value">{{ inscription.seance.cours.nom_cours }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Date</div>
+                <div class="info-value">{{ inscription.seance.date|date:"d F Y" }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Horaires</div>
+                <div class="info-value">{{ inscription.seance.heure_debut }} - {{ inscription.seance.heure_fin }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-12">
+              <div class="info-item">
+                <div class="info-label">Lieu</div>
+                <div class="info-value">{{ inscription.seance.lieu }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations sur le client -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-building me-2"></i>Informations sur le client
+        </div>
+        <div class="info-card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="info-item">
+                <div class="info-label">Nom du client</div>
+                <div class="info-value">{{ inscription.client.nom }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value">{{ inscription.client.email }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Téléphone</div>
+                <div class="info-value">{{ inscription.client.telephone }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {% if inscription.sponsor %}
+      <!-- Informations sur le sponsor -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-handshake me-2"></i>Informations sur le sponsor
+        </div>
+        <div class="info-card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="info-item">
+                <div class="info-label">Nom du sponsor</div>
+                <div class="info-value">{{ inscription.sponsor.nom }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Email</div>
+                <div class="info-value">{{ inscription.sponsor.email }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Téléphone</div>
+                <div class="info-value">{{ inscription.sponsor.telephone }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
   </div>
   
-  <div class="card-body">
-    <div class="info-section">
-      <h3>Informations générales</h3>
-      
-      <div class="info-row">
-        <div class="info-label">ID d'inscription</div>
-        <div class="info-value">{{ inscription.inscription_id }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Date d'inscription</div>
-        <div class="info-value">{{ inscription.date_inscription|date:"d/m/Y H:i" }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Statut</div>
-        <div class="info-value">
-          <span class="status-badge status-{{ inscription.statut_inscription }}">
-            {% for code, label in status_choices %}
-              {% if code == inscription.statut_inscription %}{{ label }}{% endif %}
-            {% endfor %}
-          </span>
-        </div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Type d'inscription</div>
-        <div class="info-value">
-          {% for code, label in type_choices %}
-            {% if code == inscription.type_inscription %}{{ label }}{% endif %}
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-    
-    <div class="info-section">
-      <h3>Informations sur l'apprenant</h3>
-      
-      <div class="info-row">
-        <div class="info-label">Nom complet</div>
-        <div class="info-value">{{ inscription.apprenant.nom }} {{ inscription.apprenant.prenom }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Email</div>
-        <div class="info-value">{{ inscription.apprenant.email }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Téléphone</div>
-        <div class="info-value">{{ inscription.apprenant.telephone }}</div>
-      </div>
-    </div>
-    
-    <div class="info-section">
-      <h3>Informations sur la séance</h3>
-      
-      <div class="info-row">
-        <div class="info-label">Cours</div>
-        <div class="info-value">{{ inscription.seance.cours.nom_cours }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Date de la séance</div>
-        <div class="info-value">{{ inscription.seance.date|date:"d/m/Y" }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Heure de début</div>
-        <div class="info-value">{{ inscription.seance.heure_debut }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Heure de fin</div>
-        <div class="info-value">{{ inscription.seance.heure_fin }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Lieu</div>
-        <div class="info-value">{{ inscription.seance.lieu }}</div>
-      </div>
-    </div>
-    
-    <div class="info-section">
-      <h3>Informations sur le client</h3>
-      
-      <div class="info-row">
-        <div class="info-label">Nom du client</div>
-        <div class="info-value">{{ inscription.client.nom }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Email</div>
-        <div class="info-value">{{ inscription.client.email }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Téléphone</div>
-        <div class="info-value">{{ inscription.client.telephone }}</div>
-      </div>
-    </div>
-    
-    {% if inscription.sponsor %}
-    <div class="info-section">
-      <h3>Informations sur le sponsor</h3>
-      
-      <div class="info-row">
-        <div class="info-label">Nom du sponsor</div>
-        <div class="info-value">{{ inscription.sponsor.nom }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Email</div>
-        <div class="info-value">{{ inscription.sponsor.email }}</div>
-      </div>
-      
-      <div class="info-row">
-        <div class="info-label">Téléphone</div>
-        <div class="info-value">{{ inscription.sponsor.telephone }}</div>
-      </div>
-    </div>
-    {% endif %}
-    
-    <div class="action-buttons">
-      <a href="{% url 'inscription-update' inscription.inscription_id %}" class="btn btn-primary">
-        <i class="fas fa-edit"></i> Modifier
+  <div class="d-flex justify-content-between mt-3">
+    <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+    </a>
+    <div>
+      <a href="{% url 'inscriptions:inscription-update' inscription.inscription_id %}" class="btn btn-warning btn-action">
+        <i class="fas fa-edit me-2"></i>Modifier
       </a>
-      <a href="{% url 'inscription-delete' inscription.inscription_id %}" class="btn btn-danger">
-        <i class="fas fa-trash"></i> Supprimer
+      <a href="{% url 'inscriptions:inscription-delete' inscription.inscription_id %}" class="btn btn-danger btn-action">
+        <i class="fas fa-trash me-2"></i>Supprimer
       </a>
-      
-      {% if inscription.statut_inscription == 'en_cours' %}
-      <form method="post" action="{% url 'inscription-update-status' inscription.inscription_id 'validee' %}" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-success">
-          <i class="fas fa-check"></i> Valider l'inscription
-        </button>
-      </form>
-      {% endif %}
-      
-      {% if inscription.statut_inscription != 'annulee' %}
-      <form method="post" action="{% url 'inscription-update-status' inscription.inscription_id 'annulee' %}" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-warning">
-          <i class="fas fa-times"></i> Annuler l'inscription
-        </button>
-      </form>
-      {% endif %}
     </div>
   </div>
 </div>

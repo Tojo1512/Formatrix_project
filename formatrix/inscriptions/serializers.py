@@ -44,8 +44,9 @@ class InscriptionMultipleSerializer(serializers.Serializer):
     """
     Sérialiseur pour inscrire plusieurs apprenants à une séance
     """
-    client_id = serializers.PrimaryKeyRelatedField(
-        queryset=Client.objects.all()
+    clientid = serializers.PrimaryKeyRelatedField(
+        queryset=Client.objects.all(),
+        source='client_id'
     )
     seance_id = serializers.PrimaryKeyRelatedField(
         queryset=Seance.objects.all()
@@ -57,19 +58,20 @@ class InscriptionMultipleSerializer(serializers.Serializer):
         choices=Inscription.TYPE_INSCRIPTION_CHOICES,
         default='groupe'
     )
-    sponsor_id = serializers.PrimaryKeyRelatedField(
+    sponsorid = serializers.PrimaryKeyRelatedField(
         queryset=Client.objects.all(),
         required=False,
-        allow_null=True
+        allow_null=True,
+        source='sponsor_id'
     )
 
     def create(self, validated_data):
-        client_id = validated_data['client_id'].client_id
+        client_id = validated_data['client_id'].clientid
         seance_id = validated_data['seance_id'].seance_id
         apprenants_ids = [apprenant.apprenant_id for apprenant in validated_data['apprenants_ids']]
         type_inscription = validated_data.get('type_inscription', 'groupe')
         sponsor_id = validated_data.get('sponsor_id')
-        sponsor_id = sponsor_id.client_id if sponsor_id else None
+        sponsor_id = sponsor_id.clientid if sponsor_id else None
         
         # Utiliser la méthode de classe pour inscrire les apprenants
         return Inscription.inscrire_apprenants(

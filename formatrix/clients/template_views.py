@@ -51,7 +51,7 @@ class ClientListView(LoginRequiredMixin, ListView):
             'type_filter': self.request.GET.get('type', ''),
             'ville_filter': self.request.GET.get('ville', ''),
             'show_create_button': True,
-            'create_url': reverse_lazy('client-create'),
+            'create_url': '/clients/creer/',
             'create_button_text': 'Créer un client',
             'form_action': self.request.path,
             'reset_url': self.request.path,
@@ -67,14 +67,14 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
     model = Client
     template_name = 'clients/client_form.html'
     form_class = ClientForm
-    success_url = reverse_lazy('client-list')
+    success_url = reverse_lazy('clients:client-list')  
     login_url = '/login/'
 
     def form_valid(self, form):
         try:
             client = form.save()
             messages.success(self.request, f'Le client "{client.nom_entite}" a été créé avec succès!')
-            return redirect('client-detail', pk=client.clientid)
+            return redirect(reverse_lazy('clients:client-detail', kwargs={'pk': client.clientid}))
         except Exception as e:
             messages.error(self.request, f'Erreur lors de la création du client: {str(e)}')
             return self.form_invalid(form)
@@ -93,21 +93,21 @@ class ClientDetailView(LoginRequiredMixin, DetailView):
     template_name = 'clients/client_detail.html'
     context_object_name = 'client'
     login_url = '/login/'
-    pk_url_kwarg = 'pk'  # Utilise 'pk' comme paramètre d'URL pour l'ID
+    pk_url_kwarg = 'pk'  
 
 class ClientUpdateView(LoginRequiredMixin, UpdateView):
     model = Client
     template_name = 'clients/client_form.html'
     form_class = ClientForm
-    success_url = reverse_lazy('client-list')
+    success_url = reverse_lazy('clients:client-list')  
     login_url = '/login/'
-    pk_url_kwarg = 'pk'  # Utilise 'pk' comme paramètre d'URL pour l'ID
+    pk_url_kwarg = 'pk'  
 
     def form_valid(self, form):
         try:
             client = form.save()
             messages.success(self.request, f'Le client "{client.nom_entite}" a été mis à jour avec succès!')
-            return redirect('client-detail', pk=client.clientid)
+            return redirect(reverse_lazy('clients:client-detail', kwargs={'pk': client.clientid}))
         except Exception as e:
             messages.error(self.request, f'Erreur lors de la mise à jour du client: {str(e)}')
             return self.form_invalid(form)
@@ -124,12 +124,11 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 class ClientDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Client
     template_name = 'clients/client_confirm_delete.html'
-    success_url = reverse_lazy('client-list')
+    success_url = reverse_lazy('clients:client-list')  
     login_url = '/login/'
-    pk_url_kwarg = 'pk'  # Utilise 'pk' comme paramètre d'URL pour l'ID
+    pk_url_kwarg = 'pk'  
     
     def test_func(self):
-        # Seuls les administrateurs peuvent supprimer un client
         return self.request.user.is_staff
     
     def delete(self, request, *args, **kwargs):

@@ -1,6 +1,6 @@
 from django.views.generic import ListView, CreateView, UpdateView, DetailView, DeleteView
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from .models import Formateur
@@ -59,14 +59,11 @@ class FormateurListView(LoginRequiredMixin, ListView):
         })
         return context
 
-class FormateurCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class FormateurCreateView(LoginRequiredMixin, CreateView):
     model = Formateur
     form_class = FormateurForm
     template_name = 'formateurs/formateur_form.html'
     success_url = reverse_lazy('formateurs:formateur-list')
-
-    def test_func(self):
-        return self.request.user.is_staff
 
     def form_valid(self, form):
         try:
@@ -77,20 +74,20 @@ class FormateurCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             messages.error(self.request, f'Erreur lors de la création du formateur: {str(e)}')
             return self.form_invalid(form)
 
-class FormateurUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class FormateurUpdateView(LoginRequiredMixin, UpdateView):
     model = Formateur
     form_class = FormateurForm
     template_name = 'formateurs/formateur_form.html'
     pk_url_kwarg = 'pk'
-
-    def test_func(self):
-        return self.request.user.is_staff
-
+    
+    def get_success_url(self):
+        return reverse_lazy('formateurs:formateur-detail', kwargs={'pk': self.object.pk})
+    
     def form_valid(self, form):
         try:
             formateur = form.save()
             messages.success(self.request, f'Le formateur {formateur.get_full_name()} a été mis à jour avec succès!')
-            return redirect('formateurs:formateur-detail', pk=formateur.formateurid)
+            return redirect(self.get_success_url())
         except Exception as e:
             messages.error(self.request, f'Erreur lors de la mise à jour du formateur: {str(e)}')
             return self.form_invalid(form)
@@ -100,21 +97,24 @@ class FormateurDetailView(LoginRequiredMixin, DetailView):
     template_name = 'formateurs/formateur_detail.html'
     context_object_name = 'formateur'
     pk_url_kwarg = 'pk'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         formateur = self.get_object()
+        # Préparer la liste des spécialités
+        if formateur.specialites:
+            context['specialites_list'] = [spec.strip() for spec in formateur.specialites.split(',')]
+        else:
+            context['specialites_list'] = []
+        # Ajouter les cours actifs
         context['cours_actifs'] = formateur.get_cours_actifs()
         return context
 
-class FormateurDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class FormateurDeleteView(LoginRequiredMixin, DeleteView):
     model = Formateur
     template_name = 'formateurs/formateur_confirm_delete.html'
-    success_url = reverse_lazy('formateur-list')
+    success_url = reverse_lazy('formateurs:formateur-list')
     pk_url_kwarg = 'pk'
-
-    def test_func(self):
-        return self.request.user.is_staff
 
     def delete(self, request, *args, **kwargs):
         formateur = self.get_object()

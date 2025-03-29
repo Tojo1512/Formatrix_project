@@ -4,8 +4,7 @@
 {% block title %}{% if object.cours_id %}Edit{% else %}Create{% endif %} a Course - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/theme.css' %}">
-<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -15,7 +14,7 @@
       <i class="fas {% if object.cours_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
       {% if object.cours_id %}Edit{% else %}Create{% endif %} a Course
     </h2>
-    <a href="{% url 'cours-list' %}" class="btn btn-outline">
+    <a href="{% url 'cours:cours-list' %}" class="btn btn-outline">
       <i class="fas fa-arrow-left"></i>
       Back
     </a>
@@ -30,9 +29,9 @@
   {% endif %}
 
   {% if form.non_field_errors %}
-    <div class="alert alert-danger">
+    <div class="alert alert-danger mb-4">
       {% for error in form.non_field_errors %}
-        {{ error }}
+        <p>{{ error }}</p>
       {% endfor %}
     </div>
   {% endif %}
@@ -206,7 +205,18 @@
             <i class="fas fa-user-tie"></i>
             Assigned Trainers
           </label>
-          {{ form.formateurs }}
+          <!-- Custom select for formateurs to avoid database errors -->
+          <select name="formateurs" multiple class="form-control" id="id_formateurs">
+            {% if formateurs %}
+              {% for formateur in formateurs %}
+                <option value="{{ formateur.formateurid }}" {% if formateur.selected %}selected{% endif %}>
+                  {{ formateur.nom }} {{ formateur.prenom }}
+                </option>
+              {% endfor %}
+            {% else %}
+              <option value="" disabled>No trainers available</option>
+            {% endif %}
+          </select>
           {% include "includes/field_errors.html" with field=form.formateurs %}
           <small class="form-text text-muted">
             <i class="fas fa-info-circle"></i>
@@ -217,7 +227,7 @@
     </div>
 
     <div class="form-actions">
-      <a href="{% url 'cours-list' %}" class="btn btn-outline">
+      <a href="{% url 'cours:cours-list' %}" class="btn btn-outline">
         <i class="fas fa-times"></i>
         Cancel
       </a>

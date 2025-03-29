@@ -8,8 +8,10 @@ from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.urls import reverse
+from django import forms
 
 from .models import Seance, Absence
+from formateurs.models import Formateur
 from .forms import SeanceForm, AbsenceForm
 
 # Create your views here.
@@ -95,24 +97,59 @@ class SeanceDetailView(LoginRequiredMixin, DetailView):
 
 class SeanceCreateView(LoginRequiredMixin, CreateView):
     model = Seance
-    form_class = SeanceForm
     template_name = 'seances/seance_form.html'
+    fields = [
+        'lieu',
+        'date',
+        'cours',
+        'nombre_places',
+        'prix',
+        'statut'
+    ]
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Ajouter des classes Bootstrap aux champs
+        for field_name, field in form.fields.items():
+            if isinstance(field.widget, forms.Select) or isinstance(field.widget, forms.SelectMultiple):
+                field.widget.attrs.update({'class': 'form-control'})
+            elif isinstance(field.widget, forms.DateInput):
+                field.widget = forms.DateInput(attrs={
+                    'class': 'form-control',
+                    'type': 'date'
+                })
+            elif isinstance(field.widget, forms.NumberInput):
+                field.widget.attrs.update({'class': 'form-control', 'min': '1' if field_name == 'nombre_places' else '0'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+        return form
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Ajouter les formateurs actifs au contexte
+        # Utiliser uniquement les champs nécessaires pour éviter les problèmes
+        context['formateurs_actifs'] = Formateur.objects.filter(statut='actif').only('formateurid', 'nom', 'prenom')
+        return context
     
     def get_success_url(self):
         return reverse_lazy('seances:seance-detail', kwargs={'pk': self.object.pk})
     
     def form_valid(self, form):
         try:
-            # Vérification du nombre de formateurs
-            formateurs = form.cleaned_data.get('formateurs', [])
-            if len(formateurs) < 2:
-                form.add_error('formateurs', "Vous devez sélectionner au moins deux formateurs pour cette séance.")
-                return self.form_invalid(form)
+            # Enregistrer d'abord la séance sans les formateurs
+            self.object = form.save()
             
-            # Enregistrement de la séance
-            response = super().form_valid(form)
-            messages.success(self.request, 'Séance créée avec succès avec {} formateurs assignés!'.format(len(formateurs)))
-            return response
+            # Récupérer les formateurs sélectionnés
+            formateurs_ids = self.request.POST.getlist('formateurs')
+            
+            # Ajouter les formateurs à la séance
+            self.object.formateurs.clear()  # Supprimer les formateurs existants en cas de mise à jour
+            for formateur_id in formateurs_ids:
+                formateur = Formateur.objects.get(formateurid=formateur_id)
+                self.object.formateurs.add(formateur)
+            
+            messages.success(self.request, f'Séance créée avec succès avec {len(formateurs_ids)} formateur(s) assigné(s)!')
+            return redirect(self.get_success_url())
             
         except Exception as e:
             messages.error(self.request, f"Erreur lors de la création de la séance: {str(e)}")
@@ -120,24 +157,58 @@ class SeanceCreateView(LoginRequiredMixin, CreateView):
 
 class SeanceUpdateView(LoginRequiredMixin, UpdateView):
     model = Seance
-    form_class = SeanceForm
+    fields = [
+        'lieu',
+        'date',
+        'cours',
+        'nombre_places',
+        'prix',
+        'statut'
+    ]
     template_name = 'seances/seance_form.html'
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Ajouter des classes Bootstrap aux champs
+        for field_name, field in form.fields.items():
+            if isinstance(field.widget, forms.Select) or isinstance(field.widget, forms.SelectMultiple):
+                field.widget.attrs.update({'class': 'form-control'})
+            elif isinstance(field.widget, forms.DateInput):
+                field.widget = forms.DateInput(attrs={
+                    'class': 'form-control',
+                    'type': 'date'
+                })
+            elif isinstance(field.widget, forms.NumberInput):
+                field.widget.attrs.update({'class': 'form-control', 'min': '1' if field_name == 'nombre_places' else '0'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+        return form
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Ajouter les formateurs actifs au contexte
+        context['formateurs_actifs'] = Formateur.objects.filter(statut='actif').only('formateurid', 'nom', 'prenom')
+        return context
     
     def get_success_url(self):
         return reverse_lazy('seances:seance-detail', kwargs={'pk': self.object.pk})
     
     def form_valid(self, form):
         try:
-            # Vérification du nombre de formateurs
-            formateurs = form.cleaned_data.get('formateurs', [])
-            if len(formateurs) < 2:
-                form.add_error('formateurs', "Vous devez sélectionner au moins deux formateurs pour cette séance.")
-                return self.form_invalid(form)
+            # Enregistrer d'abord la séance sans les formateurs
+            self.object = form.save()
             
-            # Enregistrement de la séance mise à jour
-            response = super().form_valid(form)
-            messages.success(self.request, 'Séance mise à jour avec succès avec {} formateurs assignés!'.format(len(formateurs)))
-            return response
+            # Récupérer les formateurs sélectionnés
+            formateurs_ids = self.request.POST.getlist('formateurs')
+            
+            # Ajouter les formateurs à la séance
+            self.object.formateurs.clear()  # Supprimer les formateurs existants
+            for formateur_id in formateurs_ids:
+                formateur = Formateur.objects.only('formateurid', 'nom', 'prenom').get(formateurid=formateur_id)
+                self.object.formateurs.add(formateur)
+            
+            messages.success(self.request, f'Séance mise à jour avec succès avec {len(formateurs_ids)} formateurs assignés!')
+            return redirect(self.get_success_url())
             
         except Exception as e:
             messages.error(self.request, f"Erreur lors de la mise à jour de la séance: {str(e)}")

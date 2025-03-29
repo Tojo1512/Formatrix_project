@@ -4,8 +4,6 @@
 {% block title %}Inscription Formateur - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/theme.css' %}">
-<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 <style>
   .form-step {
     display: none;
@@ -43,10 +41,10 @@
     z-index: 2;
   }
   .step.active {
-    background-color: var(--primary-color);
+    background-color: #007bff;
   }
   .step.completed {
-    background-color: var(--success-color);
+    background-color: #28a745;
   }
   .step-title {
     position: absolute;
@@ -56,506 +54,500 @@
     white-space: nowrap;
   }
   .step.active .step-title {
-    color: var(--primary-color);
+    color: #007bff;
     font-weight: bold;
   }
   .step.completed .step-title {
-    color: var(--success-color);
+    color: #28a745;
   }
   .form-navigation {
     display: flex;
     justify-content: space-between;
     margin-top: 2rem;
   }
+  
+  .form-section {
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+    color: #495057;
+  }
+  
+  .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .has-error .form-control {
+    border-color: #dc3545;
+  }
 </style>
 {% endblock %}
 
-{% block content %}
-<div class="form-container">
-  <div class="form-header">
-    <h2 class="form-title">
-      <i class="fas fa-user-plus"></i>
-      Inscription Formateur
-    </h2>
-    <a href="{% url 'home' %}" class="btn btn-outline">
-      <i class="fas fa-arrow-left"></i>
-      Retour
-    </a>
-  </div>
-
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  {% if form.non_field_errors %}
-    <div class="alert alert-danger">
-      {% for error in form.non_field_errors %}
-        {{ error }}
-      {% endfor %}
-    </div>
-  {% endif %}
-
-  <!-- Indicateur d'étapes -->
-  <div class="step-indicator">
-    <div class="step active" id="step-indicator-1">
-      1
-      <span class="step-title">Compte</span>
-    </div>
-    <div class="step" id="step-indicator-2">
-      2
-      <span class="step-title">Informations personnelles</span>
-    </div>
-    <div class="step" id="step-indicator-3">
-      3
-      <span class="step-title">Informations professionnelles</span>
-    </div>
-    <div class="step" id="step-indicator-4">
-      4
-      <span class="step-title">Documents</span>
-    </div>
-  </div>
-
-  <form method="post" enctype="multipart/form-data" novalidate id="formateur-form">
-    {% csrf_token %}
-    
-    <!-- Étape 1: Création du compte -->
-    <div class="form-step active" id="step-1">
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-user-lock"></i>
-          Création du compte
-        </h3>
-        
-        <div class="form-row">
-          <div class="form-group {% if form.username.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.username.id_for_label }}">
-              <i class="fas fa-user"></i>
-              Nom d'utilisateur
-            </label>
-            {{ form.username }}
-            {% include "includes/field_errors.html" with field=form.username %}
-          </div>
-
-          <div class="form-group {% if form.email.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.email.id_for_label }}">
-              <i class="fas fa-envelope"></i>
-              Email
-            </label>
-            {{ form.email }}
-            {% include "includes/field_errors.html" with field=form.email %}
+{% block guest_content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10 mt-4">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title text-white mb-0">
+              <i class="fas fa-user-plus me-2"></i>Inscription Formateur
+            </h4>
+            <a href="{% url 'home' %}" class="btn btn-light btn-sm">
+              <i class="fas fa-arrow-left me-1"></i>Retour
+            </a>
           </div>
         </div>
+        <div class="card-body p-4">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
 
-        <div class="form-row">
-          <div class="form-group {% if form.password1.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.password1.id_for_label }}">
-              <i class="fas fa-lock"></i>
-              Mot de passe
-            </label>
-            {{ form.password1 }}
-            {% include "includes/field_errors.html" with field=form.password1 %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Indicateur d'étapes -->
+          <div class="step-indicator mb-4">
+            <div class="step active" id="step-indicator-1">
+              1
+              <span class="step-title">Compte</span>
+            </div>
+            <div class="step" id="step-indicator-2">
+              2
+              <span class="step-title">Informations personnelles</span>
+            </div>
+            <div class="step" id="step-indicator-3">
+              3
+              <span class="step-title">Informations professionnelles</span>
+            </div>
+            <div class="step" id="step-indicator-4">
+              4
+              <span class="step-title">Documents</span>
+            </div>
           </div>
 
-          <div class="form-group {% if form.password2.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.password2.id_for_label }}">
-              <i class="fas fa-lock"></i>
-              Confirmer le mot de passe
-            </label>
-            {{ form.password2 }}
-            {% include "includes/field_errors.html" with field=form.password2 %}
-          </div>
-        </div>
-      </div>
+          <form method="post" enctype="multipart/form-data" novalidate id="formateur-form">
+            {% csrf_token %}
+            
+            <!-- Étape 1: Création du compte -->
+            <div class="form-step active" id="step-1">
+              <div class="form-section">
+                <h5 class="section-title">
+                  <i class="fas fa-user-lock me-2"></i>Création du compte
+                </h5>
+                
+                <div class="form-row">
+                  <div class="form-group {% if form.username.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.username.id_for_label }}">
+                      <i class="fas fa-user me-1"></i>Nom d'utilisateur
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-primary text-white">
+                        <i class="fas fa-user"></i>
+                      </span>
+                      {{ form.username }}
+                    </div>
+                    {% if form.username.errors %}
+                      {% for error in form.username.errors %}
+                        <div class="text-danger mt-1">
+                          <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                        </div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
 
-      <div class="form-navigation">
-        <button type="button" class="btn btn-outline">
-          <i class="fas fa-times"></i>
-          Annuler
-        </button>
-        <button type="button" class="btn btn-primary next-step" data-next="2">
-          Suivant
-          <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Étape 2: Informations personnelles -->
-    <div class="form-step" id="step-2">
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-user"></i>
-          Informations personnelles
-        </h3>
-        
-        <div class="form-row">
-          <div class="form-group {% if form.nom.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.nom.id_for_label }}">
-              <i class="fas fa-user"></i>
-              Nom
-            </label>
-            {{ form.nom }}
-            {% include "includes/field_errors.html" with field=form.nom %}
-          </div>
-
-          <div class="form-group {% if form.prenom.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.prenom.id_for_label }}">
-              <i class="fas fa-user"></i>
-              Prénom
-            </label>
-            {{ form.prenom }}
-            {% include "includes/field_errors.html" with field=form.prenom %}
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.telephone.id_for_label }}">
-              <i class="fas fa-phone"></i>
-              Téléphone
-            </label>
-            {{ form.telephone }}
-            {% include "includes/field_errors.html" with field=form.telephone %}
-          </div>
-
-          <div class="form-group {% if form.date_naissance.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.date_naissance.id_for_label }}">
-              <i class="fas fa-calendar"></i>
-              Date de naissance
-            </label>
-            {{ form.date_naissance }}
-            {% include "includes/field_errors.html" with field=form.date_naissance %}
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group {% if form.ville.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.ville.id_for_label }}">
-              <i class="fas fa-city"></i>
-              Ville
-            </label>
-            {{ form.ville }}
-            {% include "includes/field_errors.html" with field=form.ville %}
-          </div>
-
-          <div class="form-group {% if form.adresse.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.adresse.id_for_label }}">
-              <i class="fas fa-map-marker-alt"></i>
-              Adresse
-            </label>
-            {{ form.adresse }}
-            {% include "includes/field_errors.html" with field=form.adresse %}
-          </div>
-        </div>
-      </div>
-
-      <div class="form-navigation">
-        <button type="button" class="btn btn-outline prev-step" data-prev="1">
-          <i class="fas fa-arrow-left"></i>
-          Précédent
-        </button>
-        <button type="button" class="btn btn-primary next-step" data-next="3">
-          Suivant
-          <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Étape 3: Informations professionnelles -->
-    <div class="form-step" id="step-3">
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-briefcase"></i>
-          Informations professionnelles
-        </h3>
-        
-        <div class="form-row">
-          <div class="form-group {% if form.type_formateur.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.type_formateur.id_for_label }}">
-              <i class="fas fa-tag"></i>
-              Type de formateur
-            </label>
-            {{ form.type_formateur }}
-            {% include "includes/field_errors.html" with field=form.type_formateur %}
-          </div>
-
-          <div class="form-group {% if form.niveau_expertise.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.niveau_expertise.id_for_label }}">
-              <i class="fas fa-layer-group"></i>
-              Niveau d'expertise
-            </label>
-            {{ form.niveau_expertise }}
-            {% include "includes/field_errors.html" with field=form.niveau_expertise %}
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group {% if form.specialites.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.specialites.id_for_label }}">
-              <i class="fas fa-star"></i>
-              Spécialités
-            </label>
-            {{ form.specialites }}
-            {% include "includes/field_errors.html" with field=form.specialites %}
-          </div>
-        </div>
-
-        <div class="form-group {% if form.disponibilite.errors %}has-error{% endif %}">
-          <label class="form-label" for="{{ form.disponibilite.id_for_label }}">
-            <i class="fas fa-clock"></i>
-            Disponibilité
-          </label>
-          {{ form.disponibilite }}
-          {% include "includes/field_errors.html" with field=form.disponibilite %}
-          <small class="form-text text-muted">
-            Précisez vos horaires de disponibilité
-          </small>
-        </div>
-      </div>
-
-      <div class="form-navigation">
-        <button type="button" class="btn btn-outline prev-step" data-prev="2">
-          <i class="fas fa-arrow-left"></i>
-          Précédent
-        </button>
-        <button type="button" class="btn btn-primary next-step" data-next="4">
-          Suivant
-          <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Étape 4: Documents -->
-    <div class="form-step" id="step-4">
-      <div class="form-section">
-        <h3 class="section-title">
-          <i class="fas fa-book"></i>
-          Documents
-        </h3>
-        
-        <div class="form-row">
-          <div class="form-group {% if form.cv.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.cv.id_for_label }}">
-              <i class="fas fa-file-pdf"></i>
-              CV
-            </label>
-            <div class="file-upload-container">
-              <div class="file-upload-box" id="cv-upload-box">
-                <i class="fas fa-file-upload upload-icon"></i>
-                <div class="upload-text">
-                  <span class="primary-text">Glissez votre CV ici</span>
-                  <span class="secondary-text">ou cliquez pour sélectionner un fichier</span>
+                  <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.email.id_for_label }}">
+                      <i class="fas fa-envelope me-1"></i>Email
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-primary text-white">
+                        <i class="fas fa-envelope"></i>
+                      </span>
+                      {{ form.email }}
+                    </div>
+                    {% if form.email.errors %}
+                      {% for error in form.email.errors %}
+                        <div class="text-danger mt-1">
+                          <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                        </div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
                 </div>
-                <div class="file-info" id="cv-file-info">
-                  <i class="fas fa-file-pdf file-icon"></i>
-                  <span class="file-name" id="cv-file-name">Aucun fichier sélectionné</span>
-                  <button type="button" class="remove-file" id="cv-remove-file">
-                    <i class="fas fa-times"></i>
-                  </button>
+
+                <div class="form-row">
+                  <div class="form-group {% if form.password1.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.password1.id_for_label }}">
+                      <i class="fas fa-lock me-1"></i>Mot de passe
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-primary text-white">
+                        <i class="fas fa-lock"></i>
+                      </span>
+                      {{ form.password1 }}
+                      <button type="button" class="btn btn-outline-secondary toggle-password" data-target="{{ form.password1.id_for_label }}">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                    {% if form.password1.errors %}
+                      {% for error in form.password1.errors %}
+                        <div class="text-danger mt-1">
+                          <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                        </div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  <div class="form-group {% if form.password2.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.password2.id_for_label }}">
+                      <i class="fas fa-lock me-1"></i>Confirmer le mot de passe
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-primary text-white">
+                        <i class="fas fa-lock"></i>
+                      </span>
+                      {{ form.password2 }}
+                      <button type="button" class="btn btn-outline-secondary toggle-password" data-target="{{ form.password2.id_for_label }}">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                    {% if form.password2.errors %}
+                      {% for error in form.password2.errors %}
+                        <div class="text-danger mt-1">
+                          <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
+                        </div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
                 </div>
               </div>
-              <div class="real-file-input">
-                {{ form.cv }}
+
+              <div class="form-navigation">
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                  <i class="fas fa-times me-1"></i>Annuler
+                </a>
+                <button type="button" class="btn btn-primary next-step" data-next="2">
+                  Suivant<i class="fas fa-arrow-right ms-2"></i>
+                </button>
               </div>
             </div>
-            {% include "includes/field_errors.html" with field=form.cv %}
-            <small class="form-text text-muted">
-              Formats acceptés: PDF, DOC, DOCX. Taille max: 5MB
-            </small>
-          </div>
 
-          <div class="form-group {% if form.photo.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.photo.id_for_label }}">
-              <i class="fas fa-camera"></i>
-              Photo
-            </label>
-            <div class="file-upload-container">
-              <div class="file-upload-box image-upload-box" id="photo-upload-box">
-                <div class="image-preview" id="photo-preview">
-                  <i class="fas fa-user-circle placeholder-icon"></i>
+            <!-- Étape 2: Informations personnelles -->
+            <div class="form-step" id="step-2">
+              <div class="form-section">
+                <h5 class="section-title">
+                  <i class="fas fa-user me-2"></i>Informations personnelles
+                </h5>
+                
+                <div class="form-row">
+                  <div class="form-group {% if form.nom.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.nom.id_for_label }}">
+                      <i class="fas fa-user me-1"></i>Nom
+                    </label>
+                    {{ form.nom }}
+                    {% include "includes/field_errors.html" with field=form.nom %}
+                  </div>
+
+                  <div class="form-group {% if form.prenom.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.prenom.id_for_label }}">
+                      <i class="fas fa-user me-1"></i>Prénom
+                    </label>
+                    {{ form.prenom }}
+                    {% include "includes/field_errors.html" with field=form.prenom %}
+                  </div>
                 </div>
-                <div class="upload-text">
-                  <span class="primary-text">Ajouter une photo</span>
-                  <span class="secondary-text">JPG, PNG ou GIF</span>
+
+                <div class="form-row">
+                  <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.telephone.id_for_label }}">
+                      <i class="fas fa-phone me-1"></i>Téléphone
+                    </label>
+                    {{ form.telephone }}
+                    {% include "includes/field_errors.html" with field=form.telephone %}
+                  </div>
+
+                  <div class="form-group {% if form.date_naissance.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.date_naissance.id_for_label }}">
+                      <i class="fas fa-calendar me-1"></i>Date de naissance
+                    </label>
+                    {{ form.date_naissance }}
+                    {% include "includes/field_errors.html" with field=form.date_naissance %}
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group {% if form.ville.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.ville.id_for_label }}">
+                      <i class="fas fa-city me-1"></i>Ville
+                    </label>
+                    {{ form.ville }}
+                    {% include "includes/field_errors.html" with field=form.ville %}
+                  </div>
+
+                  <div class="form-group {% if form.adresse.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.adresse.id_for_label }}">
+                      <i class="fas fa-map-marker-alt me-1"></i>Adresse
+                    </label>
+                    {{ form.adresse }}
+                    {% include "includes/field_errors.html" with field=form.adresse %}
+                  </div>
                 </div>
               </div>
-              <div class="real-file-input">
-                {{ form.photo }}
+
+              <div class="form-navigation">
+                <button type="button" class="btn btn-outline prev-step" data-prev="1">
+                  <i class="fas fa-arrow-left me-1"></i>Précédent
+                </button>
+                <button type="button" class="btn btn-primary next-step" data-next="3">
+                  Suivant<i class="fas fa-arrow-right ms-2"></i>
+                </button>
               </div>
             </div>
-            {% include "includes/field_errors.html" with field=form.photo %}
-            <small class="form-text text-muted">
-              Formats acceptés: JPG, PNG, GIF. Taille max: 2MB
-            </small>
-          </div>
-        </div>
 
-        <div class="form-group {% if form.notes.errors %}has-error{% endif %}">
-          <label class="form-label" for="{{ form.notes.id_for_label }}">
-            <i class="fas fa-sticky-note"></i>
-            Notes
-          </label>
-          {{ form.notes }}
-          {% include "includes/field_errors.html" with field=form.notes %}
-        </div>
-      </div>
+            <!-- Étape 3: Informations professionnelles -->
+            <div class="form-step" id="step-3">
+              <div class="form-section">
+                <h5 class="section-title">
+                  <i class="fas fa-briefcase me-2"></i>Informations professionnelles
+                </h5>
+                
+                <div class="form-row">
+                  <div class="form-group {% if form.type_formateur.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.type_formateur.id_for_label }}">
+                      <i class="fas fa-tag me-1"></i>Type de formateur
+                    </label>
+                    {{ form.type_formateur }}
+                    {% include "includes/field_errors.html" with field=form.type_formateur %}
+                  </div>
 
-      <div class="form-navigation">
-        <button type="button" class="btn btn-outline prev-step" data-prev="3">
-          <i class="fas fa-arrow-left"></i>
-          Précédent
-        </button>
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-save"></i>
-          S'inscrire
-        </button>
+                  <div class="form-group {% if form.niveau_expertise.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.niveau_expertise.id_for_label }}">
+                      <i class="fas fa-layer-group me-1"></i>Niveau d'expertise
+                    </label>
+                    {{ form.niveau_expertise }}
+                    {% include "includes/field_errors.html" with field=form.niveau_expertise %}
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group {% if form.specialites.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.specialites.id_for_label }}">
+                      <i class="fas fa-star me-1"></i>Spécialités
+                    </label>
+                    {{ form.specialites }}
+                    {% include "includes/field_errors.html" with field=form.specialites %}
+                  </div>
+                </div>
+
+                <div class="form-group {% if form.disponibilite.errors %}has-error{% endif %}">
+                  <label class="form-label" for="{{ form.disponibilite.id_for_label }}">
+                    <i class="fas fa-clock me-1"></i>Disponibilité
+                  </label>
+                  {{ form.disponibilite }}
+                  {% include "includes/field_errors.html" with field=form.disponibilite %}
+                  <small class="form-text text-muted">
+                    Précisez vos horaires de disponibilité
+                  </small>
+                </div>
+              </div>
+
+              <div class="form-navigation">
+                <button type="button" class="btn btn-outline prev-step" data-prev="2">
+                  <i class="fas fa-arrow-left me-1"></i>Précédent
+                </button>
+                <button type="button" class="btn btn-primary next-step" data-next="4">
+                  Suivant<i class="fas fa-arrow-right ms-2"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Étape 4: Documents -->
+            <div class="form-step" id="step-4">
+              <div class="form-section">
+                <h5 class="section-title">
+                  <i class="fas fa-book me-2"></i>Documents
+                </h5>
+                
+                <div class="form-row">
+                  <div class="form-group {% if form.cv.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.cv.id_for_label }}">
+                      <i class="fas fa-file-pdf me-1"></i>CV
+                    </label>
+                    <div class="file-upload-container">
+                      <div class="file-upload-box" id="cv-upload-box">
+                        <i class="fas fa-file-upload upload-icon"></i>
+                        <div class="upload-text">
+                          <span class="primary-text">Glissez votre CV ici</span>
+                          <span class="secondary-text">ou cliquez pour sélectionner un fichier</span>
+                        </div>
+                        <div class="file-info" id="cv-file-info">
+                          <i class="fas fa-file-pdf file-icon"></i>
+                          <span class="file-name" id="cv-file-name">Aucun fichier sélectionné</span>
+                          <button type="button" class="remove-file" id="cv-remove-file">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="real-file-input">
+                        {{ form.cv }}
+                      </div>
+                    </div>
+                    {% include "includes/field_errors.html" with field=form.cv %}
+                    <small class="form-text text-muted">
+                      Formats acceptés: PDF, DOC, DOCX. Taille max: 5MB
+                    </small>
+                  </div>
+
+                  <div class="form-group {% if form.photo.errors %}has-error{% endif %}">
+                    <label class="form-label" for="{{ form.photo.id_for_label }}">
+                      <i class="fas fa-camera me-1"></i>Photo
+                    </label>
+                    <div class="file-upload-container">
+                      <div class="file-upload-box image-upload-box" id="photo-upload-box">
+                        <div class="image-preview" id="photo-preview">
+                          <i class="fas fa-user-circle placeholder-icon"></i>
+                        </div>
+                        <div class="upload-text">
+                          <span class="primary-text">Ajouter une photo</span>
+                          <span class="secondary-text">JPG, PNG ou GIF</span>
+                        </div>
+                      </div>
+                      <div class="real-file-input">
+                        {{ form.photo }}
+                      </div>
+                    </div>
+                    {% include "includes/field_errors.html" with field=form.photo %}
+                    <small class="form-text text-muted">
+                      Formats acceptés: JPG, PNG, GIF. Taille max: 2MB
+                    </small>
+                  </div>
+                </div>
+
+                <div class="form-group {% if form.notes.errors %}has-error{% endif %}">
+                  <label class="form-label" for="{{ form.notes.id_for_label }}">
+                    <i class="fas fa-sticky-note me-1"></i>Notes
+                  </label>
+                  {{ form.notes }}
+                  {% include "includes/field_errors.html" with field=form.notes %}
+                </div>
+              </div>
+
+              <div class="form-navigation">
+                <button type="button" class="btn btn-outline prev-step" data-prev="3">
+                  <i class="fas fa-arrow-left me-1"></i>Précédent
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save me-1"></i>S'inscrire
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-  </form>
+  </div>
 </div>
+{% endblock %}
 
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Gestion des étapes du formulaire
-    const nextButtons = document.querySelectorAll('.next-step');
-    const prevButtons = document.querySelectorAll('.prev-step');
-    const steps = document.querySelectorAll('.form-step');
-    const stepIndicators = document.querySelectorAll('.step');
-
-    // Fonction pour valider les champs d'une étape
-    function validateStep(stepNumber) {
-      const currentStep = document.getElementById(`step-${stepNumber}`);
-      const inputs = currentStep.querySelectorAll('input, select, textarea');
-      let isValid = true;
-
-      inputs.forEach(input => {
-        if (input.hasAttribute('required') && !input.value) {
-          isValid = false;
-          input.classList.add('is-invalid');
-        } else {
-          input.classList.remove('is-invalid');
+    const nextStepButtons = document.querySelectorAll('.next-step');
+    const prevStepButtons = document.querySelectorAll('.prev-step');
+    
+    nextStepButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const currentStep = document.querySelector('.form-step.active');
+        const nextStepNum = this.getAttribute('data-next');
+        const nextStep = document.getElementById('step-' + nextStepNum);
+        
+        // Vérifiez si l'étape courante est valide avant de continuer
+        const isValidStep = validateStep(currentStep);
+        if (!isValidStep) {
+          return;
         }
-      });
-
-      return isValid;
-    }
-
-    // Fonction pour passer à l'étape suivante
-    function goToNextStep(e) {
-      const currentStepNumber = parseInt(e.target.dataset.next) - 1;
-      const nextStepNumber = parseInt(e.target.dataset.next);
-      
-      if (validateStep(currentStepNumber)) {
-        // Masquer l'étape actuelle
-        steps.forEach(step => step.classList.remove('active'));
-        document.getElementById(`step-${nextStepNumber}`).classList.add('active');
         
         // Mettre à jour les indicateurs d'étape
-        stepIndicators.forEach((indicator, index) => {
-          if (index < nextStepNumber) {
-            indicator.classList.add('completed');
-            indicator.classList.remove('active');
-          } else if (index === nextStepNumber - 1) {
-            indicator.classList.add('active');
-          } else {
-            indicator.classList.remove('active', 'completed');
-          }
-        });
-      }
-    }
-
-    // Fonction pour revenir à l'étape précédente
-    function goToPrevStep(e) {
-      const prevStepNumber = parseInt(e.target.dataset.prev);
-      
-      // Masquer l'étape actuelle
-      steps.forEach(step => step.classList.remove('active'));
-      document.getElementById(`step-${prevStepNumber}`).classList.add('active');
-      
-      // Mettre à jour les indicateurs d'étape
-      stepIndicators.forEach((indicator, index) => {
-        if (index < prevStepNumber - 1) {
-          indicator.classList.add('completed');
-          indicator.classList.remove('active');
-        } else if (index === prevStepNumber - 1) {
-          indicator.classList.add('active');
-        } else {
-          indicator.classList.remove('active', 'completed');
-        }
+        document.getElementById('step-indicator-' + currentStep.id.split('-')[1]).classList.remove('active');
+        document.getElementById('step-indicator-' + currentStep.id.split('-')[1]).classList.add('completed');
+        document.getElementById('step-indicator-' + nextStepNum).classList.add('active');
+        
+        // Changer l'étape active
+        currentStep.classList.remove('active');
+        nextStep.classList.add('active');
+        
+        // Défiler vers le haut
+        window.scrollTo(0, 0);
       });
-    }
-
-    // Ajouter les écouteurs d'événements
-    nextButtons.forEach(button => {
-      button.addEventListener('click', goToNextStep);
     });
-
-    prevButtons.forEach(button => {
-      button.addEventListener('click', goToPrevStep);
+    
+    prevStepButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const currentStep = document.querySelector('.form-step.active');
+        const prevStepNum = this.getAttribute('data-prev');
+        const prevStep = document.getElementById('step-' + prevStepNum);
+        
+        // Mettre à jour les indicateurs d'étape
+        document.getElementById('step-indicator-' + currentStep.id.split('-')[1]).classList.remove('active');
+        document.getElementById('step-indicator-' + prevStepNum).classList.remove('completed');
+        document.getElementById('step-indicator-' + prevStepNum).classList.add('active');
+        
+        // Changer l'étape active
+        currentStep.classList.remove('active');
+        prevStep.classList.add('active');
+        
+        // Défiler vers le haut
+        window.scrollTo(0, 0);
+      });
     });
-
-    // Gestion des téléchargements de fichiers
-    const cvInput = document.getElementById('{{ form.cv.id_for_label }}');
-    const cvFileName = document.getElementById('cv-file-name');
-    const cvFileInfo = document.getElementById('cv-file-info');
-    const cvRemoveFile = document.getElementById('cv-remove-file');
-    const cvUploadBox = document.getElementById('cv-upload-box');
-
-    if (cvInput) {
-      cvInput.addEventListener('change', function() {
-        if (this.files.length > 0) {
-          cvFileName.textContent = this.files[0].name;
-          cvFileInfo.style.display = 'flex';
-          cvUploadBox.classList.add('has-file');
+    
+    // Fonction pour valider une étape (à implémenter selon vos besoins)
+    function validateStep(step) {
+      // Pour le moment, retourner true pour permettre la navigation
+      return true;
+    }
+    
+    // Toggle visibilité du mot de passe
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const passwordInput = document.getElementById(targetId);
+        
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          this.innerHTML = '<i class="fas fa-eye-slash"></i>';
         } else {
-          cvFileInfo.style.display = 'none';
-          cvUploadBox.classList.remove('has-file');
+          passwordInput.type = 'password';
+          this.innerHTML = '<i class="fas fa-eye"></i>';
         }
       });
-
-      cvRemoveFile.addEventListener('click', function() {
-        cvInput.value = '';
-        cvFileInfo.style.display = 'none';
-        cvUploadBox.classList.remove('has-file');
-      });
-
-      cvUploadBox.addEventListener('click', function() {
-        cvInput.click();
-      });
-    }
-
-    // Gestion de l'aperçu de l'image
-    const photoInput = document.getElementById('{{ form.photo.id_for_label }}');
-    const photoPreview = document.getElementById('photo-preview');
-    const photoUploadBox = document.getElementById('photo-upload-box');
-
-    if (photoInput) {
-      photoInput.addEventListener('change', function() {
-        if (this.files.length > 0) {
-          const file = this.files[0];
-          const reader = new FileReader();
-          
-          reader.onload = function(e) {
-            photoPreview.innerHTML = `<img src="${e.target.result}" alt="Aperçu de la photo">`;
-            photoUploadBox.classList.add('has-image');
-          };
-          
-          reader.readAsDataURL(file);
-        } else {
-          photoPreview.innerHTML = '<i class="fas fa-user-circle placeholder-icon"></i>';
-          photoUploadBox.classList.remove('has-image');
-        }
-      });
-
-      photoUploadBox.addEventListener('click', function() {
-        photoInput.click();
-      });
-    }
+    });
   });
 </script>
-{% endblock %}
-{% endblock content %} 
+{% endblock %} 

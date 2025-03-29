@@ -6,11 +6,14 @@ from .views import (
     InscriptionDetailView, 
     InscriptionCreateView, 
     InscriptionUpdateView, 
-    InscriptionDeleteView
+    InscriptionDeleteView,
+    valider_inscription
 )
 
 router = DefaultRouter()
 router.register(r'inscriptions', InscriptionViewSet)
+
+app_name = 'inscriptions'
 
 urlpatterns = [
     path('api/', include((router.urls, 'inscriptions-api'))),
@@ -21,4 +24,6 @@ urlpatterns = [
     path('<int:pk>/delete/', InscriptionDeleteView.as_view(), name='inscription-delete'),
     path('<int:pk>/update-status/<str:status>/', InscriptionDetailView.as_view(), name='inscription-update-status'),
     path('multiple/', InscriptionViewSet.as_view({'get': 'formulaire_multiple'}), name='inscription-multiple'),
+    path('api/inscrire_multiple/', InscriptionViewSet.as_view({'post': 'inscrire_multiple'}), name='inscrire-multiple'),
+    path('<int:pk>/valider/', valider_inscription, name='inscription-valider'),
 ]

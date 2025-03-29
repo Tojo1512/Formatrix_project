@@ -4,195 +4,197 @@
 {% block title %}Liste des Inscriptions - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/list.css' %}">
-<style>
-  .action-buttons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .btn-multiple {
-    background-color: #17a2b8;
-    color: white;
-  }
-  
-  .status-badge {
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-weight: 600;
-  }
-  
-  .status-en_cours {
-    background-color: #ffc107;
-    color: #000;
-  }
-  
-  .status-validee {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .status-annulee {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .filter-section {
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/list.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="card">
-  <div class="card-header">
-    <h2 class="card-title">Liste des Inscriptions</h2>
-    <div class="action-buttons">
-      <a href="{% url 'inscription-create' %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Nouvelle Inscription
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Liste des Inscriptions</h1>
+    <div class="ms-auto">
+      <a href="{% url 'inscriptions:inscription-create' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Nouvelle Inscription
       </a>
-      <a href="{% url 'inscriptions-api:inscription-formulaire-multiple' %}" class="btn btn-multiple">
-        <i class="fas fa-users"></i> Inscription Multiple
+      <a href="{% url 'inscriptions:inscription-multiple' %}" class="btn btn-info ms-2">
+        <i class="fas fa-users me-2"></i>Inscription Multiple
       </a>
     </div>
   </div>
-  
-  <div class="filter-section">
-    <h3>Filtres</h3>
-    <form id="filterForm" class="row">
-      <div class="col-md-3 mb-3">
-        <label for="filterSeance">Séance</label>
-        <select class="form-control" id="filterSeance" name="seance">
+
+  <!-- Filtres -->
+  <div class="filter-card">
+    <form method="get" class="row g-3">
+      <div class="col-md-3">
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+          <input type="text" name="search" class="form-control" placeholder="Rechercher..." value="{{ search_query }}">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <select name="seance" class="form-select">
           <option value="">Toutes les séances</option>
           {% for seance in seances %}
-            <option value="{{ seance.seance_id }}">{{ seance.cours.nom_cours }} - {{ seance.date|date:"d/m/Y" }}</option>
+            <option value="{{ seance.seance_id }}" {% if seance_filter == seance.seance_id %}selected{% endif %}>{{ seance.cours.nom_cours|truncatechars:15 }}</option>
           {% endfor %}
         </select>
       </div>
-      
-      <div class="col-md-3 mb-3">
-        <label for="filterClient">Client</label>
-        <select class="form-control" id="filterClient" name="client">
+      <div class="col-md-2">
+        <select name="client" class="form-select">
           <option value="">Tous les clients</option>
           {% for client in clients %}
-            <option value="{{ client.client_id }}">{{ client.nom }}</option>
+            <option value="{{ client.clientid }}" {% if client_filter == client.clientid %}selected{% endif %}>{{ client.nom_entite|truncatechars:15 }}</option>
           {% endfor %}
         </select>
       </div>
-      
-      <div class="col-md-3 mb-3">
-        <label for="filterStatut">Statut</label>
-        <select class="form-control" id="filterStatut" name="statut">
+      <div class="col-md-2">
+        <select name="statut" class="form-select">
           <option value="">Tous les statuts</option>
           {% for code, label in status_choices %}
-            <option value="{{ code }}">{{ label }}</option>
+            <option value="{{ code }}" {% if statut_filter == code %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
       </div>
-      
-      <div class="col-md-3 mb-3">
-        <label for="filterType">Type d'inscription</label>
-        <select class="form-control" id="filterType" name="type">
-          <option value="">Tous les types</option>
-          {% for code, label in type_choices %}
-            <option value="{{ code }}">{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      
-      <div class="col-12">
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-filter"></i> Filtrer
+      <div class="col-md-3 d-flex">
+        <button type="submit" class="btn btn-primary me-2">
+          <i class="fas fa-filter me-1"></i>Filtrer
         </button>
-        <button type="button" id="resetFilters" class="btn btn-outline-secondary">
-          <i class="fas fa-undo"></i> Réinitialiser
-        </button>
+        {% if has_active_filters %}
+        <a href="{{ reset_url }}" class="btn btn-outline-secondary">
+          <i class="fas fa-times me-1"></i>Réinitialiser
+        </a>
+        {% endif %}
       </div>
     </form>
   </div>
-  
-  <div class="table-responsive">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Apprenant</th>
-          <th>Client</th>
-          <th>Séance</th>
-          <th>Type</th>
-          <th>Date d'inscription</th>
-          <th>Statut</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for inscription in inscriptions %}
-        <tr>
-          <td>{{ inscription.inscription_id }}</td>
-          <td>{{ inscription.apprenant.nom }} {{ inscription.apprenant.prenom }}</td>
-          <td>{{ inscription.client.nom }}</td>
-          <td>{{ inscription.seance.cours.nom_cours }} - {{ inscription.seance.date|date:"d/m/Y" }}</td>
-          <td>
-            {% for code, label in type_choices %}
-              {% if code == inscription.type_inscription %}{{ label }}{% endif %}
-            {% endfor %}
-          </td>
-          <td>{{ inscription.date_inscription|date:"d/m/Y" }}</td>
-          <td>
-            <span class="status-badge status-{{ inscription.statut_inscription }}">
-              {% for code, label in status_choices %}
-                {% if code == inscription.statut_inscription %}{{ label }}{% endif %}
-              {% endfor %}
-            </span>
-          </td>
-          <td>
-            <div class="btn-group">
-              <a href="{% url 'inscription-detail' inscription.inscription_id %}" class="btn btn-sm btn-info">
-                <i class="fas fa-eye"></i>
-              </a>
-              <a href="{% url 'inscription-update' inscription.inscription_id %}" class="btn btn-sm btn-primary">
-                <i class="fas fa-edit"></i>
-              </a>
-              <a href="{% url 'inscription-delete' inscription.inscription_id %}" class="btn btn-sm btn-danger">
-                <i class="fas fa-trash"></i>
-              </a>
-            </div>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="8" class="text-center">Aucune inscription trouvée</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  
-  {% include 'components/pagination.html' with page_obj=page_obj %}
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-  $(document).ready(function() {
-    // Appliquer les filtres existants dans l'URL
-    const urlParams = new URLSearchParams(window.location.search);
+  <!-- Tableau des inscriptions -->
+  <div class="table-container">
+    {% if inscriptions %}
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>
+              <a href="?{% if ordering == 'inscription_id' %}-{% endif %}inscription_id{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
+                ID
+                <i class="fas fa-sort{% if ordering == 'inscription_id' %}-up{% elif ordering == '-inscription_id' %}-down{% endif %}"></i>
+              </a>
+            </th>
+            <th>
+              <a href="?{% if ordering == 'apprenant__nom_apprenant' %}-{% endif %}apprenant__nom_apprenant{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
+                Apprenant
+                <i class="fas fa-sort{% if ordering == 'apprenant__nom_apprenant' %}-up{% elif ordering == '-apprenant__nom_apprenant' %}-down{% endif %}"></i>
+              </a>
+            </th>
+            <th>
+              <a href="?{% if ordering == 'client__nom_entite' %}-{% endif %}client__nom_entite{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
+                Client
+                <i class="fas fa-sort{% if ordering == 'client__nom_entite' %}-up{% elif ordering == '-client__nom_entite' %}-down{% endif %}"></i>
+              </a>
+            </th>
+            <th>Séance</th>
+            <th>
+              <a href="?{% if ordering == 'date_inscription' %}-{% endif %}date_inscription{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
+                Date
+                <i class="fas fa-sort{% if ordering == 'date_inscription' %}-up{% elif ordering == '-date_inscription' %}-down{% endif %}"></i>
+              </a>
+            </th>
+            <th>
+              <a href="?{% if ordering == 'statut_inscription' %}-{% endif %}statut_inscription{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
+                Statut
+                <i class="fas fa-sort{% if ordering == 'statut_inscription' %}-up{% elif ordering == '-statut_inscription' %}-down{% endif %}"></i>
+              </a>
+            </th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inscription in inscriptions %}
+          <tr>
+            <td>{{ inscription.inscription_id }}</td>
+            <td>{{ inscription.apprenant.nom_apprenant }}</td>
+            <td>{{ inscription.client.nom_entite }}</td>
+            <td>{{ inscription.seance.cours.nom_cours|truncatechars:20 }} - {{ inscription.seance.date|date:"d/m/Y" }}</td>
+            <td>{{ inscription.date_inscription|date:"d/m/Y" }}</td>
+            <td>
+              <span class="badge {% if inscription.statut_inscription == 'validee' %}bg-success{% elif inscription.statut_inscription == 'en_cours' %}bg-warning{% elif inscription.statut_inscription == 'annulee' %}bg-danger{% else %}bg-secondary{% endif %}">
+                {% for code, label in status_choices %}
+                  {% if code == inscription.statut_inscription %}{{ label }}{% endif %}
+                {% endfor %}
+              </span>
+            </td>
+            <td class="text-end">
+              <div class="btn-group">
+                <a href="{% url 'inscriptions:inscription-detail' inscription.inscription_id %}" class="btn btn-sm btn-info btn-action" title="Voir">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="{% url 'inscriptions:inscription-update' inscription.inscription_id %}" class="btn btn-sm btn-warning btn-action" title="Modifier">
+                  <i class="fas fa-edit"></i>
+                </a>
+                {% if inscription.statut_inscription == 'en_cours' %}
+                <a href="{% url 'inscriptions:inscription-valider' inscription.inscription_id %}" class="btn btn-sm btn-success btn-action" title="Valider">
+                  <i class="fas fa-check"></i>
+                </a>
+                {% endif %}
+                <a href="{% url 'inscriptions:inscription-delete' inscription.inscription_id %}" class="btn btn-sm btn-danger btn-action" title="Supprimer">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
     
-    // Remplir les champs de filtres avec les valeurs de l'URL
-    $('#filterSeance').val(urlParams.get('seance') || '');
-    $('#filterClient').val(urlParams.get('client') || '');
-    $('#filterStatut').val(urlParams.get('statut') || '');
-    $('#filterType').val(urlParams.get('type') || '');
+    {% if is_paginated %}
+    <div class="d-flex justify-content-between align-items-center p-3">
+      <p class="mb-0">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+      <nav aria-label="Navigation de pagination">
+        <ul class="pagination mb-0">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Première">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Précédent">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          {% endif %}
+          
+          <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+          
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Suivant">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Dernière">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
     
-    // Réinitialiser les filtres
-    $('#resetFilters').on('click', function() {
-      $('#filterForm')[0].reset();
-      window.location.href = window.location.pathname;
-    });
-  });
-</script>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-clipboard-list"></i>
+      <h4 class="mb-3">Aucune inscription trouvée</h4>
+      {% if has_active_filters %}
+      <a href="{{ reset_url }}" class="btn btn-secondary">Réinitialiser les filtres</a>
+      {% else %}
+      <a href="{% url 'inscriptions:inscription-create' %}" class="btn btn-primary">Créer une inscription</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

@@ -4,201 +4,280 @@
 {% block title %}{{ cours.nom_cours }} - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/details.css' %}">
+<link rel="stylesheet" href="{% static 'css/apprenants/detail.css' %}">
 {% endblock %}
 
-<style>
-  .card{
-    height: auto;
-  }
-</style>
-
 {% block content %}
-<div class="card">
-    <div class="card-header">
-      <h2 class="card-title">{{ cours.nom_cours }}</h2>
-      <div>
-        <a href="{% url 'cours:cours-update' cours.cours_id %}" class="btn btn-outline">
-          <i class="fas fa-edit"></i> Modifier
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">{{ cours.nom_cours }}</h1>
+    <div class="ms-auto">
+      <div class="btn-group">
+        <a href="{% url 'cours:cours-update' cours.cours_id %}" class="btn btn-warning">
+          <i class="fas fa-edit me-2"></i>Modifier
         </a>
-        <a href="{% url 'cours:cours-list' %}" class="btn btn-outline">
-          <i class="fas fa-arrow-left"></i> Retour à la liste
+        <a href="{% url 'cours:cours-list' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i>Retour
         </a>
       </div>
     </div>
-    
-    <div class="status-badges">
-      <span class="badge badge-info">
-        {% for code, label in type_cours_choices %}
-            {% if code == cours.type_cours %}{{ label }}{% endif %}
-        {% endfor %}
-      </span>
-      <span class="badge badge-secondary">
-        {{ cours.niveau }}
-      </span>
-      <span class="badge {% if cours.statut_approbation == 'approuve' %}badge-success{% elif cours.statut_approbation == 'en_attente' %}badge-warning{% elif cours.statut_approbation == 'refuse' %}badge-danger{% endif %}">
-        {% if cours.statut_approbation == 'approuve' %}Approuvé{% elif cours.statut_approbation == 'en_attente' %}En attente{% elif cours.statut_approbation == 'refuse' %}Refusé{% endif %}
-      </span>
-      <span class="badge {% if cours.status == 'in_progress' %}badge-primary{% elif cours.status == 'completed' %}badge-success{% elif cours.status == 'cancelled' %}badge-danger{% endif %}">
-        {{ cours.get_status_display }}
-      </span>
-    </div>
-    
-    <div class="row">
-      <div class="col-md-6">
-        <div class="info-group">
-          <h3>Informations générales</h3>
-          <div class="info-item">
-            <span class="info-label">Type de cours:</span>
-            <span class="info-value">{{ cours.get_type_cours_display }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Niveau:</span>
-            <span class="info-value">{{ cours.niveau }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Frais:</span>
-            <span class="info-value">{{ cours.frais_par_participant }} Ar</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Durée:</span>
-            <span class="info-value">{{ cours.duree_heures }} heures</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Période:</span>
-            <span class="info-value">{{ cours.periode_mois }} mois</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Horaire:</span>
-            <span class="info-value">{{ cours.horaire }}</span>
-          </div>
-        </div>
+  </div>
 
-        <div class="info-group">
-          <h3>Description</h3>
-          <div class="info-item">
-            <span class="info-value">{{ cours.description|linebreaks }}</span>
+  <div class="row">
+    <!-- Colonne de gauche -->
+    <div class="col-md-6">
+      <!-- Informations générales -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-info-circle me-2"></i>Informations générales
+        </div>
+        <div class="info-card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Nom du cours</div>
+                <div class="info-value">{{ cours.nom_cours }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Type de cours</div>
+                <div class="info-value">
+                  <span class="badge bg-info">{{ cours.get_type_cours_display }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Durée</div>
+                <div class="info-value">
+                  {% if cours.type_cours == 'long' %}
+                    {{ cours.periode_mois }} mois
+                  {% else %}
+                    {{ cours.duree_heures }} heures
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Niveau</div>
+                <div class="info-value">{{ cours.niveau|default:"Non spécifié" }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Statut d'approbation</div>
+                <div class="info-value">
+                  {% if cours.statut_approbation == 'en_attente' %}
+                    <span class="badge bg-warning">En attente</span>
+                  {% elif cours.statut_approbation == 'approuve' %}
+                    <span class="badge bg-success">Approuvé</span>
+                  {% elif cours.statut_approbation == 'refuse' %}
+                    <span class="badge bg-danger">Refusé</span>
+                  {% elif cours.statut_approbation == 'expire' %}
+                    <span class="badge bg-secondary">Expiré</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Frais par participant</div>
+                <div class="info-value">{{ cours.frais_par_participant|default:"Non spécifié" }}</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Horaire</div>
+                <div class="info-value">{{ cours.horaire }}</div>
+              </div>
+            </div>
+            
+            {% if cours.date_approbation %}
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Date d'approbation</div>
+                <div class="info-value">{{ cours.date_approbation }}</div>
+              </div>
+            </div>
+            {% endif %}
+            
+            {% if cours.date_expiration_validite %}
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Date d'expiration</div>
+                <div class="info-value">{{ cours.date_expiration_validite }}</div>
+              </div>
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>
       
-      <div class="col-md-6">
-        <div class="info-group">
-          <h3>Objectifs</h3>
-          <div class="info-item">
-            <span class="info-value">{{ cours.objectifs|linebreaks }}</span>
-          </div>
+      <!-- Objectifs et prérequis -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-bullseye me-2"></i>Objectifs et prérequis
         </div>
-
-        <div class="info-group">
-          <h3>Prérequis</h3>
+        <div class="info-card-body">
           <div class="info-item">
-            <span class="info-value">{{ cours.prerequis|linebreaks }}</span>
+            <div class="info-label">Objectifs</div>
+            <div class="info-value">{{ cours.objectifs|linebreaks }}</div>
           </div>
-        </div>
-
-        <div class="info-group">
-          <h3>Matériel requis</h3>
+          
+          {% if cours.prerequis %}
           <div class="info-item">
-            <span class="info-value">{{ cours.materiel_requis|linebreaks }}</span>
+            <div class="info-label">Prérequis</div>
+            <div class="info-value">{{ cours.prerequis|linebreaks }}</div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>
-
-    <div class="info-group">
-      <h3>Modules</h3>
-      {% if cours.modules.all %}
-        <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Description</th>
-                <th>Durée (heures)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for module in cours.modules.all %}
-              <tr>
-                <td>{{ module.nom_module }}</td>
-                <td>{{ module.description }}</td>
-                <td>{{ module.duree_heures }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+    
+    <!-- Colonne de droite -->
+    <div class="col-md-6">
+      <!-- Matériel et ressources -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-tools me-2"></i>Matériel et ressources
         </div>
-      {% else %}
-        <div class="empty-state">
-          <i class="fas fa-inbox"></i>
-          <p>Aucun module défini pour ce cours.</p>
+        <div class="info-card-body">
+          {% if cours.materiel_requis %}
+          <div class="info-item">
+            <div class="info-label">Matériel requis</div>
+            <div class="info-value">{{ cours.materiel_requis|linebreaks }}</div>
+          </div>
+          {% else %}
+          <div class="info-item">
+            <div class="info-value text-muted">Aucun matériel spécifié</div>
+          </div>
+          {% endif %}
         </div>
-      {% endif %}
+      </div>
+      
+      <!-- Formateurs assignés -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-chalkboard-teacher me-2"></i>Formateurs assignés
+        </div>
+        <div class="info-card-body">
+          {% if course_formateurs %}
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Type</th>
+                  <th>Niveau d'expertise</th>
+                  <th>Spécialités</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for formateur in course_formateurs %}
+                <tr>
+                  <td>{{ formateur.get_full_name }}</td>
+                  <td>
+                    <span class="badge badge-info">
+                      {{ formateur.get_type_formateur_display }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge badge-primary">
+                      {{ formateur.get_niveau_expertise_display }}
+                    </span>
+                  </td>
+                  <td>
+                    {% if formateur.specialites %}
+                      {{ formateur.specialites|truncatechars:30 }}
+                    {% else %}
+                      <span class="text-muted">Non spécifié</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="/formateurs/{{ formateur.formateurid }}/" class="btn btn-sm btn-info">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <i class="fas fa-user-slash empty-icon"></i>
+            <p>Aucun formateur n'est assigné à ce cours.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Modules du cours -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-cubes me-2"></i>Modules du cours
+        </div>
+        <div class="info-card-body">
+          {% if cours.modules.all %}
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Description</th>
+                  <th>Durée (heures)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for module in cours.modules.all %}
+                <tr>
+                  <td>{{ module.nom_module }}</td>
+                  <td>{{ module.description }}</td>
+                  <td>{{ module.duree_heures }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="info-item">
+            <div class="info-value text-muted">Aucun module défini</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
-
-    <div class="info-group">
-      <h3><i class="fas fa-users"></i> Formateurs assignés</h3>
-      {% if cours.formateurs.all %}
-        <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Type</th>
-                <th>Niveau d'expertise</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for formateur in cours.formateurs.all %}
-              <tr>
-                <td>{{ formateur.get_full_name }}</td>
-                <td>
-                  <span class="badge badge-info">
-                    {{ formateur.get_type_formateur_display }}
-                  </span>
-                </td>
-                <td>{{ formateur.get_niveau_expertise_display }}</td>
-                <td>
-                  <span class="badge {% if formateur.statut == 'actif' %}badge-success{% elif formateur.statut == 'inactif' %}badge-danger{% else %}badge-warning{% endif %}">
-                    {{ formateur.get_statut_display }}
-                  </span>
-                </td>
-                <td>
-                  <a href="{% url 'formateurs:formateur-detail' formateur.formateurid %}" class="btn btn-sm btn-info">
-                    <i class="fas fa-eye"></i>
-                  </a>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div class="empty-state">
-          <i class="fas fa-user-tie"></i>
-          <p>Aucun formateur n'est assigné à ce cours.</p>
-        </div>
-      {% endif %}
-    </div>
-
-    <div class="action-buttons">
-      <a href="{% url 'cours:cours-list' %}" class="btn btn-outline">
-        <i class="fas fa-arrow-left"></i>
-        Retour à la liste
-      </a>
-      <a href="{% url 'cours:cours-update' cours.cours_id %}" class="btn btn-primary">
-        <i class="fas fa-edit"></i>
-        Modifier
+  </div>
+  
+  <div class="d-flex justify-content-between mt-3">
+    <a href="{% url 'cours:cours-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+    </a>
+    <div>
+      <a href="{% url 'cours:cours-update' cours.cours_id %}" class="btn btn-warning">
+        <i class="fas fa-edit me-2"></i>Modifier
       </a>
       {% if user.is_staff %}
-      <a href="{% url 'cours:cours-delete' cours.cours_id %}" class="btn btn-danger" 
-         onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce cours ?');">
-        <i class="fas fa-trash"></i>
-        Supprimer le cours
-      </a>
+        {% if cours.statut_approbation == 'en_attente' %}
+          <a href="{% url 'cours:cours-approuver' cours.cours_id %}" class="btn btn-success ms-2">
+            <i class="fas fa-check me-2"></i>Approuver
+          </a>
+          <a href="{% url 'cours:cours-refuser' cours.cours_id %}" class="btn btn-danger ms-2">
+            <i class="fas fa-times me-2"></i>Refuser
+          </a>
+        {% endif %}
+        <a href="{% url 'cours:cours-delete' cours.cours_id %}" class="btn btn-danger ms-2">
+          <i class="fas fa-trash me-2"></i>Supprimer
+        </a>
       {% endif %}
     </div>
   </div>

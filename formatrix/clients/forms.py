@@ -9,6 +9,21 @@ class ClientForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'exemple@email.com'})
     )
     
+    # Remplacer le ModelChoiceField par un ChoiceField avec des options fixes
+    TYPE_CHOICES = [
+        ('', 'Sélectionnez un type (optionnel)'),
+        ('1', 'Entreprise'),
+        ('2', 'ONG'),
+        ('3', 'Sponsor'),
+        ('4', 'Autre')
+    ]
+    
+    typeclientid = forms.ChoiceField(
+        choices=TYPE_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
     class Meta:
         model = Client
         fields = ['nom_entite', 'sigle', 'secteur_activite', 'email', 'localite', 'ville', 
@@ -42,7 +57,6 @@ class ClientForm(forms.ModelForm):
             'adresse_siege': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'telephone': forms.TextInput(attrs={'class': 'form-control'}),
             'site_web': forms.URLInput(attrs={'class': 'form-control'}),
-            'typeclientid': forms.Select(attrs={'class': 'form-control'}),
             'personne_contact': forms.TextInput(attrs={'class': 'form-control'}),
             'fonction_contact': forms.TextInput(attrs={'class': 'form-control'}),
             'email_contact': forms.EmailInput(attrs={'class': 'form-control'}),
@@ -57,3 +71,28 @@ class ClientForm(forms.ModelForm):
             if '@' not in email or '.' not in email:
                 raise forms.ValidationError("Veuillez entrer une adresse email valide.")
         return email
+
+    def clean_typeclientid(self):
+        typeclient_id = self.cleaned_data.get('typeclientid')
+        if not typeclient_id:
+            return None
+        
+        # Vérifier si le type de client existe déjà
+        try:
+            return TypeClient.objects.get(typeclientid=typeclient_id)
+        except TypeClient.DoesNotExist:
+            # Créer un nouveau type de client si nécessaire
+            if typeclient_id == '1':
+                return TypeClient.objects.create(typeclientid=1, typeclient='Entreprise', categorie='entreprise')
+            elif typeclient_id == '2':
+                return TypeClient.objects.create(typeclientid=2, typeclient='ONG', categorie='ong')
+            elif typeclient_id == '3':
+                return TypeClient.objects.create(typeclientid=3, typeclient='Sponsor', categorie='sponsor')
+            elif typeclient_id == '4':
+                return TypeClient.objects.create(typeclientid=4, typeclient='Autre', categorie='autre')
+            return None
+
+    def __init__(self, *args, **kwargs):
+        super(ClientForm, self).__init__(*args, **kwargs)
+        # Rendre le champ typeclientid optionnel
+        self.fields['typeclientid'].required = False

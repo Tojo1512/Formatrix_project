@@ -66,7 +66,7 @@ class ApprenantListView(LoginRequiredMixin, ListView):
             'ville_filter': self.request.GET.get('ville', ''),
             'ordering': self.request.GET.get('ordering', '-created_at'),
             'show_create_button': True,
-            'create_url': reverse_lazy('apprenant-create'),
+            'create_url': reverse_lazy('apprenants:apprenant-create'),
             'create_button_text': 'Add a learner',
             'form_action': self.request.path,
             'reset_url': self.request.path,
@@ -87,7 +87,7 @@ class ApprenantCreateView(LoginRequiredMixin, CreateView):
     model = Apprenant
     template_name = 'apprenants/apprenant_form.html'
     form_class = ApprenantForm
-    success_url = reverse_lazy('apprenant-list')
+    success_url = reverse_lazy('apprenants:apprenant-list')
     login_url = '/login/'
 
     def form_valid(self, form):
@@ -128,7 +128,7 @@ class ApprenantUpdateView(LoginRequiredMixin, UpdateView):
     model = Apprenant
     template_name = 'apprenants/apprenant_form.html'
     form_class = ApprenantForm
-    success_url = reverse_lazy('apprenant-list')
+    success_url = reverse_lazy('apprenants:apprenant-list')
     login_url = '/login/'
 
     def form_valid(self, form):
@@ -152,14 +152,22 @@ class ApprenantUpdateView(LoginRequiredMixin, UpdateView):
 class ApprenantDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Apprenant
     template_name = 'apprenants/apprenant_confirm_delete.html'
-    success_url = reverse_lazy('apprenant-list')
+    success_url = reverse_lazy('apprenants:apprenant-list')
     login_url = '/login/'
     
     def test_func(self):
-        # Seuls les administrateurs peuvent supprimer un apprenant
-        return self.request.user.is_staff
+        # Permettre à tous les utilisateurs connectés de supprimer un apprenant (temporairement)
+        return True
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['sexe_choices'] = Apprenant.GENRE_CHOICES
+        context['niveau_choices'] = Apprenant.NIVEAU_ACADEMIQUE_CHOICES
+        return context
     
     def delete(self, request, *args, **kwargs):
         apprenant = self.get_object()
         messages.success(request, f"Learner \"{apprenant.nom_apprenant}\" has been deleted successfully!")
-        return super().delete(request, *args, **kwargs)
+        success_url = self.get_success_url()
+        response = super().delete(request, *args, **kwargs)
+        return HttpResponseRedirect(success_url)

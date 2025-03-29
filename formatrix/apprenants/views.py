@@ -27,3 +27,9 @@ class ApprenantViewSet(viewsets.ModelViewSet):
         """Retourne les apprenants groupés par ville"""
         stats = dict(Apprenant.objects.values('ville').annotate(total=Count('apprenant_id')))
         return Response(stats)
+
+    @action(detail=False, methods=['get'])
+    def count(self, request):
+        """Retourne le nombre total d'apprenants"""
+        count = Apprenant.objects.count()
+        return Response({'count': count})

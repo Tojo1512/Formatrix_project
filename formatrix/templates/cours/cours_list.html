@@ -4,155 +4,219 @@
 {% block title %}Liste des Cours - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/table.css' %}">
+<link rel="stylesheet" href="{% static 'css/apprenants/list.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="table-container">
-    <div class="table-header">
-        <h2 class="table-title">Liste des cours</h2>
-        
-        <div class="table-actions">
-            <div class="search-and-filters">
-                <form method="get" class="search-form">
-                    <input type="text" name="search" class="search-input" placeholder="Rechercher un cours..." value="{{ search_query }}">
-                    <select name="statut" class="filter-select">
-                        <option value="">Tous les statuts</option>
-                        <option value="en_attente" {% if statut_filter == 'en_attente' %}selected{% endif %}>En attente</option>
-                        <option value="approuve" {% if statut_filter == 'approuve' %}selected{% endif %}>Approuvé</option>
-                        <option value="refuse" {% if statut_filter == 'refuse' %}selected{% endif %}>Refusé</option>
-                        <option value="expire" {% if statut_filter == 'expire' %}selected{% endif %}>Expiré</option>
-                    </select>
-
-                    <select name="type" class="filter-select">
-                        <option value="">Tous les types</option>
-                        <option value="formateur" {% if type_filter == 'formateur' %}selected{% endif %}>Formation pour Formateur</option>
-                        <option value="apprenant" {% if type_filter == 'apprenant' %}selected{% endif %}>Formation pour Apprenant</option>
-                        <option value="court" {% if type_filter == 'court' %}selected{% endif %}>Cours Court</option>
-                        <option value="long" {% if type_filter == 'long' %}selected{% endif %}>Cours Long</option>
-                    </select>
-
-                    <button type="submit" class="search-button">
-                        Rechercher
-                    </button>
-                </form>
-            </div>
-
-            {% if show_create_button %}
-            <a href="{{ create_url }}" class="create-button">
-                <i class="fas fa-plus"></i>
-                {{ create_button_text }}
-            </a>
-            {% endif %}
-        </div>
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Liste des Cours</h1>
+    <div class="ms-auto">
+      {% if show_create_button %}
+      <a href="{{ create_url }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>{{ create_button_text }}
+      </a>
+      {% endif %}
     </div>
+  </div>
 
+  <!-- Filtres -->
+  <div class="filter-card">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+          <input type="text" name="search" class="form-control" placeholder="Rechercher un cours..." value="{{ search_query }}">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <select name="statut" class="form-select">
+          <option value="">Tous les statuts</option>
+          <option value="en_attente" {% if statut_filter == 'en_attente' %}selected{% endif %}>En attente</option>
+          <option value="approuve" {% if statut_filter == 'approuve' %}selected{% endif %}>Approuvé</option>
+          <option value="refuse" {% if statut_filter == 'refuse' %}selected{% endif %}>Refusé</option>
+          <option value="expire" {% if statut_filter == 'expire' %}selected{% endif %}>Expiré</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="type" class="form-select">
+          <option value="">Tous les types</option>
+          <option value="formateur" {% if type_filter == 'formateur' %}selected{% endif %}>Formation Formateur</option>
+          <option value="apprenant" {% if type_filter == 'apprenant' %}selected{% endif %}>Formation Apprenant</option>
+          <option value="court" {% if type_filter == 'court' %}selected{% endif %}>Cours Court</option>
+          <option value="long" {% if type_filter == 'long' %}selected{% endif %}>Cours Long</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="ordering" class="form-select">
+          <option value="-created_at" {% if ordering == '-created_at' %}selected{% endif %}>Plus récents</option>
+          <option value="created_at" {% if ordering == 'created_at' %}selected{% endif %}>Plus anciens</option>
+          <option value="nom_cours" {% if ordering == 'nom_cours' %}selected{% endif %}>Nom (A-Z)</option>
+          <option value="-nom_cours" {% if ordering == '-nom_cours' %}selected{% endif %}>Nom (Z-A)</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter me-2"></i>Filtrer
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-container">
+    {% if cours_list %}
     <div class="table-responsive">
-        {% if cours_list %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        <a href="?{% if ordering == 'nom_cours' %}-{% endif %}nom_cours{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="sort-link {% if 'nom_cours' in ordering %}active{% endif %}">
-                            Nom du cours
-                            <i class="fas fa-sort{% if ordering == 'nom_cours' %}-up{% elif ordering == '-nom_cours' %}-down{% endif %}"></i>
-                        </a>
-                    </th>
-                    <th>Type</th>
-                    <th>
-                        <a href="?{% if ordering == 'duree_heures' %}-{% endif %}duree_heures{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="sort-link {% if 'duree_heures' in ordering %}active{% endif %}">
-                            Durée
-                            <i class="fas fa-sort{% if ordering == 'duree_heures' %}-up{% elif ordering == '-duree_heures' %}-down{% endif %}"></i>
-                        </a>
-                    </th>
-                    <th>
-                        <a href="?{% if ordering == 'statut_approbation' %}-{% endif %}statut_approbation{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}" class="sort-link {% if 'statut_approbation' in ordering %}active{% endif %}">
-                            Statut d'approbation
-                            <i class="fas fa-sort{% if ordering == 'statut_approbation' %}-up{% elif ordering == '-statut_approbation' %}-down{% endif %}"></i>
-                        </a>
-                    </th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cours in cours_list %}
-                <tr>
-                    <td>{{ cours.nom_cours }}</td>
-                    <td>
-                        <span class="badge badge-secondary">{{ cours.get_type_cours_display }}</span>
-                    </td>
-                    <td>{{ cours.duree_heures }} heures</td>
-                    <td>
-                        <span class="badge {% if cours.statut_approbation == 'approuve' %}badge-success{% elif cours.statut_approbation == 'en_attente' %}badge-warning{% elif cours.statut_approbation == 'refuse' %}badge-danger{% else %}badge-secondary{% endif %}">
-                            {{ cours.get_statut_approbation_display }}
-                        </span>
-                    </td>
-                    <td class="actions-column">
-                        <a href="{% url 'cours-detail' cours.pk %}" class="btn btn-sm btn-info" title="Voir">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="{% url 'cours-update' cours.pk %}" class="btn btn-sm btn-warning" title="Modifier">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        {% if user.is_staff %}
-                            {% if cours.statut_approbation == 'en_attente' %}
-                                <a href="{% url 'cours-approuver' cours.pk %}" class="btn btn-sm btn-success" title="Approuver">
-                                    <i class="fas fa-check"></i>
-                                </a>
-                                <a href="{% url 'cours-refuser' cours.pk %}" class="btn btn-sm btn-danger" title="Refuser">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                            {% endif %}
-                            <a href="{% url 'cours-delete' cours.pk %}" class="btn btn-sm btn-danger" title="Supprimer"
-                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce cours ?');">
-                                <i class="fas fa-trash"></i>
-                            </a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            {% if is_paginated %}
-            <tfoot>
-                <tr>
-                    <td colspan="5">
-                        <div class="table-pagination">
-                            <div class="pagination-info">
-                                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
-                            </div>
-                            <div class="pagination-controls">
-                                {% if page_obj.has_previous %}
-                                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" class="btn btn-sm btn-outline">
-                                        <i class="fas fa-chevron-left"></i>
-                                        Précédent
-                                    </a>
-                                {% endif %}
-                                {% if page_obj.has_next %}
-                                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" class="btn btn-sm btn-outline">
-                                        Suivant
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </tfoot>
-            {% endif %}
-        </table>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-state-icon">
-                <i class="fas fa-book"></i>
-            </div>
-            <p class="empty-state-text">Aucun cours trouvé</p>
-            {% if has_active_filters %}
-            <a href="{{ reset_url }}" class="btn btn-secondary">Réinitialiser les filtres</a>
-            {% else %}
-            <a href="{{ create_url }}" class="btn btn-primary">{{ create_button_text }}</a>
-            {% endif %}
-        </div>
-        {% endif %}
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Nom du cours</th>
+            <th>Type</th>
+            <th>Durée</th>
+            <th>Statut</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cours in cours_list %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm bg-primary-light rounded me-2">
+                  <i class="fas fa-book"></i>
+                </div>
+                <div>
+                  <div class="fw-bold">{{ cours.nom_cours }}</div>
+                  <small class="text-muted">{{ cours.objectifs|truncatechars:50 }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-info">{{ cours.get_type_cours_display }}</span>
+            </td>
+            <td>
+              {% if cours.type_cours == 'long' %}
+                {{ cours.periode_mois }} mois
+              {% else %}
+                {{ cours.duree_heures }} heures
+              {% endif %}
+            </td>
+            <td>
+              {% if cours.statut_approbation == 'en_attente' %}
+                <span class="badge bg-warning">En attente</span>
+              {% elif cours.statut_approbation == 'approuve' %}
+                <span class="badge bg-success">Approuvé</span>
+              {% elif cours.statut_approbation == 'refuse' %}
+                <span class="badge bg-danger">Refusé</span>
+              {% elif cours.statut_approbation == 'expire' %}
+                <span class="badge bg-secondary">Expiré</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <a href="{% url 'cours:cours-detail' cours.pk %}" class="btn btn-sm btn-info" title="Voir">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'cours:cours-update' cours.pk %}" class="btn btn-sm btn-warning" title="Modifier">
+                <i class="fas fa-edit"></i>
+              </a>
+              {% if user.is_staff %}
+                {% if cours.statut_approbation == 'en_attente' %}
+                  <a href="{% url 'cours:cours-approuver' cours.pk %}" class="btn btn-sm btn-success" title="Approuver">
+                    <i class="fas fa-check"></i>
+                  </a>
+                  <a href="{% url 'cours:cours-refuser' cours.pk %}" class="btn btn-sm btn-danger" title="Refuser">
+                    <i class="fas fa-times"></i>
+                  </a>
+                {% endif %}
+                <a href="{% url 'cours:cours-delete' cours.pk %}" class="btn btn-sm btn-danger" title="Supprimer">
+                  <i class="fas fa-trash"></i>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+    
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center p-3">
+      <p class="mb-0">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
+      <nav aria-label="Navigation de pagination">
+        <ul class="pagination mb-0">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Première">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Précédente">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Première">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Précédente">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% endif %}
+          
+          {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+              <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+            {% elif i > page_obj.number|add:"-3" and i < page_obj.number|add:"3" %}
+              <li class="page-item"><a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Suivante">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Dernière">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Suivante">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Dernière">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i class="fas fa-book fa-3x"></i>
+      </div>
+      <h3>Aucun cours trouvé</h3>
+      <p>Il n'y a pas de cours correspondant à vos critères de recherche.</p>
+      {% if show_create_button %}
+      <a href="{{ create_url }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>{{ create_button_text }}
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

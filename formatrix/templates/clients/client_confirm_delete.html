@@ -1,69 +1,71 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Delete Client - {{ client.nom_entite }} - Formatrix{% endblock %}
+{% block title %}Supprimer {{ client.nom_entite }} - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/theme.css' %}">
-<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/apprenants/delete.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="form-container">
-  <div class="form-header">
-    <h2 class="form-title">
-      <i class="fas fa-exclamation-triangle"></i>
-      Delete Confirmation
-    </h2>
-    <a href="{% url 'client-list' %}" class="btn btn-outline">
-      <i class="fas fa-arrow-left"></i>
-      Back
-    </a>
-  </div>
-
-  <div class="alert alert-danger">
-    <i class="fas fa-exclamation-triangle"></i>
-    Are you sure you want to delete the client <strong>"{{ client.nom_entite }}"</strong>?
-    This action is irreversible and will delete all data associated with this client.
-  </div>
-
-  <div class="form-section">
-    <h3 class="section-title">
-      <i class="fas fa-info-circle"></i>
-      Client Information
-    </h3>
-    <div class="detail-grid">
-      <div class="detail-item">
-        <span class="detail-label">Entity Name:</span>
-        <span class="detail-value">{{ client.nom_entite }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">Type:</span>
-        <span class="detail-value">{{ client.typeclientid.typeclient }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">Business Sector:</span>
-        <span class="detail-value">{{ client.get_secteur_activite_display }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">City:</span>
-        <span class="detail-value">{{ client.ville|default:"Not specified" }}</span>
-      </div>
-    </div>
-  </div>
-
-  <form method="post">
-    {% csrf_token %}
-    <div class="form-actions">
-      <a href="{% url 'client-detail' client.clientid %}" class="btn btn-outline">
-        <i class="fas fa-times"></i>
-        Cancel
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Confirmation de suppression</h1>
+    <div class="ms-auto">
+      <a href="/clients/liste/" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Retour
       </a>
-      <button type="submit" class="btn btn-danger">
-        <i class="fas fa-trash"></i>
-        Confirm Delete
-      </button>
     </div>
-  </form>
+  </div>
+
+  <div class="delete-card">
+    <div class="p-4">
+      <div class="alert-warning-custom d-flex">
+        <div class="me-3">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <div>
+          <h4 class="mb-2">Attention !</h4>
+          <p class="mb-0">Êtes-vous sûr de vouloir supprimer le client <strong>{{ client.nom_entite }}</strong> ? Cette action est irréversible et supprimera toutes les données associées à ce client.</p>
+        </div>
+      </div>
+      
+      <h5 class="mb-3">Informations du client</h5>
+      <table class="info-table mb-4">
+        <tbody>
+          <tr>
+            <th>Nom de l'entité :</th>
+            <td>{{ client.nom_entite }}</td>
+          </tr>
+          <tr>
+            <th>Type :</th>
+            <td>{{ client.typeclientid.typeclient }}</td>
+          </tr>
+          <tr>
+            <th>Secteur d'activité :</th>
+            <td>
+              <span class="badge bg-secondary">{{ client.get_secteur_activite_display }}</span>
+            </td>
+          </tr>
+          <tr>
+            <th>Ville :</th>
+            <td>{{ client.ville|default:"Non spécifié" }}</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="/clients/liste/" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i>Annuler
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash me-2"></i>Confirmer la suppression
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}
