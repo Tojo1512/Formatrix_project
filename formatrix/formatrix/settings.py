@@ -73,6 +73,8 @@ INSTALLED_APPS = [
     'formateurs',
     'paiements',
     'rapports',  # Ajout de l'application rapports
+
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -114,8 +116,8 @@ DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.postgresql'),
         'NAME': os.environ.get('DATABASE_NAME', 'formatrix'),
-        'USER': os.environ.get('DATABASE_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'root'),
+        'USER': os.environ.get('DATABASE_USER', 'formatrix'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'formatrix'),
         'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
         'PORT': os.environ.get('DATABASE_PORT', '5432'),
     }

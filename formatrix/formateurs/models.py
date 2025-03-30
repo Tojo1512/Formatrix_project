@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from cours.models import Cours
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Formateur(models.Model):
     STATUT_CHOICES = [
@@ -93,7 +95,17 @@ class Formateur(models.Model):
         return f"{self.prenom} {self.nom}"
 
     def get_cours_actifs(self):
-        return self.cours_assignes.filter(statut_approbation='approuve')
+        from cours.models import Cours
+        return Cours.objects.filter(formateurs=self, statut_approbation='approuve')
 
     def est_disponible(self):
         return self.statut == 'actif'
+
+@receiver(post_save, sender=Formateur)
+def create_formateur_notification(sender, instance, created, **kwargs):
+    if created:
+        # Importer ici pour éviter les importations circulaires
+        from notifications.views import create_notification
+        
+        message = f"Nouveau formateur inscrit : {instance.get_full_name()}"
+        create_notification(message, 'new_trainer', instance.formateurid)

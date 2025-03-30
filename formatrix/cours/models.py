@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Cours(models.Model):
     TYPE_CHOICES = [
@@ -57,7 +59,7 @@ class Cours(models.Model):
         db_table = 'cours'
 
     def __str__(self):
-        return self.nom_cours
+        return str(self.nom_cours)
 
     def save(self, *args, **kwargs):
         if self.date_approbation and not self.date_expiration_validite:
@@ -80,3 +82,12 @@ class Cours(models.Model):
         if self.date_expiration_validite:
             return timezone.now().date() > self.date_expiration_validite
         return False
+
+@receiver(post_save, sender=Cours)
+def create_cours_notification(sender, instance, created, **kwargs):
+    if created:
+        # Importer ici pour éviter les importations circulaires
+        from notifications.views import create_notification
+        
+        message = f"Nouveau cours créé : {instance.nom_cours}"
+        create_notification(message, 'new_course', instance.cours_id)

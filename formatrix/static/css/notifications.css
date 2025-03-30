@@ -1,0 +1,79 @@
+/* Styles pour les notifications */
+
+/* Indicateur de notification non lue */
+.notification-badge {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  background-color: #FF5722;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Style pour le dropdown des notifications */
+.notification-dropdown {
+  min-width: 320px;
+  max-width: 400px;
+  padding: 0;
+}
+
+/* Style pour les notifications non lues */
+.notification-item.unread {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* Avatar des notifications */
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.avatar.avatar-sm {
+  width: 32px;
+  height: 32px;
+}
+
+.bg-success-light {
+  background-color: rgba(40, 167, 69, 0.2);
+}
+
+.bg-info-light {
+  background-color: rgba(23, 162, 184, 0.2);
+}
+
+/* Bouton de notification */
+.btn-notification {
+  position: relative;
+}
+
+.btn-notification .notification-badge {
+  top: -5px;
+  right: -5px;
+}
+
+/* Animation pour les nouvelles notifications */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.notification-badge.new-notification {
+  animation: pulse 1s infinite;
+} 
