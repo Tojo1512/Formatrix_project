@@ -1,0 +1,110 @@
+{% load static %}
+
+<div class="dropdown-menu dropdown-menu-end notification-dropdown shadow" aria-labelledby="navbarNotifications">
+  <div class="dropdown-header d-flex align-items-center py-3">
+    <span class="h6 mb-0 flex-grow-1">Notifications</span>
+    <a href="{% url 'notifications:mark_all_read' %}" class="text-muted me-2 fs-xs" id="mark-all-read">Tout marquer comme lu</a>
+  </div>
+  
+  <div class="dropdown-divider my-0"></div>
+  
+  <div class="notification-list overflow-auto" style="max-height: 300px;">
+    {% if notifications %}
+      {% for notification in notifications %}
+        <a href="#" class="dropdown-item d-flex align-items-center py-2 px-3 border-bottom notification-item {% if not notification.is_read %}unread{% endif %}" data-id="{{ notification.id }}">
+          <div class="flex-shrink-0 me-2">
+            {% if notification.notification_type == 'new_course' %}
+              <div class="avatar avatar-sm bg-success-light rounded">
+                <i class="fas fa-book text-success"></i>
+              </div>
+            {% elif notification.notification_type == 'new_trainer' %}
+              <div class="avatar avatar-sm bg-info-light rounded">
+                <i class="fas fa-chalkboard-teacher text-info"></i>
+              </div>
+            {% endif %}
+          </div>
+          <div class="flex-grow-1 overflow-hidden">
+            <p class="mb-1 text-truncate">{{ notification.message }}</p>
+            <p class="small text-muted mb-0">{{ notification.created_at|date:"d/m/Y H:i" }}</p>
+          </div>
+          {% if not notification.is_read %}
+            <span class="badge bg-warning rounded-circle ms-1"></span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    {% else %}
+      <div class="text-center py-4">
+        <i class="fas fa-bell-slash fa-2x text-muted mb-2"></i>
+        <p class="text-muted">Aucune notification</p>
+      </div>
+    {% endif %}
+  </div>
+  
+  <div class="dropdown-divider my-0"></div>
+  
+  <a href="{% url 'notifications:notification_list' %}" class="dropdown-item text-center py-2">
+    <span class="text-primary">Voir toutes les notifications</span>
+  </a>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Marquer une notification comme lue au clic
+    const notificationItems = document.querySelectorAll('.notification-item');
+    notificationItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const notificationId = this.dataset.id;
+        const notificationType = this.querySelector('.avatar i').classList.contains('fa-book') ? 'new_course' : 'new_trainer';
+        const relatedId = this.dataset.relatedId;
+        
+        // Marquer comme lu via AJAX
+        fetch(`{% url 'notifications:mark_notification_read' 0 %}`.replace('0', notificationId), {
+          method: 'GET',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Enlever la classe unread
+          this.classList.remove('unread');
+          this.querySelector('.badge')?.remove();
+          
+          // Mettre à jour le compteur
+          updateNotificationCounter();
+          
+          // Rediriger vers la page correspondante
+          if (notificationType === 'new_course') {
+            window.location.href = `/cours/detail/${relatedId}/`;
+          } else if (notificationType === 'new_trainer') {
+            window.location.href = `/formateurs/detail/${relatedId}/`;
+          }
+        });
+      });
+    });
+    
+    // Marquer toutes les notifications comme lues
+    document.getElementById('mark-all-read')?.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      fetch(`{% url 'notifications:mark_all_read' %}`, {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Mise à jour visuelle
+        document.querySelectorAll('.notification-item.unread').forEach(item => {
+          item.classList.remove('unread');
+          item.querySelector('.badge')?.remove();
+        });
+        
+        // Mettre à jour le compteur
+        updateNotificationCounter();
+      });
+    });
+  });
+</script> 

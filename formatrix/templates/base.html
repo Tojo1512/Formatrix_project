@@ -36,6 +36,9 @@
   <link rel="stylesheet" href="{% static 'css/variables.css' %}" />
   <link rel="stylesheet" href="{% static 'css/base.css' %}" />
   <link rel="stylesheet" href="{% static 'css/file-upload.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/kaiadmin.css' %}">
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
@@ -342,6 +345,26 @@
                   {% endif %}
                 </span>
               </li>
+              
+              {% if user.is_staff %}
+              <!-- Icône de notification pour les administrateurs -->
+              <li class="nav-item dropdown me-2">
+                <a class="nav-link btn-notification" href="#" id="navbarNotifications" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-bell"></i>
+                  <span id="notification-counter" class="notification-badge d-none">0</span>
+                </a>
+                <!-- Le contenu du dropdown sera chargé par AJAX -->
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow" aria-labelledby="navbarNotifications">
+                  <div class="text-center p-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mb-0 mt-1">Chargement des notifications...</p>
+                  </div>
+                </div>
+              </li>
+              {% endif %}
+              
               <li class="nav-item dropdown user-profile">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <span class="user-name me-1">{{ user.username }}</span>
@@ -516,6 +539,178 @@
     });
   </script>
   {% endblock %}
-</body>
 
+  <!-- Script pour charger les notifications -->
+  {% if user.is_authenticated and user.is_staff %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fonction pour mettre à jour le compteur de notifications
+      function updateNotificationCounter() {
+        fetch('{% url "notifications:get_unread_count" %}')
+          .then(response => response.json())
+          .then(data => {
+            const counter = document.getElementById('notification-counter');
+            if (counter) {
+              if (data.count > 0) {
+                counter.textContent = data.count;
+                counter.classList.remove('d-none');
+              } else {
+                counter.classList.add('d-none');
+              }
+            }
+          });
+      }
+      
+      // Mettre à jour le compteur au chargement
+      updateNotificationCounter();
+      
+      // Charger les notifications au clic sur l'icône
+      const notificationButton = document.getElementById('navbarNotifications');
+      if (notificationButton) {
+        let isLoaded = false;
+        
+        notificationButton.addEventListener('click', function() {
+          if (!isLoaded) {
+            const dropdownMenu = this.nextElementSibling;
+            
+            // Charger les notifications via AJAX
+            fetch('{% url "notifications:notification_list" %}')
+              .then(response => response.text())
+              .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const notifications = Array.from(doc.querySelectorAll('.card-body .table-responsive tbody tr'))
+                  .map(row => {
+                    return {
+                      id: row.querySelector('a[href*="mark_notification_read"]')?.href.split('/').filter(Boolean).pop(),
+                      type: row.querySelector('.badge')?.innerText.trim() === 'Cours' ? 'new_course' : 'new_trainer',
+                      message: row.querySelectorAll('td')[1].innerText.trim(),
+                      date: row.querySelectorAll('td')[2].innerText.trim(),
+                      is_read: row.querySelectorAll('td')[3].innerText.trim() === 'Lu',
+                      related_id: row.querySelector('a[href*="detail"]')?.href.split('/').filter(Boolean).pop()
+                    };
+                  });
+                
+                // On va créer manuellement le contenu du dropdown
+                let dropdownContent = `
+                  <div class="dropdown-header d-flex align-items-center py-3">
+                    <span class="h6 mb-0 flex-grow-1">Notifications</span>
+                    <a href="{% url 'notifications:mark_all_read' %}" class="text-muted me-2 fs-xs" id="mark-all-read">Tout marquer comme lu</a>
+                  </div>
+                  <div class="dropdown-divider my-0"></div>
+                  <div class="notification-list overflow-auto" style="max-height: 300px;">`;
+                
+                if (notifications.length > 0) {
+                  notifications.forEach(notif => {
+                    const iconClass = notif.type === 'new_course' ? 'fa-book text-success' : 'fa-chalkboard-teacher text-info';
+                    const bgClass = notif.type === 'new_course' ? 'bg-success-light' : 'bg-info-light';
+                    
+                    dropdownContent += `
+                      <a href="#" class="dropdown-item d-flex align-items-center py-2 px-3 border-bottom notification-item ${!notif.is_read ? 'unread' : ''}" 
+                         data-id="${notif.id}" data-related-id="${notif.related_id}">
+                        <div class="flex-shrink-0 me-2">
+                          <div class="avatar avatar-sm ${bgClass} rounded">
+                            <i class="fas ${iconClass}"></i>
+                          </div>
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                          <p class="mb-1 text-truncate">${notif.message}</p>
+                          <p class="small text-muted mb-0">${notif.date}</p>
+                        </div>
+                        ${!notif.is_read ? '<span class="badge bg-warning rounded-circle ms-1"></span>' : ''}
+                      </a>
+                    `;
+                  });
+                } else {
+                  dropdownContent += `
+                    <div class="text-center py-4">
+                      <i class="fas fa-bell-slash fa-2x text-muted mb-2"></i>
+                      <p class="text-muted">Aucune notification</p>
+                    </div>
+                  `;
+                }
+                
+                dropdownContent += `
+                  </div>
+                  <div class="dropdown-divider my-0"></div>
+                  <a href="{% url 'notifications:notification_list' %}" class="dropdown-item text-center py-2">
+                    <span class="text-primary">Voir toutes les notifications</span>
+                  </a>
+                `;
+                
+                dropdownMenu.innerHTML = dropdownContent;
+                
+                // Ajouter les écouteurs d'événements
+                initNotificationEvents();
+                
+                isLoaded = true;
+              });
+          }
+        });
+        
+        // Fonction pour initialiser les événements des notifications
+        function initNotificationEvents() {
+          // Marquer une notification comme lue au clic
+          const notificationItems = document.querySelectorAll('.notification-item');
+          notificationItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+              e.preventDefault();
+              const notificationId = this.dataset.id;
+              const relatedId = this.dataset.relatedId;
+              const notificationType = this.querySelector('.avatar i').classList.contains('fa-book') ? 'new_course' : 'new_trainer';
+              
+              // Marquer comme lu via AJAX
+              fetch(`{% url 'notifications:mark_notification_read' 0 %}`.replace('0', notificationId), {
+                method: 'GET',
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              })
+              .then(response => response.json())
+              .then(data => {
+                // Enlever la classe unread
+                this.classList.remove('unread');
+                this.querySelector('.badge')?.remove();
+                
+                // Mettre à jour le compteur
+                updateNotificationCounter();
+                
+                // Rediriger vers la page correspondante
+                if (notificationType === 'new_course') {
+                  window.location.href = `/cours/detail/${relatedId}/`;
+                } else if (notificationType === 'new_trainer') {
+                  window.location.href = `/formateurs/detail/${relatedId}/`;
+                }
+              });
+            });
+          });
+          
+          // Marquer toutes les notifications comme lues
+          document.getElementById('mark-all-read')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            fetch(`{% url 'notifications:mark_all_read' %}`, {
+              method: 'GET',
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+              }
+            })
+            .then(response => response.json())
+            .then(data => {
+              // Mise à jour visuelle
+              document.querySelectorAll('.notification-item.unread').forEach(item => {
+                item.classList.remove('unread');
+                item.querySelector('.badge')?.remove();
+              });
+              
+              // Mettre à jour le compteur
+              updateNotificationCounter();
+            });
+          });
+        }
+      }
+    });
+  </script>
+  {% endif %}
+</body>
 </html>
