@@ -1,0 +1,463 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rapport démographique{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-header {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .report-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, #007bff, #6610f2);
+    }
+    .chart-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    .chart-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+    .chart-card .card-header {
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+        padding: 1rem 1.25rem;
+    }
+    .chart-card .card-body {
+        padding: 1.5rem;
+    }
+    .table-card {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .table-card .card-header {
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+        padding: 1rem 1.25rem;
+    }
+    .table-responsive {
+        border-radius: 0 0 10px 10px;
+        overflow: hidden;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    .btn-action {
+        border-radius: 50px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .btn-export {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .btn-export:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    .btn-back {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    .btn-back:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+    .gender-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 500;
+        display: inline-block;
+        min-width: 80px;
+        text-align: center;
+    }
+    .male-badge {
+        background-color: rgba(54, 162, 235, 0.2);
+        color: #2980b9;
+        border: 1px solid rgba(54, 162, 235, 0.4);
+    }
+    .female-badge {
+        background-color: rgba(255, 99, 132, 0.2);
+        color: #e74c3c;
+        border: 1px solid rgba(255, 99, 132, 0.4);
+    }
+    .other-badge {
+        background-color: rgba(153, 102, 255, 0.2);
+        color: #8e44ad;
+        border: 1px solid rgba(153, 102, 255, 0.4);
+    }
+    .age-badge {
+        background-color: rgba(255, 206, 86, 0.2);
+        color: #f39c12;
+        border: 1px solid rgba(255, 206, 86, 0.4);
+    }
+    .education-badge {
+        background-color: rgba(75, 192, 192, 0.2);
+        color: #16a085;
+        border: 1px solid rgba(75, 192, 192, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="report-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="mb-2">Rapport démographique</h1>
+            <p class="text-muted">Statistiques sur les apprenants par genre, âge et niveau académique</p>
+        </div>
+        <div>
+            <a href="{% url 'rapports:dashboard' %}" class="btn btn-action btn-back text-white me-2">
+                <i class="fas fa-arrow-left me-1"></i> Tableau de bord
+            </a>
+            <a href="{% url 'rapports:export' 'demographique' %}" class="btn btn-action btn-export text-white">
+                <i class="fas fa-file-download me-1"></i> Exporter CSV
+            </a>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card chart-card">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-venus-mars me-2"></i> Répartition par genre et âge
+                </div>
+                <div class="card-body">
+                    <canvas id="genreAgeChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card chart-card">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-graduation-cap me-2"></i> Répartition par genre et niveau académique
+                </div>
+                <div class="card-body">
+                    <canvas id="genreNiveauChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card table-card">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-chart-pie me-2"></i> Détails par genre et âge
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Genre</th>
+                                    <th>Catégorie d'âge</th>
+                                    <th class="text-center">Nombre</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in genre_age %}
+                                <tr>
+                                    <td>
+                                        {% if item.sexe == 'M' %}
+                                            <span class="gender-badge male-badge">
+                                                <i class="fas fa-mars me-1"></i> Homme
+                                            </span>
+                                        {% elif item.sexe == 'F' %}
+                                            <span class="gender-badge female-badge">
+                                                <i class="fas fa-venus me-1"></i> Femme
+                                            </span>
+                                        {% else %}
+                                            <span class="gender-badge other-badge">
+                                                <i class="fas fa-genderless me-1"></i> Autre
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="gender-badge age-badge">
+                                            <i class="fas fa-birthday-cake me-1"></i> {{ item.categorie_age }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong>{{ item.total }}</strong>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card table-card">
+                <div class="card-header bg-warning text-dark">
+                    <i class="fas fa-user-graduate me-2"></i> Détails par genre et niveau académique
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Genre</th>
+                                    <th>Niveau académique</th>
+                                    <th class="text-center">Nombre</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in genre_niveau %}
+                                <tr>
+                                    <td>
+                                        {% if item.sexe == 'M' %}
+                                            <span class="gender-badge male-badge">
+                                                <i class="fas fa-mars me-1"></i> Homme
+                                            </span>
+                                        {% elif item.sexe == 'F' %}
+                                            <span class="gender-badge female-badge">
+                                                <i class="fas fa-venus me-1"></i> Femme
+                                            </span>
+                                        {% else %}
+                                            <span class="gender-badge other-badge">
+                                                <i class="fas fa-genderless me-1"></i> Autre
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="gender-badge education-badge">
+                                            <i class="fas fa-graduation-cap me-1"></i>
+                                            {% if item.niveau_academique == 'below_certificate' %}
+                                                En dessous du certificat
+                                            {% elif item.niveau_academique == 'high_school' %}
+                                                Certificat scolaire
+                                            {% elif item.niveau_academique == 'higher_education' %}
+                                                Études supérieures
+                                            {% else %}
+                                                {{ item.niveau_academique }}
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong>{{ item.total }}</strong>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuration des couleurs
+        const colors = {
+            homme: {
+                bg: 'rgba(54, 162, 235, 0.7)',
+                border: 'rgba(54, 162, 235, 1)'
+            },
+            femme: {
+                bg: 'rgba(255, 99, 132, 0.7)',
+                border: 'rgba(255, 99, 132, 1)'
+            }
+        };
+        
+        // Graphique par genre et âge
+        const genreAgeCtx = document.getElementById('genreAgeChart').getContext('2d');
+        const genreAgeData = {
+            labels: ['16-30 ans', '31-60 ans', 'Plus de 60 ans'],
+            datasets: [
+                {
+                    label: 'Hommes',
+                    data: [
+                        {{ hommes_par_age.tranche1 }},
+                        {{ hommes_par_age.tranche2 }},
+                        {{ hommes_par_age.tranche3 }}
+                    ],
+                    backgroundColor: colors.homme.bg,
+                    borderColor: colors.homme.border,
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    barPercentage: 0.7
+                },
+                {
+                    label: 'Femmes',
+                    data: [
+                        {{ femmes_par_age.tranche1 }},
+                        {{ femmes_par_age.tranche2 }},
+                        {{ femmes_par_age.tranche3 }}
+                    ],
+                    backgroundColor: colors.femme.bg,
+                    borderColor: colors.femme.border,
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    barPercentage: 0.7
+                }
+            ]
+        };
+        
+        new Chart(genreAgeCtx, {
+            type: 'bar',
+            data: genreAgeData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 15,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Graphique par genre et niveau académique
+        const genreNiveauCtx = document.getElementById('genreNiveauChart').getContext('2d');
+        const genreNiveauData = {
+            labels: ['En dessous du certificat', 'Certificat scolaire', 'Études supérieures'],
+            datasets: [
+                {
+                    label: 'Hommes',
+                    data: [
+                        {{ hommes_par_niveau.below_certificate }},
+                        {{ hommes_par_niveau.high_school }},
+                        {{ hommes_par_niveau.higher_education }}
+                    ],
+                    backgroundColor: colors.homme.bg,
+                    borderColor: colors.homme.border,
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    barPercentage: 0.7
+                },
+                {
+                    label: 'Femmes',
+                    data: [
+                        {{ femmes_par_niveau.below_certificate }},
+                        {{ femmes_par_niveau.high_school }},
+                        {{ femmes_par_niveau.higher_education }}
+                    ],
+                    backgroundColor: colors.femme.bg,
+                    borderColor: colors.femme.border,
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    barPercentage: 0.7
+                }
+            ]
+        };
+        
+        new Chart(genreNiveauCtx, {
+            type: 'bar',
+            data: genreNiveauData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 15,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

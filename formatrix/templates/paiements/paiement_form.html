@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.paiement_id %}Modifier{% else %}Nouveau{% endif %} paiement - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-title {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  
+  .form-section {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    color: #3a3a3a;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas {% if form.instance.paiement_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+      {% if form.instance.paiement_id %}Modifier{% else %}Nouveau{% endif %} paiement
+    </h1>
+    <a href="{% url 'paiements:paiement-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour à la liste
+    </a>
+  </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  
+  {% if inscriptions_count == 0 %}
+  <div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <strong>Attention :</strong> Aucune inscription n'est disponible dans le système. Vous devez d'abord créer une inscription avant de pouvoir enregistrer un paiement.
+    <div class="mt-3">
+      <a href="{% url 'inscriptions:inscription-create' %}" class="btn btn-primary">
+        <i class="fas fa-plus-circle me-1"></i> Créer une inscription
+      </a>
+    </div>
+  </div>
+  {% else %}
+
+  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Informations principales -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Informations principales
+      </h3>
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.inscription.id_for_label }}" class="form-label">Inscription <span class="text-danger">*</span></label>
+          {{ form.inscription }}
+          {% if form.inscription.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.inscription.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Sélectionnez l'inscription associée à ce paiement</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.montant.id_for_label }}" class="form-label">Montant (€) <span class="text-danger">*</span></label>
+          {{ form.montant }}
+          {% if form.montant.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.montant.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.statut.id_for_label }}" class="form-label">Statut <span class="text-danger">*</span></label>
+          {{ form.statut }}
+          {% if form.statut.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.statut.errors }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Dates et échéances -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-calendar-alt"></i>
+        Dates et échéances
+      </h3>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.date_paiement.id_for_label }}" class="form-label">Date de paiement <span class="text-danger">*</span></label>
+          {{ form.date_paiement }}
+          {% if form.date_paiement.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.date_paiement.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.date_echeance.id_for_label }}" class="form-label">Date d'échéance</label>
+          {{ form.date_echeance }}
+          {% if form.date_echeance.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.date_echeance.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Date limite à laquelle le paiement doit être reçu</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Détails du paiement -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-money-bill-wave"></i>
+        Détails du paiement
+      </h3>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.mode_paiement.id_for_label }}" class="form-label">Mode de paiement</label>
+          {{ form.mode_paiement }}
+          {% if form.mode_paiement.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.mode_paiement.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.reference.id_for_label }}" class="form-label">Référence</label>
+          {{ form.reference }}
+          {% if form.reference.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.reference.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Numéro de référence du paiement (ex: numéro de chèque)</div>
+        </div>
+        
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.commentaires.id_for_label }}" class="form-label">Commentaires</label>
+          {{ form.commentaires }}
+          {% if form.commentaires.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.commentaires.errors }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Enregistrer
+      </button>
+    </div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Formulaire de paiement chargé');
+    
+    // Initialiser les champs de date
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+      if (!input.value) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        input.value = `${year}-${month}-${day}`;
+      }
+    });
+    
+    // Ajouter la validation côté client et le débogage
+    const form = document.querySelector('form');
+    if (form) {
+      console.log('Formulaire trouvé:', form);
+      
+      // Appliquer des classes Bootstrap aux champs du formulaire
+      const formControls = document.querySelectorAll('input, select, textarea');
+      formControls.forEach(function(element) {
+        if (element.tagName === 'SELECT') {
+          element.classList.add('form-select');
+        } else if (element.tagName === 'TEXTAREA') {
+          element.classList.add('form-control');
+          element.rows = 4;
+        } else {
+          element.classList.add('form-control');
+        }
+      });
+      
+      // Ajouter un gestionnaire d'événements pour le bouton de soumission
+      const submitButton = form.querySelector('button[type="submit"]');
+      if (submitButton) {
+        console.log('Bouton de soumission trouvé:', submitButton);
+        submitButton.addEventListener('click', function(event) {
+          console.log('Bouton de soumission cliqué');
+        });
+      } else {
+        console.error('Bouton de soumission non trouvé');
+      }
+      
+      form.addEventListener('submit', function(event) {
+        console.log('Événement de soumission du formulaire déclenché');
+        let isValid = true;
+        
+        // Valider les champs requis
+        const requiredInputs = form.querySelectorAll('input[required], select[required]');
+        requiredInputs.forEach(input => {
+          console.log('Validation du champ:', input.name, 'Valeur:', input.value);
+          if (!input.value) {
+            isValid = false;
+            input.classList.add('is-invalid');
+            console.error('Champ invalide:', input.name);
+          } else {
+            input.classList.remove('is-invalid');
+          }
+        });
+        
+        if (!isValid) {
+          event.preventDefault();
+          console.error('Formulaire invalide, soumission annulée');
+          alert('Veuillez remplir tous les champs obligatoires.');
+        } else {
+          console.log('Formulaire valide, soumission en cours...');
+        }
+      });
+    } else {
+      console.error('Formulaire non trouvé');
+    }
+  });
+</script>
+{% endblock %}

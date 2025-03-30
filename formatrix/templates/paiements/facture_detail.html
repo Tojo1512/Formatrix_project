@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Facture {{ facture.numero_facture }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .facture-header {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .facture-section {
+    margin-bottom: 30px;
+  }
+  
+  .facture-section-title {
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  
+  .badge-statut-brouillon {
+    background-color: #6c757d;
+  }
+  
+  .badge-statut-emise {
+    background-color: #007bff;
+  }
+  
+  .badge-statut-payee {
+    background-color: #28a745;
+  }
+  
+  .badge-statut-annulee {
+    background-color: #dc3545;
+  }
+  
+  .badge-type-individuelle {
+    background-color: #17a2b8;
+  }
+  
+  .badge-type-entreprise {
+    background-color: #6610f2;
+  }
+  
+  .badge-type-sponsor {
+    background-color: #fd7e14;
+  }
+  
+  .info-box {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .info-label {
+    font-weight: 600;
+    color: #495057;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    .container-fluid {
+      width: 100%;
+      padding: 0;
+    }
+    
+    .card {
+      border: none !important;
+    }
+    
+    .card-header, .card-footer {
+      background-color: white !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+  <!-- En-tête avec boutons d'action -->
+  <div class="d-flex justify-content-between align-items-center mt-4 mb-4 no-print">
+    <h1>Facture {{ facture.numero_facture }}</h1>
+    <div class="action-buttons">
+      <a href="{% url 'paiements:facture-list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+      </a>
+      <a href="{% url 'paiements:facture-recreer' facture_id=facture.facture_id %}" class="btn btn-outline-primary">
+        <i class="fas fa-edit me-1"></i> Modifier
+      </a>
+      <a href="{% url 'paiements:telecharger-facture' facture_id=facture.facture_id %}" class="btn btn-outline-info">
+        <i class="fas fa-download me-1"></i> Télécharger PDF
+      </a>
+      <a href="{% url 'paiements:envoyer-facture' facture_id=facture.facture_id %}" class="btn btn-outline-success">
+        <i class="fas fa-envelope me-1"></i> Envoyer par email
+      </a>
+      {% if facture.statut == 'emise' %}
+      <a href="{% url 'paiements:envoyer-rappel-facture' facture_id=facture.facture_id %}" class="btn btn-outline-warning">
+        <i class="fas fa-bell me-1"></i> Envoyer un rappel
+      </a>
+      {% endif %}
+      <button onclick="window.print();" class="btn btn-outline-dark">
+        <i class="fas fa-print me-1"></i> Imprimer
+      </button>
+    </div>
+  </div>
+  
+  <!-- Statut de la facture -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div>
+        <i class="fas fa-info-circle me-1"></i>
+        Statut de la facture
+      </div>
+      <div>
+        <span class="badge badge-statut-{{ facture.statut }} fs-6">
+          {% for value, label in facture.STATUT_CHOICES %}
+            {% if value == facture.statut %}{{ label }}{% endif %}
+          {% endfor %}
+        </span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Type de facture:</strong> 
+            <span class="badge badge-type-{{ facture.type_facture }}">
+              {% for value, label in facture.TYPE_FACTURE_CHOICES %}
+                {% if value == facture.type_facture %}{{ label }}{% endif %}
+              {% endfor %}
+            </span>
+          </p>
+          <p><strong>Date d'émission:</strong> {{ facture.date_emission|date:"d/m/Y" }}</p>
+          <p><strong>Date d'échéance:</strong> {{ facture.date_echeance|date:"d/m/Y" }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Montant HT:</strong> {{ facture.montant_ht|floatformat:2 }} €</p>
+          <p><strong>TVA ({{ facture.taux_tva }}%):</strong> {{ facture.montant_tva|floatformat:2 }} €</p>
+          <p><strong>Montant TTC:</strong> <span class="fw-bold fs-5">{{ facture.montant_ttc|floatformat:2 }} €</span></p>
+        </div>
+      </div>
+      
+      <!-- Formulaire de changement de statut -->
+      <div class="mt-3 no-print">
+        <form method="post" action="{% url 'paiements:changer-statut-facture' facture_id=facture.facture_id %}" class="row g-3">
+          {% csrf_token %}
+          <div class="col-md-4">
+            <select name="statut" class="form-select">
+              {% for value, label in facture.STATUT_CHOICES %}
+                <option value="{{ value }}" {% if value == facture.statut %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-8">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-check-circle me-1"></i> Changer le statut
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Contenu de la facture -->
+  <div class="row">
+    <!-- Informations client -->
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-user me-1"></i>
+          Informations du destinataire
+        </div>
+        <div class="card-body">
+          <h5>{{ facture.destinataire_nom }}</h5>
+          <p>{{ facture.destinataire_adresse|linebreaks }}</p>
+          <p><i class="fas fa-envelope me-2"></i> {{ facture.destinataire_email }}</p>
+          {% if facture.destinataire_telephone %}
+          <p><i class="fas fa-phone me-2"></i> {{ facture.destinataire_telephone }}</p>
+          {% endif %}
+          {% if facture.destinataire_siret %}
+          <p><i class="fas fa-building me-2"></i> SIRET: {{ facture.destinataire_siret }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Informations inscription -->
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-clipboard-list me-1"></i>
+          Informations de l'inscription
+        </div>
+        <div class="card-body">
+          {% if inscription %}
+          <p><strong>Apprenant:</strong> {{ inscription.apprenant }}</p>
+          <p><strong>Formation:</strong> {{ inscription.seance.cours.nom_cours }}</p>
+          <p><strong>Date d'inscription:</strong> {{ inscription.date_inscription|date:"d/m/Y" }}</p>
+          <p><strong>Type d'inscription:</strong> 
+            {% for value, label in inscription.TYPE_INSCRIPTION_CHOICES %}
+              {% if value == inscription.type_inscription %}{{ label }}{% endif %}
+            {% endfor %}
+          </p>
+          {% if inscription.sponsor %}
+          <p><strong>Sponsor:</strong> {{ inscription.sponsor.nom_client }}</p>
+          {% endif %}
+          {% else %}
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Aucune inscription associée à cette facture.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Détails de la facture -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-list me-1"></i>
+      Détails de la facture
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="text-center">Quantité</th>
+              <th class="text-end">Prix unitaire HT</th>
+              <th class="text-end">Montant HT</th>
+              <th class="text-center">TVA</th>
+              <th class="text-end">Montant TTC</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if lignes %}
+              {% for ligne in lignes %}
+              <tr>
+                <td>{{ ligne.description }}</td>
+                <td class="text-center">{{ ligne.quantite }}</td>
+                <td class="text-end">{{ ligne.prix_unitaire_ht|floatformat:2 }} €</td>
+                <td class="text-end">{{ ligne.montant_ht|floatformat:2 }} €</td>
+                <td class="text-center">{{ ligne.taux_tva }}%</td>
+                <td class="text-end">{{ ligne.montant_ttc|floatformat:2 }} €</td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6" class="text-center">Aucune ligne de facture.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+          <tfoot>
+            <tr class="table-secondary">
+              <th colspan="3" class="text-end">Total:</th>
+              <th class="text-end">{{ facture.montant_ht|floatformat:2 }} €</th>
+              <th class="text-center">TVA</th>
+              <th class="text-end">{{ facture.montant_ttc|floatformat:2 }} €</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Informations supplémentaires -->
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-file-alt me-1"></i>
+          Conditions de paiement
+        </div>
+        <div class="card-body">
+          {% if facture.conditions_paiement %}
+            {{ facture.conditions_paiement|linebreaks }}
+          {% else %}
+            <p>Aucune condition de paiement spécifiée.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-sticky-note me-1"></i>
+          Notes
+        </div>
+        <div class="card-body">
+          {% if facture.notes %}
+            {{ facture.notes|linebreaks }}
+          {% else %}
+            <p>Aucune note.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Paiement associé -->
+  {% if facture.paiement %}
+  <div class="card mb-4 no-print">
+    <div class="card-header">
+      <i class="fas fa-money-bill-wave me-1"></i>
+      Paiement associé
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Référence:</strong> {{ facture.paiement.reference|default:"Non spécifié" }}</p>
+          <p><strong>Date de paiement:</strong> {{ facture.paiement.date_paiement|date:"d/m/Y" }}</p>
+          <p><strong>Statut:</strong> 
+            {% for value, label in facture.paiement.STATUT_CHOICES %}
+              {% if value == facture.paiement.statut %}{{ label }}{% endif %}
+            {% endfor %}
+          </p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Mode de paiement:</strong> 
+            {% for value, label in facture.paiement.MODE_PAIEMENT_CHOICES %}
+              {% if value == facture.paiement.mode_paiement %}{{ label }}{% endif %}
+            {% endfor %}
+          </p>
+          <p><strong>Montant:</strong> {{ facture.paiement.montant|floatformat:2 }} €</p>
+          <p>
+            <a href="{% url 'paiements:paiement-detail' paiement_id=facture.paiement.paiement_id %}" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-eye me-1"></i> Voir le paiement
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  
+  <!-- Pied de page pour impression -->
+  <div class="d-none d-print-block mt-5">
+    <div class="row">
+      <div class="col-12 text-center">
+        <p>Formatrix - Centre de formation professionnelle</p>
+        <p>123 Avenue de la Formation, 75000 Paris - Tél: 01 23 45 67 89</p>
+        <p>SIRET: 123 456 789 00012 - N° TVA: FR12 123 456 789</p>
+        <p>contact@formatrix.fr - www.formatrix.fr</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Activer les tooltips Bootstrap
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  });
+</script>
+{% endblock %}

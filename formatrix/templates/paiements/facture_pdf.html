@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Facture {{ facture.numero_facture }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #333;
+        }
+        .header {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        .logo {
+            width: 150px;
+            height: auto;
+        }
+        .facture-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+        .facture-info {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .facture-info td {
+            vertical-align: top;
+            padding: 5px;
+        }
+        .facture-info .label {
+            font-weight: bold;
+            width: 150px;
+        }
+        .address-box {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 45%;
+        }
+        .address-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .table th {
+            background-color: #f5f5f5;
+            text-align: left;
+            font-weight: bold;
+            padding: 8px;
+            border-bottom: 2px solid #ddd;
+        }
+        .table td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .table .text-right {
+            text-align: right;
+        }
+        .table .text-center {
+            text-align: center;
+        }
+        .total-table {
+            width: 40%;
+            margin-left: auto;
+            border-collapse: collapse;
+        }
+        .total-table td {
+            padding: 5px;
+        }
+        .total-table .label {
+            font-weight: bold;
+            text-align: right;
+        }
+        .total-table .value {
+            text-align: right;
+        }
+        .total-table .total-row {
+            font-weight: bold;
+            font-size: 14px;
+            border-top: 2px solid #ddd;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 10px;
+            text-align: center;
+            color: #777;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .conditions {
+            margin-top: 30px;
+            font-size: 11px;
+        }
+        .conditions-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .notes {
+            margin-top: 20px;
+            font-style: italic;
+            font-size: 11px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 7px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            border-radius: 4px;
+        }
+        .badge-brouillon {
+            background-color: #6c757d;
+        }
+        .badge-emise {
+            background-color: #007bff;
+        }
+        .badge-payee {
+            background-color: #28a745;
+        }
+        .badge-annulee {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête -->
+    <table class="header">
+        <tr>
+            <td style="width: 50%;">
+                {% if logo_url %}
+                <img src="{{ logo_url }}" class="logo" alt="Formatrix Logo">
+                {% else %}
+                <div style="font-size: 24px; font-weight: bold; color: #007bff;">FORMATRIX</div>
+                {% endif %}
+                <div style="margin-top: 10px;">
+                    <strong>Formatrix</strong><br>
+                    123 Avenue de la Formation<br>
+                    75000 Paris<br>
+                    Tél: 01 23 45 67 89<br>
+                    Email: contact@formatrix.fr<br>
+                    SIRET: 123 456 789 00012<br>
+                    N° TVA: FR12 123 456 789
+                </div>
+            </td>
+            <td style="width: 50%; text-align: right;">
+                <div class="facture-title">FACTURE</div>
+                <div>N° {{ facture.numero_facture }}</div>
+                <div style="margin-top: 10px;">
+                    <span class="badge badge-{{ facture.statut }}">
+                        {% for value, label in facture.STATUT_CHOICES %}
+                            {% if value == facture.statut %}{{ label }}{% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+                <div style="margin-top: 10px;">
+                    <table>
+                        <tr>
+                            <td><strong>Date d'émission:</strong></td>
+                            <td>{{ facture.date_emission|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Date d'échéance:</strong></td>
+                            <td>{{ facture.date_echeance|date:"d/m/Y" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Adresses -->
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 50%; vertical-align: top;">
+                <div class="address-box">
+                    <div class="address-title">FACTURÉ À:</div>
+                    <div>
+                        <strong>{{ facture.destinataire_nom }}</strong><br>
+                        {{ facture.destinataire_adresse|linebreaksbr }}<br>
+                        {% if facture.destinataire_telephone %}
+                        Tél: {{ facture.destinataire_telephone }}<br>
+                        {% endif %}
+                        Email: {{ facture.destinataire_email }}<br>
+                        {% if facture.destinataire_siret %}
+                        SIRET: {{ facture.destinataire_siret }}
+                        {% endif %}
+                    </div>
+                </div>
+            </td>
+            <td style="width: 50%; vertical-align: top;">
+                {% if inscription %}
+                <div class="address-box">
+                    <div class="address-title">INFORMATIONS INSCRIPTION:</div>
+                    <div>
+                        <strong>Apprenant:</strong> {{ inscription.apprenant }}<br>
+                        <strong>Formation:</strong> {{ inscription.seance.cours.nom_cours }}<br>
+                        <strong>Date d'inscription:</strong> {{ inscription.date_inscription|date:"d/m/Y" }}<br>
+                        <strong>Type d'inscription:</strong> 
+                        {% for value, label in inscription.TYPE_INSCRIPTION_CHOICES %}
+                            {% if value == inscription.type_inscription %}{{ label }}{% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Détails de la facture -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width: 40%;">Description</th>
+                <th class="text-center" style="width: 10%;">Quantité</th>
+                <th class="text-right" style="width: 15%;">Prix unitaire HT</th>
+                <th class="text-right" style="width: 15%;">Montant HT</th>
+                <th class="text-center" style="width: 5%;">TVA</th>
+                <th class="text-right" style="width: 15%;">Montant TTC</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if lignes %}
+                {% for ligne in lignes %}
+                <tr>
+                    <td>{{ ligne.description }}</td>
+                    <td class="text-center">{{ ligne.quantite }}</td>
+                    <td class="text-right">{{ ligne.prix_unitaire_ht|floatformat:2 }} €</td>
+                    <td class="text-right">{{ ligne.montant_ht|floatformat:2 }} €</td>
+                    <td class="text-center">{{ ligne.taux_tva }}%</td>
+                    <td class="text-right">{{ ligne.montant_ttc|floatformat:2 }} €</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">Aucune ligne de facture.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <!-- Totaux -->
+    <table class="total-table">
+        <tr>
+            <td class="label">Total HT:</td>
+            <td class="value">{{ facture.montant_ht|floatformat:2 }} €</td>
+        </tr>
+        <tr>
+            <td class="label">TVA ({{ facture.taux_tva }}%):</td>
+            <td class="value">{{ facture.montant_tva|floatformat:2 }} €</td>
+        </tr>
+        <tr class="total-row">
+            <td class="label">Total TTC:</td>
+            <td class="value">{{ facture.montant_ttc|floatformat:2 }} €</td>
+        </tr>
+    </table>
+
+    <!-- Conditions de paiement -->
+    <div class="conditions">
+        <div class="conditions-title">CONDITIONS DE PAIEMENT:</div>
+        <div>
+            {% if facture.conditions_paiement %}
+                {{ facture.conditions_paiement|linebreaksbr }}
+            {% else %}
+                Paiement à réception de facture.<br>
+                Merci d'indiquer le numéro de facture dans votre référence de paiement.
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Notes -->
+    {% if facture.notes %}
+    <div class="notes">
+        <div class="conditions-title">NOTES:</div>
+        <div>{{ facture.notes|linebreaksbr }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Pied de page -->
+    <div class="footer">
+        <p>Formatrix - Centre de formation professionnelle</p>
+        <p>123 Avenue de la Formation, 75000 Paris - Tél: 01 23 45 67 89</p>
+        <p>SIRET: 123 456 789 00012 - N° TVA: FR12 123 456 789</p>
+        <p>contact@formatrix.fr - www.formatrix.fr</p>
+    </div>
+</body>
+</html>

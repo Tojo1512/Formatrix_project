@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.plan_id %}Modifier{% else %}Nouveau{% endif %} plan de paiement - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-title {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  
+  .form-section {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    color: #3a3a3a;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  
+  .echeancier-item {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 3px solid #007bff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas {% if form.instance.plan_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+      {% if form.instance.plan_id %}Modifier{% else %}Nouveau{% endif %} plan de paiement
+    </h1>
+    <a href="{% url 'paiements:plan-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour à la liste
+    </a>
+  </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Informations principales -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Informations principales
+      </h3>
+      <div class="row">
+        {% if not form.instance.plan_id %}
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.inscription.id_for_label }}" class="form-label">Inscription <span class="text-danger">*</span></label>
+          {{ form.inscription }}
+          {% if form.inscription.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.inscription.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Sélectionnez l'inscription associée à ce plan de paiement</div>
+        </div>
+        {% endif %}
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.montant_total.id_for_label }}" class="form-label">Montant total (€) <span class="text-danger">*</span></label>
+          {{ form.montant_total }}
+          {% if form.montant_total.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.montant_total.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Montant total à payer pour cette inscription</div>
+        </div>
+        
+        {% if form.instance.plan_id %}
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.statut.id_for_label }}" class="form-label">Statut <span class="text-danger">*</span></label>
+          {{ form.statut }}
+          {% if form.statut.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.statut.errors }}
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Configuration du plan -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-cog"></i>
+        Configuration du plan
+      </h3>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.nombre_versements.id_for_label }}" class="form-label">Nombre de versements <span class="text-danger">*</span></label>
+          {{ form.nombre_versements }}
+          {% if form.nombre_versements.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.nombre_versements.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.date_debut.id_for_label }}" class="form-label">Date du premier versement <span class="text-danger">*</span></label>
+          {{ form.date_debut }}
+          {% if form.date_debut.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.date_debut.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.intervalle_jours.id_for_label }}" class="form-label">Intervalle (jours) <span class="text-danger">*</span></label>
+          {{ form.intervalle_jours }}
+          {% if form.intervalle_jours.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.intervalle_jours.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Nombre de jours entre chaque versement</div>
+        </div>
+        
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.commentaires.id_for_label }}" class="form-label">Commentaires</label>
+          {{ form.commentaires }}
+          {% if form.commentaires.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.commentaires.errors }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Échéancier généré -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-calculator"></i>
+        Calcul des versements
+      </h3>
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        L'échéancier ci-dessous est généré automatiquement en fonction des paramètres saisis. Il vous permet de visualiser les dates et montants des versements avant d'enregistrer le plan.
+      </div>
+      
+      <div id="echeancier-container" class="mt-3">
+        <div class="text-center py-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          <p class="mt-2">Calcul de l'échéancier en cours...</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Enregistrer
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Appliquer des classes Bootstrap aux champs du formulaire
+    const formControls = document.querySelectorAll('input, select, textarea');
+    formControls.forEach(function(element) {
+      if (element.tagName === 'SELECT') {
+        element.classList.add('form-select');
+      } else if (element.tagName === 'TEXTAREA') {
+        element.classList.add('form-control');
+        element.rows = 4;
+      } else {
+        element.classList.add('form-control');
+      }
+    });
+    
+    // Récupérer les éléments du formulaire
+    const montantTotalInput = document.getElementById('{{ form.montant_total.id_for_label }}');
+    const nombreVersementsInput = document.getElementById('{{ form.nombre_versements.id_for_label }}');
+    const dateDebutInput = document.getElementById('{{ form.date_debut.id_for_label }}');
+    const intervalleJoursInput = document.getElementById('{{ form.intervalle_jours.id_for_label }}');
+    const echeancierContainer = document.getElementById('echeancier-container');
+    
+    // Fonction pour formater une date en français
+    function formatDate(date) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('fr-FR', options);
+    }
+    
+    // Fonction pour formater un montant en euros
+    function formatMontant(montant) {
+      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(montant);
+    }
+    
+    // Fonction pour mettre à jour l'échéancier
+    function updateEcheancier() {
+      const montantTotal = parseFloat(montantTotalInput.value) || 0;
+      const nombreVersements = parseInt(nombreVersementsInput.value) || 1;
+      const dateDebut = new Date(dateDebutInput.value);
+      const intervalleJours = parseInt(intervalleJoursInput.value) || 30;
+      
+      if (isNaN(dateDebut.getTime()) || montantTotal <= 0 || nombreVersements <= 0) {
+        echeancierContainer.innerHTML = '<div class="alert alert-warning">Veuillez remplir tous les champs pour générer l\'échéancier.</div>';
+        return;
+      }
+      
+      const montantParVersement = montantTotal / nombreVersements;
+      let html = '';
+      
+      for (let i = 0; i < nombreVersements; i++) {
+        const dateVersement = new Date(dateDebut);
+        dateVersement.setDate(dateVersement.getDate() + i * intervalleJours);
+        
+        html += `
+          <div class="echeancier-item">
+            <div class="row align-items-center">
+              <div class="col-md-2">
+                <span class="badge bg-primary">Versement ${i + 1}/${nombreVersements}</span>
+              </div>
+              <div class="col-md-5">
+                <i class="fas fa-calendar-day me-1"></i> <strong>Date:</strong> ${formatDate(dateVersement)}
+              </div>
+              <div class="col-md-5">
+                <i class="fas fa-money-bill-wave me-1"></i> <strong>Montant:</strong> ${formatMontant(montantParVersement)}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      echeancierContainer.innerHTML = html;
+    }
+    
+    // Mettre à jour l'échéancier au chargement de la page
+    updateEcheancier();
+    
+    // Mettre à jour l'échéancier lorsque les valeurs changent
+    montantTotalInput.addEventListener('input', updateEcheancier);
+    nombreVersementsInput.addEventListener('input', updateEcheancier);
+    dateDebutInput.addEventListener('input', updateEcheancier);
+    intervalleJoursInput.addEventListener('input', updateEcheancier);
+  });
+</script>
+{% endblock %}

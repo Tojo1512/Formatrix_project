@@ -41,7 +41,7 @@ class Inscription(models.Model):
     def __str__(self):
         """Représentation textuelle de l'inscription"""
         # Accéder aux noms via les relations au lieu d'utiliser directement les attributs
-        apprenant_nom = f"{self.apprenant.nom} {self.apprenant.prenom}"
+        apprenant_nom = f"{self.apprenant.nom_apprenant} {self.apprenant.autres_nom or ''}"
         cours_nom = self.seance.cours.nom_cours if hasattr(self.seance, 'cours') else "Cours inconnu"
         return f"Inscription de {apprenant_nom} pour {cours_nom}"
     

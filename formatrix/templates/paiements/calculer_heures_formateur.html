@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Calculer les heures du formateur{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+        <h1>Calculer les heures travaillées</h1>
+        <div>
+            <a href="{% url 'paiements:paiement-formateur-list' %}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+            </a>
+            <a href="{% url 'formateurs:formateur-detail' formateur.formateur_id %}" class="btn btn-outline-primary">
+                <i class="fas fa-user me-1"></i> Profil du formateur
+            </a>
+        </div>
+    </div>
+    
+    <!-- Informations du formateur -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-user me-1"></i>
+            Informations du formateur
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>{{ formateur.nom }} {{ formateur.prenom }}</h5>
+                    <p>
+                        <strong>Email:</strong> {{ formateur.email }}<br>
+                        <strong>Téléphone:</strong> {{ formateur.telephone|default:"Non renseigné" }}<br>
+                        <strong>Spécialité:</strong> {{ formateur.specialite|default:"Non renseignée" }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Statistiques</h5>
+                    <p>
+                        <strong>Nombre de séances:</strong> {{ formateur.seances.count }}<br>
+                        <strong>Dernière séance:</strong> 
+                        {% with last_seance=formateur.seances.all|dictsort:"date_seance"|last %}
+                            {% if last_seance %}
+                                {{ last_seance.date_seance|date:"d/m/Y" }}
+                            {% else %}
+                                Aucune séance
+                            {% endif %}
+                        {% endwith %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Formulaire de calcul -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-calculator me-1"></i>
+            Sélectionner une période
+        </div>
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                
+                <div class="col-md-6 mb-3">
+                    <label for="date_debut" class="form-label">Date de début *</label>
+                    <input type="date" class="form-control" id="date_debut" name="date_debut" required>
+                    <div class="form-text">Date de début de la période à calculer</div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="date_fin" class="form-label">Date de fin *</label>
+                    <input type="date" class="form-control" id="date_fin" name="date_fin" required>
+                    <div class="form-text">Date de fin de la période à calculer</div>
+                </div>
+                
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Le système va calculer le nombre total d'heures travaillées par le formateur sur la période sélectionnée, en se basant sur les séances enregistrées dans le système.
+                    </div>
+                </div>
+                
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calculator me-1"></i> Calculer les heures
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Périodes prédéfinies -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-clock me-1"></i>
+            Périodes prédéfinies
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <button class="btn btn-outline-primary w-100" id="mois-courant">
+                        <i class="fas fa-calendar-day me-1"></i> Mois courant
+                    </button>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <button class="btn btn-outline-primary w-100" id="mois-precedent">
+                        <i class="fas fa-calendar-minus me-1"></i> Mois précédent
+                    </button>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <button class="btn btn-outline-primary w-100" id="trimestre-courant">
+                        <i class="fas fa-calendar-week me-1"></i> Trimestre courant
+                    </button>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <button class="btn btn-outline-primary w-100" id="annee-courante">
+                        <i class="fas fa-calendar-alt me-1"></i> Année courante
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateDebutInput = document.getElementById('date_debut');
+        const dateFinInput = document.getElementById('date_fin');
+        
+        // Fonction pour formater une date en YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Mois courant
+        document.getElementById('mois-courant').addEventListener('click', function(e) {
+            e.preventDefault();
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            
+            dateDebutInput.value = formatDate(firstDay);
+            dateFinInput.value = formatDate(lastDay);
+        });
+        
+        // Mois précédent
+        document.getElementById('mois-precedent').addEventListener('click', function(e) {
+            e.preventDefault();
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth(), 0);
+            
+            dateDebutInput.value = formatDate(firstDay);
+            dateFinInput.value = formatDate(lastDay);
+        });
+        
+        // Trimestre courant
+        document.getElementById('trimestre-courant').addEventListener('click', function(e) {
+            e.preventDefault();
+            const today = new Date();
+            const quarter = Math.floor(today.getMonth() / 3);
+            const firstDay = new Date(today.getFullYear(), quarter * 3, 1);
+            const lastDay = new Date(today.getFullYear(), (quarter + 1) * 3, 0);
+            
+            dateDebutInput.value = formatDate(firstDay);
+            dateFinInput.value = formatDate(lastDay);
+        });
+        
+        // Année courante
+        document.getElementById('annee-courante').addEventListener('click', function(e) {
+            e.preventDefault();
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), 0, 1);
+            const lastDay = new Date(today.getFullYear(), 11, 31);
+            
+            dateDebutInput.value = formatDate(firstDay);
+            dateFinInput.value = formatDate(lastDay);
+        });
+    });
+</script>
+{% endblock %}

@@ -3,211 +3,501 @@
 
 {% block title %}Inscription - Formatrix{% endblock %}
 
+{% block extra_css %}
+<style>
+  :root {
+    --primary-color: #2c3e50;
+    --secondary-color: #34495e;
+    --accent-color: #3498db;
+    --success-color: #2ecc71;
+    --warning-color: #f1c40f;
+    --danger-color: #e74c3c;
+    --light-color: #ecf0f1;
+    --dark-color: #2c3e50;
+    --border-radius: 12px;
+    --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .registration-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .registration-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--primary-color);
+  }
+
+  .registration-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .registration-header p {
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .registration-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto 3rem;
+  }
+
+  .progress-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 0 1rem;
+  }
+
+  .progress-step::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: -50%;
+    width: 100%;
+    height: 3px;
+    background: var(--light-color);
+    z-index: 0;
+  }
+
+  .progress-step:first-child::before {
+    display: none;
+  }
+
+  .step-number {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--light-color);
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+  }
+
+  .progress-step.active .step-number {
+    background: var(--accent-color);
+    color: white;
+  }
+
+  .progress-step.completed .step-number {
+    background: var(--success-color);
+    color: white;
+  }
+
+  .step-label {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-top: 0.5rem;
+  }
+
+  .registration-form {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+  }
+
+  .form-step {
+    display: none;
+    padding: 2rem;
+  }
+
+  .form-step.active {
+    display: block;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+    font-weight: 500;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--light-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+  }
+
+  .form-text {
+    font-size: 0.85rem;
+    color: var(--secondary-color);
+    margin-top: 0.25rem;
+  }
+
+  .form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-prev {
+    background: var(--light-color);
+    color: var(--dark-color);
+  }
+
+  .btn-next {
+    background: var(--accent-color);
+    color: white;
+  }
+
+  .btn-submit {
+    background: var(--success-color);
+    color: white;
+    width: 100%;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-col {
+    flex: 1;
+  }
+
+  @media (max-width: 768px) {
+    .registration-header h2 {
+      font-size: 2rem;
+    }
+
+    .registration-progress {
+      margin-bottom: 2rem;
+    }
+
+    .form-step {
+      padding: 1.5rem;
+    }
+
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .form-col {
+      margin-bottom: 1.5rem;
+    }
+
+    .btn {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .form-buttons {
+      flex-direction: column-reverse;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .registration-container {
+      margin: 1rem auto;
+    }
+
+    .registration-header h2 {
+      font-size: 1.75rem;
+    }
+
+    .step-label {
+      display: none;
+    }
+
+    .form-step {
+      padding: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block guest_content %}
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6 mt-5">
-      <div class="card full-height shadow-lg">
-        <div class="card-header bg-primary">
-          <h4 class="card-title text-white mb-0 text-center">
-            <i class="fas fa-user-plus me-2"></i>Inscription
-          </h4>
+<div class="registration-container">
+  <div class="registration-header">
+    <h2>Inscription Formateur</h2>
+    <p>Rejoignez notre communauté de formateurs et partagez votre expertise</p>
+  </div>
+
+  <div class="registration-progress">
+    <div class="progress-step active" id="step-1-indicator">
+      <div class="step-number">1</div>
+      <div class="step-label">Compte</div>
+    </div>
+    <div class="progress-step" id="step-2-indicator">
+      <div class="step-number">2</div>
+      <div class="step-label">Profil</div>
+    </div>
+    <div class="progress-step" id="step-3-indicator">
+      <div class="step-number">3</div>
+      <div class="step-label">Expertise</div>
+    </div>
+    <div class="progress-step" id="step-4-indicator">
+      <div class="step-number">4</div>
+      <div class="step-label">Finalisation</div>
+    </div>
+  </div>
+
+  <div class="registration-form">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Étape 1: Informations du compte -->
+      <div class="form-step active" id="step-1">
+        <h3 class="mb-4">Créez votre compte</h3>
+        
+        <div class="form-group">
+          <label class="form-label">Nom d'utilisateur</label>
+          <input type="text" class="form-control" name="username" required>
+          <small class="form-text">Choisissez un nom d'utilisateur unique</small>
         </div>
-        <div class="card-body p-4">
-          {% if form.non_field_errors %}
-          <div class="alert alert-danger mb-4">
-            <div class="d-flex">
-              <div class="alert-icon me-2">
-                <i class="fas fa-exclamation-triangle"></i>
-              </div>
-              <div class="flex-grow-1">
-                <strong>Erreur</strong> - 
-                {% for error in form.non_field_errors %}
-                  {{ error }}
-                {% endfor %}
-              </div>
-            </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" name="email" required>
+          <small class="form-text">Nous ne partagerons jamais votre email</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" class="form-control" name="password1" required>
           </div>
-          {% endif %}
+          <div class="form-col">
+            <label class="form-label">Confirmer le mot de passe</label>
+            <input type="password" class="form-control" name="password2" required>
+          </div>
+        </div>
 
-          <form method="post">
-            {% csrf_token %}
-            
-            <div class="form-group mb-4">
-              <label class="form-label">Nom d'utilisateur</label>
-              <div class="input-group {% if form.username.errors %}has-error{% endif %}">
-                <span class="input-group-text bg-primary text-white">
-                  <i class="fas fa-user"></i>
-                </span>
-                <input type="text" name="username" id="id_username" class="form-control" value="{{ form.username.value|default:'' }}" placeholder="Choisissez un nom d'utilisateur" required>
-              </div>
-              {% if form.username.errors %}
-                {% for error in form.username.errors %}
-                  <div class="text-danger mt-1">
-                    <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                  </div>
-                {% endfor %}
-              {% endif %}
-            </div>
-
-            <div class="form-group mb-4">
-              <label class="form-label">Email</label>
-              <div class="input-group {% if form.email.errors %}has-error{% endif %}">
-                <span class="input-group-text bg-primary text-white">
-                  <i class="fas fa-envelope"></i>
-                </span>
-                <input type="email" name="email" id="id_email" class="form-control" value="{{ form.email.value|default:'' }}" placeholder="Entrez votre adresse email" required>
-              </div>
-              {% if form.email.errors %}
-                {% for error in form.email.errors %}
-                  <div class="text-danger mt-1">
-                    <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                  </div>
-                {% endfor %}
-              {% endif %}
-            </div>
-
-            <div class="form-group mb-4">
-              <label class="form-label">Mot de passe</label>
-              <div class="input-group {% if form.password1.errors %}has-error{% endif %}">
-                <span class="input-group-text bg-primary text-white">
-                  <i class="fas fa-lock"></i>
-                </span>
-                <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Créez un mot de passe sécurisé" required>
-                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="id_password1">
-                  <i class="fas fa-eye"></i>
-                </button>
-              </div>
-              {% if form.password1.errors %}
-                {% for error in form.password1.errors %}
-                  <div class="text-danger mt-1">
-                    <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                  </div>
-                {% endfor %}
-              {% else %}
-                <small class="text-muted mt-1">
-                  <i class="fas fa-info-circle me-1"></i>Le mot de passe doit contenir au moins 8 caractères.
-                </small>
-              {% endif %}
-            </div>
-
-            <div class="form-group mb-4">
-              <label class="form-label">Confirmer le mot de passe</label>
-              <div class="input-group {% if form.password2.errors %}has-error{% endif %}">
-                <span class="input-group-text bg-primary text-white">
-                  <i class="fas fa-lock"></i>
-                </span>
-                <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Confirmez votre mot de passe" required>
-                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="id_password2">
-                  <i class="fas fa-eye"></i>
-                </button>
-              </div>
-              {% if form.password2.errors %}
-                {% for error in form.password2.errors %}
-                  <div class="text-danger mt-1">
-                    <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                  </div>
-                {% endfor %}
-              {% endif %}
-            </div>
-
-            <div class="form-group mb-4">
-              <label class="form-label">Rôle</label>
-              <div class="input-group {% if form.role.errors %}has-error{% endif %}">
-                <span class="input-group-text bg-primary text-white">
-                  <i class="fas fa-user-tag"></i>
-                </span>
-                <select name="role" id="id_role" class="form-select form-control" required>
-                  <option value="trainer" {% if form.role.value == 'trainer' %}selected{% endif %}>Responsable</option>
-                  <option value="admin" {% if form.role.value == 'admin' %}selected{% endif %}>Administrateur</option>
-                </select>
-              </div>
-              {% if form.role.errors %}
-                {% for error in form.role.errors %}
-                  <div class="text-danger mt-1">
-                    <small><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</small>
-                  </div>
-                {% endfor %}
-              {% else %}
-                <small class="text-muted mt-1">
-                  <i class="fas fa-info-circle me-1"></i>Les administrateurs ont un accès complet à toutes les fonctionnalités du système.
-                </small>
-              {% endif %}
-            </div>
-
-            <div class="form-group mb-4 mt-4">
-              <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
-                <i class="fas fa-user-plus me-2"></i>S'inscrire
-              </button>
-            </div>
-
-            <div class="text-center mt-4">
-              <p class="mb-2">Vous avez déjà un compte ?</p>
-              <a href="{% url 'login' %}" class="btn btn-outline-primary">
-                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
-              </a>
-            </div>
-          </form>
+        <div class="form-buttons">
+          <button type="button" class="btn btn-next" onclick="nextStep(1, 2)">Suivant</button>
         </div>
       </div>
-    </div>
+
+      <!-- Étape 2: Informations personnelles -->
+      <div class="form-step" id="step-2">
+        <h3 class="mb-4">Informations personnelles</h3>
+        
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label">Prénom</label>
+            <input type="text" class="form-control" name="first_name" required>
+          </div>
+          <div class="form-col">
+            <label class="form-label">Nom</label>
+            <input type="text" class="form-control" name="last_name" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Date de naissance</label>
+          <input type="date" class="form-control" name="date_naissance" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input type="tel" class="form-control" name="telephone" required>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn btn-prev" onclick="prevStep(2, 1)">Précédent</button>
+          <button type="button" class="btn btn-next" onclick="nextStep(2, 3)">Suivant</button>
+        </div>
+      </div>
+
+      <!-- Étape 3: Profil formateur -->
+      <div class="form-step" id="step-3">
+        <h3 class="mb-4">Profil formateur</h3>
+
+        <div class="form-group">
+          <label class="form-label">Spécialités</label>
+          <select class="form-control" name="specialites" multiple required>
+            <option value="informatique">Informatique</option>
+            <option value="langues">Langues</option>
+            <option value="management">Management</option>
+            <option value="marketing">Marketing</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Niveau d'expertise</label>
+          <select class="form-control" name="niveau_expertise" required>
+            <option value="junior">Junior (1-3 ans)</option>
+            <option value="intermediaire">Intermédiaire (4-7 ans)</option>
+            <option value="senior">Senior (8+ ans)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">CV</label>
+          <input type="file" class="form-control" name="cv" accept=".pdf,.doc,.docx">
+          <small class="form-text">Format accepté : PDF, DOC, DOCX</small>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn btn-prev" onclick="prevStep(3, 2)">Précédent</button>
+          <button type="button" class="btn btn-next" onclick="nextStep(3, 4)">Suivant</button>
+        </div>
+      </div>
+
+      <!-- Étape 4: Récapitulatif -->
+      <div class="form-step" id="step-4">
+        <h3 class="mb-4">Récapitulatif</h3>
+        
+        <div id="recap-content" class="mb-4">
+          <!-- Le contenu sera rempli dynamiquement par JavaScript -->
+        </div>
+
+        <div class="form-group">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="terms" required>
+            <label class="form-check-label" for="terms">
+              J'accepte les conditions d'utilisation et la politique de confidentialité
+            </label>
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="btn btn-prev" onclick="prevStep(4, 3)">Précédent</button>
+          <button type="submit" class="btn btn-submit">Finaliser l'inscription</button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Select all password visibility toggle buttons
-    const toggleButtons = document.querySelectorAll('.toggle-password');
-    
-    // Add an event listener to each button
-    toggleButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        // Get the target password field ID
-        const targetId = this.getAttribute('data-target');
-        const passwordInput = document.getElementById(targetId);
-        
-        // Toggle the field type between 'password' and 'text'
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-          this.innerHTML = '<i class="fas fa-eye-slash"></i>';
-        } else {
-          passwordInput.type = 'password';
-          this.innerHTML = '<i class="fas fa-eye"></i>';
-        }
-      });
-    });
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialisation des étapes
+  updateProgressBar(1);
+  
+  // Validation des mots de passe
+  const password1 = document.querySelector('input[name="password1"]');
+  const password2 = document.querySelector('input[name="password2"]');
+  
+  password2.addEventListener('input', function() {
+    if (password1.value !== password2.value) {
+      password2.setCustomValidity('Les mots de passe ne correspondent pas');
+    } else {
+      password2.setCustomValidity('');
+    }
   });
-</script>
-{% endblock %}
+});
 
-{% block extra_css %}
-<style>
-  .toggle-password {
-    cursor: pointer;
+function updateProgressBar(currentStep) {
+  const steps = document.querySelectorAll('.progress-step');
+  steps.forEach((step, index) => {
+    if (index + 1 < currentStep) {
+      step.classList.add('completed');
+      step.classList.remove('active');
+    } else if (index + 1 === currentStep) {
+      step.classList.add('active');
+      step.classList.remove('completed');
+    } else {
+      step.classList.remove('completed', 'active');
+    }
+  });
+}
+
+function validateStep(step) {
+  const currentStep = document.getElementById(`step-${step}`);
+  const inputs = currentStep.querySelectorAll('input[required], select[required]');
+  let isValid = true;
+  
+  inputs.forEach(input => {
+    if (!input.value) {
+      isValid = false;
+      input.classList.add('is-invalid');
+    } else {
+      input.classList.remove('is-invalid');
+    }
+  });
+  
+  return isValid;
+}
+
+function nextStep(currentStep, nextStep) {
+  if (validateStep(currentStep)) {
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`step-${nextStep}`).classList.add('active');
+    updateProgressBar(nextStep);
+    
+    if (nextStep === 4) {
+      updateRecapContent();
+    }
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function prevStep(currentStep, prevStep) {
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  document.getElementById(`step-${prevStep}`).classList.add('active');
+  updateProgressBar(prevStep);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateRecapContent() {
+  const recap = document.getElementById('recap-content');
+  const formData = new FormData(document.querySelector('form'));
+  let recapHTML = '<div class="recap-section">';
+  
+  for (let [key, value] of formData.entries()) {
+    if (key !== 'password1' && key !== 'password2' && key !== 'csrfmiddlewaretoken') {
+      recapHTML += `
+        <div class="recap-item">
+          <strong>${key}:</strong> ${value}
+        </div>
+      `;
+    }
   }
   
-  .form-control, .form-select {
-    border-radius: 0 0.25rem 0.25rem 0;
-  }
-  
-  .input-group-text {
-    width: 40px;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .alert-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-  }
-  
-  .has-error .form-control, 
-  .has-error .form-select {
-    border-color: #dc3545;
-  }
-</style>
+  recapHTML += '</div>';
+  recap.innerHTML = recapHTML;
+}
+</script>
 {% endblock %}

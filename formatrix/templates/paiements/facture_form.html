@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.facture_id %}Modifier{% else %}Nouvelle{% endif %} facture - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-title {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  
+  .form-section {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    color: #3a3a3a;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  
+  .badge-type-individuelle {
+    background-color: #17a2b8;
+  }
+  
+  .badge-type-entreprise {
+    background-color: #6610f2;
+  }
+  
+  .badge-type-sponsor {
+    background-color: #fd7e14;
+  }
+  
+  .ligne-facture-item {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 3px solid #007bff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas {% if form.instance.facture_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+      {{ titre|default:"Facture" }}
+    </h1>
+    <a href="{% url 'paiements:facture-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour à la liste
+    </a>
+  </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Informations principales -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Informations principales
+      </h3>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.inscription.id_for_label }}" class="form-label">Inscription <span class="text-danger">*</span></label>
+          {{ form.inscription }}
+          {% if form.inscription.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.inscription.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Sélectionnez l'inscription associée à cette facture</div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.paiement.id_for_label }}" class="form-label">Paiement associé</label>
+          {{ form.paiement }}
+          {% if form.paiement.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.paiement.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Sélectionnez le paiement associé à cette facture (optionnel)</div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.type_facture.id_for_label }}" class="form-label">Type de facture <span class="text-danger">*</span></label>
+          {{ form.type_facture }}
+          {% if form.type_facture.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.type_facture.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.statut.id_for_label }}" class="form-label">Statut <span class="text-danger">*</span></label>
+          {{ form.statut }}
+          {% if form.statut.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.statut.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        {% if form.instance.facture_id %}
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Numéro de facture</label>
+          <input type="text" class="form-control" value="{{ form.instance.numero_facture }}" readonly>
+          <div class="form-text">Numéro généré automatiquement</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Dates et montants -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-calendar-alt"></i>
+        Dates et montants
+      </h3>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.date_emission.id_for_label }}" class="form-label">Date d'émission <span class="text-danger">*</span></label>
+          {{ form.date_emission }}
+          {% if form.date_emission.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.date_emission.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.date_echeance.id_for_label }}" class="form-label">Date d'échéance</label>
+          {{ form.date_echeance }}
+          {% if form.date_echeance.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.date_echeance.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Date limite de paiement</div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.montant_ht.id_for_label }}" class="form-label">Montant HT (€) <span class="text-danger">*</span></label>
+          {{ form.montant_ht }}
+          {% if form.montant_ht.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.montant_ht.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.taux_tva.id_for_label }}" class="form-label">Taux de TVA (%) <span class="text-danger">*</span></label>
+          {{ form.taux_tva }}
+          {% if form.taux_tva.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.taux_tva.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Montant TTC calculé (€)</label>
+          <input type="text" id="montant_ttc_calcule" class="form-control" readonly>
+          <div class="form-text">Calculé automatiquement (HT + TVA)</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Informations du destinataire -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-user"></i>
+        Informations du destinataire
+      </h3>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.destinataire_nom.id_for_label }}" class="form-label">Nom du destinataire <span class="text-danger">*</span></label>
+          {{ form.destinataire_nom }}
+          {% if form.destinataire_nom.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_nom.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.destinataire_email.id_for_label }}" class="form-label">Email du destinataire <span class="text-danger">*</span></label>
+          {{ form.destinataire_email }}
+          {% if form.destinataire_email.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_email.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.destinataire_adresse.id_for_label }}" class="form-label">Adresse du destinataire <span class="text-danger">*</span></label>
+          {{ form.destinataire_adresse }}
+          {% if form.destinataire_adresse.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_adresse.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.destinataire_telephone.id_for_label }}" class="form-label">Téléphone du destinataire</label>
+          {{ form.destinataire_telephone }}
+          {% if form.destinataire_telephone.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_telephone.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.destinataire_siret.id_for_label }}" class="form-label">SIRET (pour les entreprises)</label>
+          {{ form.destinataire_siret }}
+          {% if form.destinataire_siret.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.destinataire_siret.errors }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Informations complémentaires -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-file-alt"></i>
+        Informations complémentaires
+      </h3>
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.conditions_paiement.id_for_label }}" class="form-label">Conditions de paiement</label>
+          {{ form.conditions_paiement }}
+          {% if form.conditions_paiement.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.conditions_paiement.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+          {{ form.notes }}
+          {% if form.notes.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.notes.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Notes internes ou informations supplémentaires à afficher sur la facture</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Lignes de facture -->
+    {% if form.instance.facture_id %}
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-list"></i>
+        Lignes de facture
+      </h3>
+      
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Pour voir ou modifier les lignes de cette facture, veuillez d'abord enregistrer vos modifications, puis accéder à la page de détail de la facture.
+      </div>
+      
+      <div class="text-center mb-3">
+        <a href="{% url 'paiements:facture-detail' facture_id=form.instance.facture_id %}" class="btn btn-outline-primary">
+          <i class="fas fa-eye me-1"></i> Voir les détails de la facture
+        </a>
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Enregistrer
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Appliquer des classes Bootstrap aux champs du formulaire
+    const formControls = document.querySelectorAll('input, select, textarea');
+    formControls.forEach(function(element) {
+      if (element.tagName === 'SELECT') {
+        element.classList.add('form-select');
+      } else if (element.tagName === 'TEXTAREA') {
+        element.classList.add('form-control');
+        element.rows = 4;
+      } else {
+        element.classList.add('form-control');
+      }
+    });
+    
+    // Calculer le montant TTC
+    const montantHtInput = document.getElementById('{{ form.montant_ht.id_for_label }}');
+    const tauxTvaInput = document.getElementById('{{ form.taux_tva.id_for_label }}');
+    const montantTtcCalcInput = document.getElementById('montant_ttc_calcule');
+    
+    function updateMontantTtc() {
+      const montantHt = parseFloat(montantHtInput.value) || 0;
+      const tauxTva = parseFloat(tauxTvaInput.value) || 0;
+      
+      const montantTva = montantHt * (tauxTva / 100);
+      const montantTtc = montantHt + montantTva;
+      
+      montantTtcCalcInput.value = montantTtc.toFixed(2);
+    }
+    
+    // Mettre à jour le montant TTC lorsque les valeurs changent
+    montantHtInput.addEventListener('input', updateMontantTtc);
+    tauxTvaInput.addEventListener('input', updateMontantTtc);
+    
+    // Initialiser le calcul
+    updateMontantTtc();
+    
+    // Gérer le changement d'inscription
+    const inscriptionSelect = document.getElementById('{{ form.inscription.id_for_label }}');
+    const typeFactureSelect = document.getElementById('{{ form.type_facture.id_for_label }}');
+    const destinataireNomInput = document.getElementById('{{ form.destinataire_nom.id_for_label }}');
+    const destinataireAdresseInput = document.getElementById('{{ form.destinataire_adresse.id_for_label }}');
+    const destinataireEmailInput = document.getElementById('{{ form.destinataire_email.id_for_label }}');
+    const destinataireTelephoneInput = document.getElementById('{{ form.destinataire_telephone.id_for_label }}');
+    const destinataireSiretInput = document.getElementById('{{ form.destinataire_siret.id_for_label }}');
+    
+    if (inscriptionSelect) {
+      inscriptionSelect.addEventListener('change', function() {
+        const inscriptionId = this.value;
+        if (inscriptionId) {
+          // Dans un environnement réel, nous ferions une requête AJAX ici
+          // Pour l'instant, nous allons simuler ce comportement
+          console.log('Inscription sélectionnée:', inscriptionId);
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

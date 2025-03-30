@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ajouter une ligne - Facture {{ facture.numero_facture }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-title {
+    margin: 0;
+    font-size: 1.8rem;
+  }
+  
+  .form-section {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    color: #3a3a3a;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .facture-info {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-left: 3px solid #007bff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas fa-plus-circle"></i>
+      Ajouter une ligne à la facture
+    </h1>
+    <a href="{% url 'paiements:facture-detail' facture_id=facture.facture_id %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour à la facture
+    </a>
+  </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Informations sur la facture -->
+  <div class="facture-info">
+    <div class="row">
+      <div class="col-md-6">
+        <p><strong>Facture N°:</strong> {{ facture.numero_facture }}</p>
+        <p><strong>Date d'émission:</strong> {{ facture.date_emission|date:"d/m/Y" }}</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>Destinataire:</strong> {{ facture.destinataire_nom }}</p>
+        <p><strong>Montant total actuel:</strong> {{ facture.montant_ttc|floatformat:2 }} €</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Détails de la ligne -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        Détails de la ligne
+      </h3>
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="{{ form.description.id_for_label }}" class="form-label">Description <span class="text-danger">*</span></label>
+          {{ form.description }}
+          {% if form.description.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.description.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Description détaillée de l'article ou service</div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.quantite.id_for_label }}" class="form-label">Quantité <span class="text-danger">*</span></label>
+          {{ form.quantite }}
+          {% if form.quantite.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.quantite.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.prix_unitaire_ht.id_for_label }}" class="form-label">Prix unitaire HT (€) <span class="text-danger">*</span></label>
+          {{ form.prix_unitaire_ht }}
+          {% if form.prix_unitaire_ht.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.prix_unitaire_ht.errors }}
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label for="{{ form.taux_tva.id_for_label }}" class="form-label">Taux de TVA (%) <span class="text-danger">*</span></label>
+          {{ form.taux_tva }}
+          {% if form.taux_tva.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.taux_tva.errors }}
+          </div>
+          {% endif %}
+          <div class="form-text">Par défaut, le taux de TVA de la facture</div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Montant HT calculé (€)</label>
+          <input type="text" id="montant_ht_calcule" class="form-control" readonly>
+          <div class="form-text">Calculé automatiquement (Quantité × Prix unitaire)</div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Montant TVA calculé (€)</label>
+          <input type="text" id="montant_tva_calcule" class="form-control" readonly>
+          <div class="form-text">Calculé automatiquement (Montant HT × Taux TVA)</div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Montant TTC calculé (€)</label>
+          <input type="text" id="montant_ttc_calcule" class="form-control" readonly>
+          <div class="form-text">Calculé automatiquement (HT + TVA)</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <a href="{% url 'paiements:facture-detail' facture_id=facture.facture_id %}" class="btn btn-outline-secondary">
+        <i class="fas fa-times me-1"></i> Annuler
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i> Ajouter
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Appliquer des classes Bootstrap aux champs du formulaire
+    const formControls = document.querySelectorAll('input, select, textarea');
+    formControls.forEach(function(element) {
+      if (element.tagName === 'SELECT') {
+        element.classList.add('form-select');
+      } else if (element.tagName === 'TEXTAREA') {
+        element.classList.add('form-control');
+        element.rows = 3;
+      } else {
+        element.classList.add('form-control');
+      }
+    });
+    
+    // Calculer les montants
+    const quantiteInput = document.getElementById('{{ form.quantite.id_for_label }}');
+    const prixUnitaireInput = document.getElementById('{{ form.prix_unitaire_ht.id_for_label }}');
+    const tauxTvaInput = document.getElementById('{{ form.taux_tva.id_for_label }}');
+    const montantHtCalcInput = document.getElementById('montant_ht_calcule');
+    const montantTvaCalcInput = document.getElementById('montant_tva_calcule');
+    const montantTtcCalcInput = document.getElementById('montant_ttc_calcule');
+    
+    function updateMontants() {
+      const quantite = parseFloat(quantiteInput.value) || 0;
+      const prixUnitaire = parseFloat(prixUnitaireInput.value) || 0;
+      const tauxTva = parseFloat(tauxTvaInput.value) || 0;
+      
+      const montantHt = quantite * prixUnitaire;
+      const montantTva = montantHt * (tauxTva / 100);
+      const montantTtc = montantHt + montantTva;
+      
+      montantHtCalcInput.value = montantHt.toFixed(2);
+      montantTvaCalcInput.value = montantTva.toFixed(2);
+      montantTtcCalcInput.value = montantTtc.toFixed(2);
+    }
+    
+    // Mettre à jour les montants lorsque les valeurs changent
+    quantiteInput.addEventListener('input', updateMontants);
+    prixUnitaireInput.addEventListener('input', updateMontants);
+    tauxTvaInput.addEventListener('input', updateMontants);
+    
+    // Initialiser le calcul
+    updateMontants();
+  });
+</script>
+{% endblock %}

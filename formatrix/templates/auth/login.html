@@ -3,15 +3,106 @@
 
 {% block title %}Connexion - Formatrix{% endblock %}
 
+{% block extra_css %}
+<style>
+  .auth-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .auth-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+  
+  .auth-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    padding: 1.5rem;
+  }
+  
+  .auth-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .auth-option-btn {
+    flex: 1;
+    min-width: 180px;
+    padding: 12px 15px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .auth-option-btn:hover {
+    transform: translateY(-3px);
+  }
+  
+  .auth-option-btn.admin {
+    background-color: #343a40;
+    border-color: #343a40;
+  }
+  
+  .auth-option-btn.admin:hover {
+    background-color: #23272b;
+    border-color: #1d2124;
+  }
+  
+  .auth-option-btn.formateur {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+  
+  .auth-option-btn.formateur:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+  
+  .input-group-text {
+    width: 40px;
+    justify-content: center;
+  }
+  
+  .toggle-password {
+    cursor: pointer;
+  }
+  
+  .divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+  }
+  
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .divider span {
+    padding: 0 1rem;
+    color: #6c757d;
+    font-weight: 500;
+  }
+</style>
+{% endblock %}
+
 {% block guest_content %}
 <div class="container">
   <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5 mt-5">
-      <div class="card full-height shadow-lg">
-        <div class="card-header bg-primary">
-          <h4 class="card-title text-white mb-0 text-center">
+    <div class="col-md-6 col-lg-5 mt-5 mb-5">
+      <div class="card auth-card">
+        <div class="auth-header">
+          <h4 class="text-white mb-0 text-center">
             <i class="fas fa-sign-in-alt me-2"></i>Connexion
           </h4>
+          <p class="text-white-50 text-center mb-0 mt-2">Accédez à votre compte Formatrix</p>
         </div>
         <div class="card-body p-4">
           {% if form.errors %}
@@ -63,14 +154,20 @@
                 <i class="fas fa-sign-in-alt me-2"></i>Se connecter
               </button>
             </div>
-
-            <div class="text-center mt-4">
-              <p class="mb-2">Vous n'avez pas encore de compte ?</p>
-              <a href="{% url 'formateurs:formateur-register' 'formateur_secret_key_2024' %}" class="btn btn-outline-primary">
-                <i class="fas fa-user-plus me-2"></i>S'inscrire comme formateur
-              </a>
-            </div>
           </form>
+          
+          <div class="divider">
+            <span>Pas encore de compte ?</span>
+          </div>
+          
+          <div class="auth-options">
+            <a href="{% url 'admin-register' %}" class="btn btn-lg auth-option-btn admin text-white">
+              <i class="fas fa-user-shield me-2"></i>Administrateur
+            </a>
+            <a href="{% url 'formateurs:formateur-register' %}" class="btn btn-lg auth-option-btn formateur text-white">
+              <i class="fas fa-chalkboard-teacher me-2"></i>Formateur
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -103,29 +200,4 @@
     });
   });
 </script>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-  .toggle-password {
-    cursor: pointer;
-  }
-  
-  .form-control {
-    border-radius: 0 0.25rem 0.25rem 0;
-  }
-  
-  .input-group-text {
-    width: 40px;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .alert-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-  }
-</style>
 {% endblock %}

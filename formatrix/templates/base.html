@@ -233,6 +233,58 @@
               </div>
             </li>
             
+            <li class="nav-item {% if 'paiement' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#paiementsMenu" {% if 'paiement' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'paiement' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-money-bill-wave"></i>
+                <p>Paiements</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'paiement' in request.resolver_match.url_name %}show{% endif %}" id="paiementsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'paiements:tableau-bord' %}" class="{% if request.resolver_match.url_name == 'tableau-bord' %}active{% endif %}">
+                      <span class="sub-item">Tableau de bord</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:paiement-list' %}" class="{% if request.resolver_match.url_name == 'paiement-list' %}active{% endif %}">
+                      <span class="sub-item">Tous les paiements</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:paiement-create' %}" class="{% if request.resolver_match.url_name == 'paiement-create' %}active{% endif %}">
+                      <span class="sub-item">Ajouter un paiement</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:plan-list' %}" class="{% if request.resolver_match.url_name == 'plan-list' %}active{% endif %}">
+                      <span class="sub-item">Plans de paiement</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:paiement-formateur-list' %}" class="{% if request.resolver_match.url_name == 'paiement-formateur-list' %}active{% endif %}">
+                      <span class="sub-item">Paiements formateurs</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:paiement-formateur-create' %}" class="{% if request.resolver_match.url_name == 'paiement-formateur-create' %}active{% endif %}">
+                      <span class="sub-item">Payer un formateur</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:facture-list' %}" class="{% if request.resolver_match.url_name == 'facture-list' %}active{% endif %}">
+                      <span class="sub-item">Factures</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'paiements:generer-facture' %}" class="{% if request.resolver_match.url_name == 'generer-facture' %}active{% endif %}">
+                      <span class="sub-item">Générer une facture</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
             <li class="nav-section">
               <span class="sidebar-mini-icon">
                 <i class="fa fa-ellipsis-h"></i>
@@ -300,6 +352,45 @@
                   <li>
                     <a href="{% url 'formateurs:formateur-create' %}" class="{% if request.resolver_match.url_name == 'formateur-create' %}active{% endif %}">
                       <span class="sub-item">Ajouter un formateur</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            
+            <li class="nav-section">
+              <span class="sidebar-mini-icon">
+                <i class="fa fa-ellipsis-h"></i>
+              </span>
+              <h4 class="text-section">Analyses et rapports</h4>
+            </li>
+            
+            <li class="nav-item {% if 'rapport' in request.resolver_match.url_name %}active{% endif %}">
+              <a data-bs-toggle="collapse" href="#rapportsMenu" {% if 'rapport' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'rapport' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i>
+                <p>Rapports statistiques</p>
+                <span class="caret"></span>
+              </a>
+              <div class="collapse {% if 'rapport' in request.resolver_match.url_name %}show{% endif %}" id="rapportsMenu">
+                <ul class="nav nav-collapse">
+                  <li>
+                    <a href="{% url 'rapports:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                      <span class="sub-item">Tableau de bord</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'rapports:demographique' %}" class="{% if request.resolver_match.url_name == 'demographique' %}active{% endif %}">
+                      <span class="sub-item">Rapport démographique</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'rapports:ressources' %}" class="{% if request.resolver_match.url_name == 'ressources' %}active{% endif %}">
+                      <span class="sub-item">Utilisation des ressources</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="{% url 'rapports:clients' %}" class="{% if request.resolver_match.url_name == 'clients' %}active{% endif %}">
+                      <span class="sub-item">Rapport clients</span>
                     </a>
                   </li>
                 </ul>
@@ -436,7 +527,7 @@
                 <i class="fas fa-sign-in-alt me-1"></i>
                 <span>Connexion</span>
               </a>
-              <a href="{% url 'formateurs:formateur-register' 'formateur_secret_key_2024' %}" class="btn btn-primary">
+              <a href="{% url 'formateurs:formateur-register' %}" class="btn btn-primary">
                 <i class="fas fa-user-plus me-1"></i>
                 <span>Inscription</span>
               </a>
