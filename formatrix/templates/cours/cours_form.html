@@ -182,6 +182,7 @@
           {% include "includes/field_errors.html" with field=form.start_time %}
         </div>
 
+        {% if object.cours_id %}
         <div class="form-group {% if form.status.errors %}has-error{% endif %}">
           <label class="form-label" for="{{ form.status.id_for_label }}">
             <i class="fas fa-flag"></i>
@@ -190,7 +191,10 @@
           {{ form.status }}
           {% include "includes/field_errors.html" with field=form.status %}
         </div>
+        {% else %}
+        <input type="hidden" name="status" value="actif">
         <input type="hidden" name="statut_approbation" value="en_attente">
+        {% endif %}
       </div>
       
       <!-- Trainers -->

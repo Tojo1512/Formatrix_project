@@ -24,14 +24,18 @@ class ClientListView(LoginRequiredMixin, ListView):
         search = self.request.GET.get('search', '')
         ordering = self.request.GET.get('ordering', '-clientid')
         type_client = self.request.GET.get('type', '')
+        secteur = self.request.GET.get('secteur', '')
         ville = self.request.GET.get('ville', '')
         
         # Application des filtres de l'API
         if search:
             queryset = queryset.filter(nom_entite__icontains=search)
             
-        if type_client:
-            queryset = queryset.filter(typeclientid__typeclient=type_client)
+        if type_client and type_client != '':
+            queryset = queryset.filter(typeclientid__categorie=type_client)
+            
+        if secteur and secteur != '':
+            queryset = queryset.filter(secteur_activite=secteur)
             
         if ville:
             queryset = queryset.filter(ville=ville)
@@ -49,6 +53,7 @@ class ClientListView(LoginRequiredMixin, ListView):
             'search_query': self.request.GET.get('search', ''),
             'ordering': self.request.GET.get('ordering', '-clientid'),
             'type_filter': self.request.GET.get('type', ''),
+            'secteur_filter': self.request.GET.get('secteur', ''),
             'ville_filter': self.request.GET.get('ville', ''),
             'show_create_button': True,
             'create_url': '/clients/creer/',
@@ -58,6 +63,7 @@ class ClientListView(LoginRequiredMixin, ListView):
             'has_active_filters': bool(
                 self.request.GET.get('search', '') or 
                 self.request.GET.get('type', '') or 
+                self.request.GET.get('secteur', '') or
                 self.request.GET.get('ville', '')
             )
         })
