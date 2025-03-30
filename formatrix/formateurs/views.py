@@ -129,6 +129,7 @@ class FormateurRegistrationForm(UserCreationForm):
     date_naissance = forms.DateField(required=False, label="Date de naissance", widget=forms.DateInput(attrs={'type': 'date'}))
     adresse = forms.CharField(max_length=200, required=False, label="Adresse")
     ville = forms.CharField(max_length=100, required=False, label="Ville")
+    code_postal = forms.CharField(max_length=10, required=False, label="Code postal")
     type_formateur = forms.ChoiceField(choices=Formateur.TYPE_CHOICES, required=True, label="Type de formateur")
     niveau_expertise = forms.ChoiceField(choices=Formateur.NIVEAU_CHOICES, required=True, label="Niveau d'expertise")
     specialites = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=True, label="Spécialités")
@@ -140,7 +141,7 @@ class FormateurRegistrationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("username", "email", "password1", "password2", "nom", "prenom", "telephone", "date_naissance", 
-                 "adresse", "ville", "type_formateur", "niveau_expertise", "specialites", 
+                 "adresse", "ville", "code_postal", "type_formateur", "niveau_expertise", "specialites", 
                  "disponibilite", "cv", "photo", "notes")
         
     def save(self, commit=True):
@@ -150,32 +151,32 @@ class FormateurRegistrationForm(UserCreationForm):
             user.save()
         return user
 
-def formateur_register(request, registration_key):
-    if registration_key != settings.FORMATEUR_REGISTRATION_KEY:
-        messages.error(request, "Clé d'inscription invalide")
-        return redirect('home')
-        
+def formateur_register(request):
+    """
+    Vue pour l'inscription des formateurs.
+    Cette fonction gère à la fois la création d'un utilisateur dans auth.User
+    et d'un profil dans le modèle Formateur.
+    """
     if request.method == 'POST':
         form = FormateurRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                # Créer l'utilisateur
+                # Créer l'utilisateur auth.User
                 user = form.save()
-                print(f"Utilisateur créé : ID={user.id}, Username={user.username}, Email={user.email}")
                 
                 # Créer un formateur associé à cet utilisateur
                 formateur = Formateur(
-                    user=user,  # Associer explicitement l'utilisateur
+                    # Ne pas utiliser user=user car la colonne user_id n'existe pas encore
                     nom=form.cleaned_data.get('nom', ''),
                     prenom=form.cleaned_data.get('prenom', ''),
                     email=user.email,
                     telephone=form.cleaned_data.get('telephone', ''),
-                    date_naissance=form.cleaned_data.get('date_naissance', timezone.now().date()),
+                    date_naissance=form.cleaned_data.get('date_naissance'),
                     adresse=form.cleaned_data.get('adresse', ''),
                     ville=form.cleaned_data.get('ville', ''),
-                    type_formateur=form.cleaned_data.get('type_formateur', ''),
-                    niveau_expertise=form.cleaned_data.get('niveau_expertise', ''),
                     specialites=form.cleaned_data.get('specialites', ''),
+                    niveau_expertise=form.cleaned_data.get('niveau_expertise', ''),
+                    type_formateur=form.cleaned_data.get('type_formateur', ''),
                     disponibilite=form.cleaned_data.get('disponibilite', ''),
                     cv=form.cleaned_data.get('cv'),
                     photo=form.cleaned_data.get('photo'),
@@ -183,31 +184,16 @@ def formateur_register(request, registration_key):
                     statut='actif',
                     date_embauche=timezone.now().date()
                 )
-                
-                # Vérifier que l'utilisateur est bien associé avant de sauvegarder
-                if formateur.user is None:
-                    print("ERREUR : L'utilisateur n'est pas associé au formateur avant la sauvegarde")
-                    formateur.user = user
-                
                 formateur.save()
-                print(f"Formateur créé : ID={formateur.formateurid}, Nom={formateur.nom}, Prénom={formateur.prenom}, User ID={formateur.user_id}")
-                
-                # Double vérification après la sauvegarde
-                formateur.refresh_from_db()
-                if formateur.user_id != user.id:
-                    print(f"ERREUR : L'association n'a pas été sauvegardée correctement. Tentative de correction...")
-                    formateur.user = user
-                    formateur.save(update_fields=['user'])
-                    print(f"Correction effectuée : User ID maintenant = {formateur.user_id}")
                 
                 # Connecter l'utilisateur
                 login(request, user)
                 messages.success(request, "Inscription réussie ! Bienvenue sur Formatrix.")
+                
+                # Rediriger vers le dashboard formateur ou la page d'accueil
                 return redirect('formateurs:formateur-detail', pk=formateur.formateurid)
             except Exception as e:
-                print(f"ERREUR lors de l'inscription : {str(e)}")
                 messages.error(request, f"Une erreur est survenue lors de l'inscription : {str(e)}")
-                return render(request, 'formateurs/formateur_register.html', {'form': form})
         else:
             print(f"Erreurs de formulaire : {form.errors}")
     else:

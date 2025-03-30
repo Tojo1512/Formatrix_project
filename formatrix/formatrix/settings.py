@@ -71,6 +71,8 @@ INSTALLED_APPS = [
     'evaluations',
     'presences',
     'formateurs',
+    'paiements',
+    'rapports',  # Ajout de l'application rapports
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rapport d'utilisation des ressources{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Rapport d'utilisation des ressources</h1>
+        <div>
+            <a href="{% url 'rapports:dashboard' %}" class="btn btn-secondary">Retour au tableau de bord</a>
+            <a href="{% url 'rapports:export' 'ressources' %}" class="btn btn-success">Exporter en CSV</a>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Nombre de cours par formateur ({{ annee_courante }})</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="formateursChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Taux d'utilisation des lieux</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="lieuxChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Répartition des cours selon les horaires</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="horairesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Détails des cours par formateur</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Formateur</th>
+                                    <th>Nombre de cours ({{ annee_courante }})</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for formateur in cours_par_formateur %}
+                                <tr>
+                                    <td>{{ formateur.nom_formateur }}</td>
+                                    <td>{{ formateur.total_cours }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Détails d'utilisation des lieux</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Lieu</th>
+                                    <th>Nombre de séances</th>
+                                    <th>Pourcentage d'utilisation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lieu in lieux_utilisation %}
+                                <tr>
+                                    <td>{{ lieu.lieu }}</td>
+                                    <td>{{ lieu.total_seances }}</td>
+                                    <td>{{ lieu.pourcentage|floatformat:2 }}%</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Graphique des formateurs
+        const formateursCtx = document.getElementById('formateursChart').getContext('2d');
+        const formateursData = {
+            labels: [
+                {% for formateur in cours_par_formateur|slice:":10" %}
+                    '{{ formateur.nom_formateur }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Nombre de cours',
+                data: [
+                    {% for formateur in cours_par_formateur|slice:":10" %}
+                        {{ formateur.total_cours }},
+                    {% endfor %}
+                ],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+        
+        new Chart(formateursCtx, {
+            type: 'bar',
+            data: formateursData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Graphique des lieux
+        const lieuxCtx = document.getElementById('lieuxChart').getContext('2d');
+        const lieuxData = {
+            labels: [
+                {% for lieu in lieux_utilisation|slice:":10" %}
+                    '{{ lieu.lieu }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Pourcentage d\'utilisation',
+                data: [
+                    {% for lieu in lieux_utilisation|slice:":10" %}
+                        {{ lieu.pourcentage|floatformat:2 }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(153, 102, 255, 0.5)',
+                    'rgba(255, 159, 64, 0.5)',
+                    'rgba(199, 199, 199, 0.5)',
+                    'rgba(83, 102, 255, 0.5)',
+                    'rgba(40, 159, 64, 0.5)',
+                    'rgba(210, 199, 199, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(199, 199, 199, 1)',
+                    'rgba(83, 102, 255, 1)',
+                    'rgba(40, 159, 64, 1)',
+                    'rgba(210, 199, 199, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        
+        new Chart(lieuxCtx, {
+            type: 'pie',
+            data: lieuxData,
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Graphique des horaires
+        const horairesCtx = document.getElementById('horairesChart').getContext('2d');
+        const horairesData = {
+            labels: [
+                {% for horaire in repartition_horaires %}
+                    '{% if horaire.horaire == "pendant_bureau" %}Pendant heures de bureau{% elif horaire.horaire == "apres_bureau" %}Après heures de bureau{% elif horaire.horaire == "weekend" %}Weekend{% else %}{{ horaire.horaire }}{% endif %}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Nombre de cours',
+                data: [
+                    {% for horaire in repartition_horaires %}
+                        {{ horaire.total }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        
+        new Chart(horairesCtx, {
+            type: 'doughnut',
+            data: horairesData,
+            options: {
+                responsive: true
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

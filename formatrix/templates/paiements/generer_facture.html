@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Générer une facture - Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .form-container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .form-section {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    color: #3a3a3a;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  
+  .badge-type-individuelle {
+    background-color: #17a2b8;
+  }
+  
+  .badge-type-entreprise {
+    background-color: #6610f2;
+  }
+  
+  .badge-type-sponsor {
+    background-color: #fd7e14;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+  <div class="form-container">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+      <h1>
+        <i class="fas fa-file-invoice"></i>
+        {{ titre }}
+      </h1>
+      <a href="{% url 'paiements:facture-list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Retour à la liste
+      </a>
+    </div>
+
+    {% if messages %}
+    <div>
+      {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+        <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <p class="text-muted">Utilisez ce formulaire pour générer automatiquement une facture pour une inscription. Le système remplira automatiquement les informations en fonction du type d'inscription.</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <!-- Informations de base -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-info-circle"></i>
+          Informations de base
+        </h3>
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <label for="{{ form.inscription.id_for_label }}" class="form-label">Inscription <span class="text-danger">*</span></label>
+            {{ form.inscription }}
+            {% if form.inscription.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.inscription.errors }}
+            </div>
+            {% endif %}
+            <div class="form-text">Sélectionnez l'inscription pour laquelle vous souhaitez générer une facture</div>
+          </div>
+          
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.montant_ht.id_for_label }}" class="form-label">Montant HT (€) <span class="text-danger">*</span></label>
+            {{ form.montant_ht }}
+            {% if form.montant_ht.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.montant_ht.errors }}
+            </div>
+            {% endif %}
+            <div class="form-text">Montant hors taxes de la facture</div>
+          </div>
+          
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.taux_tva.id_for_label }}" class="form-label">Taux de TVA (%) <span class="text-danger">*</span></label>
+            {{ form.taux_tva }}
+            {% if form.taux_tva.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.taux_tva.errors }}
+            </div>
+            {% endif %}
+            <div class="form-text">Définissez à 0 pour une facture sans TVA</div>
+          </div>
+          
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.type_facture.id_for_label }}" class="form-label">Type de facture <span class="text-danger">*</span></label>
+            {{ form.type_facture }}
+            {% if form.type_facture.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.type_facture.errors }}
+            </div>
+            {% endif %}
+            <div class="form-text">Le type de facture sera automatiquement déterminé en fonction du type d'inscription</div>
+          </div>
+          
+          <div class="col-md-6 mb-3">
+            <label for="{{ form.statut_initial.id_for_label }}" class="form-label">Statut initial <span class="text-danger">*</span></label>
+            {{ form.statut_initial }}
+            {% if form.statut_initial.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.statut_initial.errors }}
+            </div>
+            {% endif %}
+            <div class="form-text">Statut initial de la facture</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Options -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-cog"></i>
+          Options
+        </h3>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <div class="form-check">
+              {{ form.generer_pdf }}
+              <label class="form-check-label" for="{{ form.generer_pdf.id_for_label }}">
+                Générer le PDF de la facture
+              </label>
+              {% if form.generer_pdf.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.generer_pdf.errors }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="col-md-6 mb-3">
+            <div class="form-check">
+              {{ form.envoyer_email }}
+              <label class="form-check-label" for="{{ form.envoyer_email.id_for_label }}">
+                Envoyer la facture par email
+              </label>
+              {% if form.envoyer_email.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.envoyer_email.errors }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-file-invoice me-1"></i> Générer la facture
+        </button>
+      </div>
+    </form>
+    
+    <!-- Informations sur les types de facture -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <i class="fas fa-info-circle me-1"></i>
+        Informations sur les types de facture
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card mb-3">
+              <div class="card-header bg-light">
+                <span class="badge badge-type-individuelle">Individuelle</span>
+              </div>
+              <div class="card-body">
+                <p>Les factures individuelles sont destinées aux apprenants qui s'inscrivent à titre personnel.</p>
+                <p><strong>Destinataire :</strong> Le client (personne physique)</p>
+                <p><strong>Contenu :</strong> Détails de la formation, montant, TVA</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="card mb-3">
+              <div class="card-header bg-light">
+                <span class="badge badge-type-entreprise">Entreprise</span>
+              </div>
+              <div class="card-body">
+                <p>Les factures entreprise sont destinées aux organisations qui financent la formation de leurs employés.</p>
+                <p><strong>Destinataire :</strong> L'entreprise (personne morale)</p>
+                <p><strong>Contenu :</strong> Détails de la formation, informations sur l'apprenant, montant, TVA, SIRET</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="card mb-3">
+              <div class="card-header bg-light">
+                <span class="badge badge-type-sponsor">Sponsor</span>
+              </div>
+              <div class="card-body">
+                <p>Les factures sponsor sont destinées aux tiers qui financent la formation d'un apprenant.</p>
+                <p><strong>Destinataire :</strong> Le sponsor (personne morale ou physique)</p>
+                <p><strong>Contenu :</strong> Détails de la formation, informations sur l'apprenant, montant, TVA</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Fonction pour mettre à jour le montant en fonction de l'inscription sélectionnée
+  function updateMontantFromInscription(inscriptionId) {
+    if (!inscriptionId) return;
+    
+    // Appel AJAX pour récupérer les informations de l'inscription
+    fetch(`/paiements/api/inscription/${inscriptionId}/prix/`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Mettre à jour le champ montant_ht
+          document.getElementById('id_montant_ht').value = data.montant_ht;
+        }
+      })
+      .catch(error => console.error('Erreur lors de la récupération du prix:', error));
+  }
+  
+  // Initialiser le montant au chargement de la page
+  document.addEventListener('DOMContentLoaded', function() {
+    const inscriptionSelect = document.getElementById('id_inscription');
+    if (inscriptionSelect && inscriptionSelect.value) {
+      updateMontantFromInscription(inscriptionSelect.value);
+    }
+    
+    // Appliquer des classes Bootstrap aux champs du formulaire
+    const formControls = document.querySelectorAll('input, select, textarea');
+    formControls.forEach(function(element) {
+      if (!element.classList.contains('form-check-input')) {
+        element.classList.add('form-control');
+      }
+    });
+    
+    // Appliquer des classes spécifiques aux checkboxes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(function(checkbox) {
+      checkbox.classList.remove('form-control');
+      checkbox.classList.add('form-check-input');
+    });
+    
+    // Ajouter des événements pour les champs spécifiques
+    if (inscriptionSelect) {
+      inscriptionSelect.addEventListener('change', function() {
+        const selectedType = this.options[this.selectedIndex].getAttribute('data-type');
+        if (selectedType) {
+          document.getElementById('id_type_facture').value = selectedType;
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -23,8 +23,7 @@ class Formateur(models.Model):
     ]
 
     formateurid = models.AutoField(primary_key=True)
-    # Nous commentons temporairement cette relation pour éviter les erreurs
-    # user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='formateur_profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='formateur_profile')
     nom = models.CharField(max_length=100, verbose_name="Nom")
     prenom = models.CharField(max_length=100, verbose_name="Prénom")
     email = models.EmailField(unique=True, verbose_name="Email")

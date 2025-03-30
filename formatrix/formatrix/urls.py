@@ -50,6 +50,8 @@ urlpatterns = [
     path('clients/', include(('clients.urls', 'clients'))),
     path('inscriptions/', include(('inscriptions.urls', 'inscriptions'))),
     path('lieux/', include(('lieux.urls', 'lieux'))),  # Ajout de l'URL pour les templates de lieux
+    path('paiements/', include(('paiements.urls', 'paiements'))),  # Ajout de l'URL pour les paiements
+    path('rapports/', include(('rapports.urls', 'rapports'))),  # Ajout de l'URL pour les rapports
     
     path('accounts/', include('django.contrib.auth.urls')),
     path('register/', register_view, name='register'),

@@ -75,6 +75,11 @@ class AdminRegistrationForm(UserCreationForm):
         return user
 
 def home_view(request):
+    # Si l'utilisateur n'est pas connecté, afficher la page d'accueil avec les deux options
+    if not request.user.is_authenticated:
+        return render(request, 'welcome.html')
+    
+    # Si l'utilisateur est connecté, afficher le tableau de bord
     context = {}
     
     # Compter les entités principales
@@ -156,7 +161,8 @@ def home_view(request):
     return render(request, 'home.html', context)
 
 def register_view(request):
-    return redirect('formateurs:formateur-register', registration_key=settings.FORMATEUR_REGISTRATION_KEY)
+    """Redirige vers la page d'inscription formateur"""
+    return redirect('formateurs:formateur-register')
 
 def admin_register_view(request):
     if request.method == 'POST':

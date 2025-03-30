@@ -1,0 +1,377 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord des rapports{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+    .stat-card .card-body {
+        padding: 1.5rem;
+    }
+    .stat-card .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .stat-card .card-text {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+        position: absolute;
+        right: 1.5rem;
+        top: 1.5rem;
+    }
+    .report-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        height: 100%;
+    }
+    .report-card:hover {
+        transform: translateY(-5px);
+    }
+    .report-card .card-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .report-card .card-text {
+        margin-bottom: 1.5rem;
+        color: #6c757d;
+    }
+    .chart-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .chart-card .card-header {
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+    }
+    .btn-export {
+        background-color: transparent;
+        border: 1px solid #6c757d;
+        color: #6c757d;
+        transition: all 0.3s ease;
+    }
+    .btn-export:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+    .dashboard-header {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, #007bff, #6610f2);
+    }
+    .table-responsive {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="dashboard-header">
+        <h1 class="mb-2">Tableau de bord des rapports</h1>
+        <p class="text-muted">Vue d'ensemble des statistiques et rapports disponibles</p>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-user-graduate stat-icon"></i>
+                    <h5 class="card-title">Apprenants</h5>
+                    <h2 class="card-text">{{ total_apprenants }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-book stat-icon"></i>
+                    <h5 class="card-title">Cours</h5>
+                    <h2 class="card-text">{{ total_cours }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card bg-info text-white">
+                <div class="card-body">
+                    <i class="fas fa-clipboard-list stat-icon"></i>
+                    <h5 class="card-title">Inscriptions</h5>
+                    <h2 class="card-text">{{ total_inscriptions }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card stat-card bg-warning text-dark">
+                <div class="card-body">
+                    <i class="fas fa-calendar-alt stat-icon"></i>
+                    <h5 class="card-title">Séances</h5>
+                    <h2 class="card-text">{{ total_seances }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card chart-card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Rapports disponibles</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary text-white p-3 me-3">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Rapport démographique</h5>
+                                    </div>
+                                    <p class="card-text">Statistiques sur les apprenants par genre, âge et niveau académique.</p>
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{% url 'rapports:demographique' %}" class="btn btn-primary">
+                                            <i class="fas fa-chart-pie me-1"></i> Voir
+                                        </a>
+                                        <a href="{% url 'rapports:export' 'demographique' %}" class="btn btn-export">
+                                            <i class="fas fa-download me-1"></i> CSV
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-success text-white p-3 me-3">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Rapport ressources</h5>
+                                    </div>
+                                    <p class="card-text">Analyse de l'utilisation des formateurs, lieux et horaires.</p>
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{% url 'rapports:ressources' %}" class="btn btn-success">
+                                            <i class="fas fa-chart-bar me-1"></i> Voir
+                                        </a>
+                                        <a href="{% url 'rapports:export' 'ressources' %}" class="btn btn-export">
+                                            <i class="fas fa-download me-1"></i> CSV
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card report-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-info text-white p-3 me-3">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Rapport clients</h5>
+                                    </div>
+                                    <p class="card-text">Chiffre d'affaires par client et nombre de cours par client/apprenant.</p>
+                                    <div class="d-flex justify-content-between">
+                                        <a href="{% url 'rapports:clients' %}" class="btn btn-info text-white">
+                                            <i class="fas fa-chart-area me-1"></i> Voir
+                                        </a>
+                                        <a href="{% url 'rapports:export' 'clients' %}" class="btn btn-export">
+                                            <i class="fas fa-download me-1"></i> CSV
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-md-6 mb-4">
+            <div class="card chart-card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-venus-mars me-2"></i>Répartition par genre</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="genreChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card chart-card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-birthday-cake me-2"></i>Répartition par âge</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="ageChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card chart-card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Cours les plus populaires</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Cours</th>
+                                    <th>Type</th>
+                                    <th>Inscriptions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cours in cours_populaires %}
+                                <tr>
+                                    <td>{{ cours.nom_cours }}</td>
+                                    <td><span class="badge bg-secondary">{{ cours.get_type_cours_display }}</span></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     style="width: {{ cours.total_inscriptions }}0%;" 
+                                                     aria-valuenow="{{ cours.total_inscriptions }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="10"></div>
+                                            </div>
+                                            <span>{{ cours.total_inscriptions }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">Aucun cours disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Graphique de répartition par genre
+        const genreCtx = document.getElementById('genreChart').getContext('2d');
+        const genreData = {
+            labels: [
+                {% for item in repartition_genre %}
+                    '{{ item.sexe|default:"Non spécifié" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Nombre d\'apprenants',
+                data: [
+                    {% for item in repartition_genre %}
+                        {{ item.total }},
+                    {% endfor %}
+                ],
+                backgroundColor: ['#3498db', '#e74c3c', '#9b59b6'],
+                borderWidth: 0
+            }]
+        };
+        
+        new Chart(genreCtx, {
+            type: 'doughnut',
+            data: genreData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label === 'M') label = 'Homme';
+                                if (label === 'F') label = 'Femme';
+                                if (label === 'A') label = 'Autre';
+                                return label + ': ' + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Graphique de répartition par âge
+        const ageCtx = document.getElementById('ageChart').getContext('2d');
+        const ageData = {
+            labels: [
+                {% for item in repartition_age %}
+                    '{{ item.categorie_age|default:"Non spécifié" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Nombre d\'apprenants',
+                data: [
+                    {% for item in repartition_age %}
+                        {{ item.total }},
+                    {% endfor %}
+                ],
+                backgroundColor: ['#2ecc71', '#f39c12', '#1abc9c'],
+                borderWidth: 0
+            }]
+        };
+        
+        new Chart(ageCtx, {
+            type: 'pie',
+            data: ageData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,556 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rapport clients{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-header {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .report-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, #007bff, #6610f2);
+    }
+    .chart-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
+    .chart-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+    .chart-card .card-header {
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+        padding: 1rem 1.25rem;
+    }
+    .chart-card .card-body {
+        padding: 1.5rem;
+    }
+    .table-card {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .table-card .card-header {
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+        padding: 1rem 1.25rem;
+    }
+    .table-responsive {
+        border-radius: 0 0 10px 10px;
+        overflow: hidden;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    .btn-action {
+        border-radius: 50px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .btn-export {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .btn-export:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    .btn-back {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    .btn-back:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+    .revenue-badge {
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        display: inline-block;
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+    }
+    .course-badge {
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        display: inline-block;
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+    .progress-thin {
+        height: 6px;
+        border-radius: 3px;
+    }
+    .client-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .learner-name {
+        font-weight: 600;
+        color: #8e44ad;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="report-header d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="mb-2">Rapport clients</h1>
+            <p class="text-muted">Analyse du chiffre d'affaires et du nombre de cours par client et apprenant</p>
+        </div>
+        <div>
+            <a href="{% url 'rapports:dashboard' %}" class="btn btn-action btn-back text-white me-2">
+                <i class="fas fa-arrow-left me-1"></i> Tableau de bord
+            </a>
+            <a href="{% url 'rapports:export' 'clients' %}" class="btn btn-action btn-export text-white">
+                <i class="fas fa-file-download me-1"></i> Exporter CSV
+            </a>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card chart-card">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-chart-bar me-2"></i> Chiffre d'affaires par client
+                </div>
+                <div class="card-body">
+                    <canvas id="chiffreAffairesChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card chart-card">
+                <div class="card-header bg-info text-white">
+                    <i class="fas fa-building me-2"></i> Nombre de cours par client
+                </div>
+                <div class="card-body">
+                    <canvas id="coursClientChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card chart-card">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-user-graduate me-2"></i> Nombre de cours par apprenant
+                </div>
+                <div class="card-body">
+                    <canvas id="coursApprenantChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card table-card">
+                <div class="card-header bg-warning text-dark">
+                    <i class="fas fa-money-bill-wave me-2"></i> Détails du chiffre d'affaires par client
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th class="text-end">Chiffre d'affaires</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for client in chiffre_affaires %}
+                                <tr>
+                                    <td>
+                                        <span class="client-name">
+                                            <i class="fas fa-building me-2"></i>
+                                            {{ client.destinataire_nom }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span class="revenue-badge">
+                                            <i class="fas fa-coins me-1"></i>
+                                            {{ client.total }} Rs
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card table-card">
+                <div class="card-header bg-danger text-white">
+                    <i class="fas fa-briefcase me-2"></i> Détails des cours par client
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Nombre de cours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for client in cours_par_client %}
+                                <tr>
+                                    <td>
+                                        <span class="client-name">
+                                            <i class="fas fa-building me-2"></i>
+                                            {{ client.client__nom_entite }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2 progress-thin">
+                                                <div class="progress-bar bg-danger" role="progressbar" 
+                                                     style="width: {{ client.total_cours }}0%;" 
+                                                     aria-valuenow="{{ client.total_cours }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="10"></div>
+                                            </div>
+                                            <span class="course-badge">{{ client.total_cours }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card table-card">
+                <div class="card-header bg-dark text-white">
+                    <i class="fas fa-user-friends me-2"></i> Détails des cours par apprenant
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Apprenant</th>
+                                    <th>Nombre de cours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for apprenant in cours_par_apprenant %}
+                                <tr>
+                                    <td>
+                                        <span class="learner-name">
+                                            <i class="fas fa-user me-2"></i>
+                                            {{ apprenant.apprenant__nom_apprenant }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2 progress-thin">
+                                                <div class="progress-bar bg-dark" role="progressbar" 
+                                                     style="width: {{ apprenant.total_cours }}0%;" 
+                                                     aria-valuenow="{{ apprenant.total_cours }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="10"></div>
+                                            </div>
+                                            <span class="course-badge">{{ apprenant.total_cours }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center">Aucune donnée disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuration des couleurs
+        const colors = {
+            revenue: {
+                bg: 'rgba(52, 152, 219, 0.7)',
+                border: 'rgba(52, 152, 219, 1)'
+            },
+            client: {
+                bg: 'rgba(46, 204, 113, 0.7)',
+                border: 'rgba(46, 204, 113, 1)'
+            },
+            learner: {
+                bg: 'rgba(155, 89, 182, 0.7)',
+                border: 'rgba(155, 89, 182, 1)'
+            }
+        };
+        
+        // Graphique du chiffre d'affaires par client
+        const chiffreAffairesCtx = document.getElementById('chiffreAffairesChart').getContext('2d');
+        const chiffreAffairesData = {
+            labels: [
+                {% for client in chiffre_affaires|slice:":10" %}
+                    '{{ client.destinataire_nom }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Chiffre d\'affaires (Rs)',
+                data: [
+                    {% for client in chiffre_affaires|slice:":10" %}
+                        {{ client.total }},
+                    {% endfor %}
+                ],
+                backgroundColor: colors.revenue.bg,
+                borderColor: colors.revenue.border,
+                borderWidth: 2,
+                borderRadius: 5,
+                barPercentage: 0.7
+            }]
+        };
+        
+        new Chart(chiffreAffairesCtx, {
+            type: 'bar',
+            data: chiffreAffairesData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 15,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw + ' Rs';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' Rs';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Graphique du nombre de cours par client
+        const coursClientCtx = document.getElementById('coursClientChart').getContext('2d');
+        const coursClientData = {
+            labels: [
+                {% for client in cours_par_client|slice:":10" %}
+                    '{{ client.client__nom_entite }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Nombre de cours',
+                data: [
+                    {% for client in cours_par_client|slice:":10" %}
+                        {{ client.total_cours }},
+                    {% endfor %}
+                ],
+                backgroundColor: colors.client.bg,
+                borderColor: colors.client.border,
+                borderWidth: 2,
+                borderRadius: 5,
+                barPercentage: 0.7
+            }]
+        };
+        
+        new Chart(coursClientCtx, {
+            type: 'bar',
+            data: coursClientData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 15,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Graphique du nombre de cours par apprenant
+        const coursApprenantCtx = document.getElementById('coursApprenantChart').getContext('2d');
+        const coursApprenantData = {
+            labels: [
+                {% for apprenant in cours_par_apprenant|slice:":10" %}
+                    '{{ apprenant.apprenant__nom_apprenant }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Nombre de cours',
+                data: [
+                    {% for apprenant in cours_par_apprenant|slice:":10" %}
+                        {{ apprenant.total_cours }},
+                    {% endfor %}
+                ],
+                backgroundColor: colors.learner.bg,
+                borderColor: colors.learner.border,
+                borderWidth: 2,
+                borderRadius: 5,
+                barPercentage: 0.7
+            }]
+        };
+        
+        new Chart(coursApprenantCtx, {
+            type: 'bar',
+            data: coursApprenantData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 15,
+                        cornerRadius: 8,
+                        displayColors: true
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Bienvenue sur Formatrix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .welcome-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+  }
+  
+  .welcome-card {
+    max-width: 900px;
+    width: 100%;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+  
+  .welcome-header {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+  }
+  
+  .welcome-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .welcome-header p {
+    font-size: 1.1rem;
+    color: #6c757d;
+  }
+  
+  .welcome-body {
+    padding: 2rem;
+  }
+  
+  .user-types {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .user-type-card {
+    flex: 1;
+    min-width: 300px;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+  }
+  
+  .user-type-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-type-card.admin {
+    border-top: 5px solid #0d6efd;
+  }
+  
+  .user-type-card.formateur {
+    border-top: 5px solid #28a745;
+  }
+  
+  .user-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 2.5rem;
+  }
+  
+  .user-icon.admin {
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+  }
+  
+  .user-icon.formateur {
+    color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+  
+  .user-type-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .user-type-card p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+    min-height: 50px;
+  }
+  
+  .btn-connect {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-connect:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+</style>
+{% endblock %}
+
+{% block guest_content %}
+<div class="welcome-container">
+  <div class="welcome-card">
+    <div class="welcome-header">
+      <h1>Formatrix</h1>
+      <p>Plateforme de gestion de formations professionnelles</p>
+    </div>
+    <div class="welcome-body">
+      <div class="user-types">
+        <div class="user-type-card admin">
+          <div class="user-icon admin">
+            <i class="fas fa-user-shield"></i>
+          </div>
+          <h3>Administrateur</h3>
+          <p>Accédez à toutes les fonctionnalités d'administration de la plateforme.</p>
+          <a href="{% url 'login' %}" class="btn btn-primary btn-connect">
+            <i class="fas fa-sign-in-alt me-2"></i>Connexion
+          </a>
+        </div>
+        
+        <div class="user-type-card formateur">
+          <div class="user-icon formateur">
+            <i class="fas fa-chalkboard-teacher"></i>
+          </div>
+          <h3>Formateur</h3>
+          <p>Gérez vos cours et suivez vos apprenants.</p>
+          <a href="{% url 'login' %}" class="btn btn-success btn-connect">
+            <i class="fas fa-sign-in-alt me-2"></i>Connexion
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
