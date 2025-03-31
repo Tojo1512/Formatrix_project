@@ -102,55 +102,63 @@ def home_view(request):
     upcoming_seances = Seance.objects.filter(date__gte=today, date__lte=next_week)
     context['upcoming_seances_count'] = upcoming_seances.count()
     
-    # Données pour le graphique des séances à venir
-    days = [(today + timedelta(days=i)).strftime('%d/%m') for i in range(7)]
-    counts = []
-    for i in range(7):
-        day = today + timedelta(days=i)
-        count = upcoming_seances.filter(date=day).count()
-        counts.append(count)
+    # AMÉLIORATION 1: Données pour le donut chart des statuts de sessions
+    # Définir l'ordre et les traductions françaises des statuts
+    status_translations = {
+        'Not started': 'Non commencé',
+        'In progress': 'En cours',
+        'Completed': 'Terminé',
+        'Cancelled': 'Annulé'
+    }
     
-    context['upcoming_days'] = json.dumps(days)
-    context['upcoming_counts'] = json.dumps(counts)
+    # Obtenir tous les statuts possibles et leurs nombres
+    statut_counts_dict = {}
+    for status_choice in Seance.STATUS_CHOICES:
+        status_key, status_label = status_choice
+        translated_label = status_translations.get(status_label, status_label)
+        count = Seance.objects.filter(statut=status_key).count()
+        statut_counts_dict[translated_label] = count
     
-    # Données pour le graphique principal
-    months = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"]
-    cours_mensuel = [0] * 12
-    seances_mensuel = [0] * 12
-    inscriptions_mensuel = [0] * 12
+    # Créer les listes dans un ordre spécifique
+    ordered_status = ['Non commencé', 'En cours', 'Terminé', 'Annulé']
+    session_status_labels = []
+    session_status_counts = []
     
-    # Agrégation par mois pour chaque entité
-    current_year = timezone.now().year
+    for status in ordered_status:
+        if status in statut_counts_dict:
+            session_status_labels.append(status)
+            session_status_counts.append(statut_counts_dict[status])
     
-    # Cours par mois (uniquement pour l'année en cours)
-    for cours in Cours.objects.filter(created_at__year=current_year):
-        if hasattr(cours, 'created_at'):
-            creation_month = cours.created_at.month - 1
-            if 0 <= creation_month < 12:
-                cours_mensuel[creation_month] += 1
+    context['session_status_labels'] = json.dumps(session_status_labels)
+    context['session_status_counts'] = json.dumps(session_status_counts)
     
-    # Séances par mois (uniquement pour l'année en cours)
-    for seance in Seance.objects.filter(date__year=current_year):
-        seance_month = seance.date.month - 1
-        if 0 <= seance_month < 12:
-            seances_mensuel[seance_month] += 1
+    # AMÉLIORATION 2: Données pour le bar chart des heures de formation par formateur
+    # Get top 10 formateurs by total training hours
+    formateurs_with_hours = Formateur.objects.annotate(
+        total_seances=Count('seances_assignees', distinct=True)
+    ).order_by('-total_seances')[:10]
+    
+    formateur_names = []
+    formateur_heures = []
+    
+    for formateur in formateurs_with_hours:
+        formateur_names.append(formateur.get_full_name())
+        # Calculate total duration in months (as defined in the model)
+        total_duree = 0
+        for seance in formateur.seances_assignees.all():
+            if hasattr(seance, 'duree') and seance.duree:
+                # La durée est en mois, on la convertit en heures (approx 160h/mois)
+                total_duree += seance.duree * 160
+        formateur_heures.append(round(total_duree, 1))
+    
+    context['formateur_names'] = json.dumps(formateur_names)
+    context['formateur_heures'] = json.dumps(formateur_heures)
     
     # Dernières inscriptions
     latest_inscriptions = Inscription.objects.all().order_by('-date_inscription')[:5]
     context['latest_inscriptions'] = latest_inscriptions
     
-    # Inscriptions par mois (uniquement pour l'année en cours)
-    for inscription in Inscription.objects.filter(date_inscription__year=current_year):
-        if hasattr(inscription, 'date_inscription'):
-            inscription_month = inscription.date_inscription.month - 1
-            if 0 <= inscription_month < 12:
-                inscriptions_mensuel[inscription_month] += 1
-    
-    context['cours_mensuel'] = json.dumps(cours_mensuel)
-    context['seances_mensuel'] = json.dumps(seances_mensuel)
-    context['inscriptions_mensuel'] = json.dumps(inscriptions_mensuel)
-    
-    # Données pour le sparkline des formateurs
+    # Données pour le sparkline des formateurs (keeping this for compatibility)
     activities = [0] * 14
     for i in range(14):
         day = today - timedelta(days=13-i)

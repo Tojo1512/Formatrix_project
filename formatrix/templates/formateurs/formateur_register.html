@@ -1390,4 +1390,55 @@
     
     // Update step indicators
     document.getElementById(`step-${currentStep}-indicator`).classList.remove('active');
-    document.getElementById(`
+    document.getElementById(`step-${prevStep}-indicator`).classList.add('active');
+    
+    // Update progress bar
+    updateProgressBar(prevStep);
+    
+    // Scroll to top
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+  
+  // Function to update progress bar
+  function updateProgressBar(step) {
+    const totalSteps = 4; // Total number of steps
+    const progressPercentage = (step - 1) / (totalSteps - 1) * 100;
+    document.querySelector('.progress-bar-fill').style.width = `${progressPercentage}%`;
+  }
+  
+  // Basic validation function for each step
+  function validateStep(step) {
+    // You can add specific validation for each step
+    // For now, we'll just return true to allow progression
+    return true;
+  }
+  
+  // Update summary information
+  function updateRecapInfo() {
+    // Get relevant field values and update summary
+    const fullname = document.getElementById('id_prenom').value + ' ' + document.getElementById('id_nom').value;
+    document.getElementById('recap-fullname').textContent = fullname;
+    document.getElementById('recap-email').textContent = document.getElementById('id_email').value;
+    document.getElementById('recap-username').textContent = document.getElementById('id_username').value;
+    document.getElementById('recap-telephone').textContent = document.getElementById('id_telephone').value || 'Not specified';
+    
+    // Other fields
+    const speciality = document.getElementById('id_specialites').value || 'Not specified';
+    document.getElementById('recap-specialites').textContent = speciality;
+    
+    const trainerType = document.getElementById('id_type_formateur');
+    const trainerTypeText = trainerType.options[trainerType.selectedIndex].text;
+    document.getElementById('recap-type').textContent = trainerTypeText;
+    
+    const expertiseLevel = document.getElementById('id_niveau_expertise');
+    const expertiseLevelText = expertiseLevel.options[expertiseLevel.selectedIndex].text;
+    document.getElementById('recap-niveau').textContent = expertiseLevelText;
+    
+    const disponibilite = document.getElementById('id_disponibilite').value || 'Not specified';
+    document.getElementById('recap-disponibilite').textContent = disponibilite;
+  }
+</script>
+{% endblock %}

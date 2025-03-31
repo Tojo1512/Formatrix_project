@@ -156,13 +156,13 @@
         <div class="card shadow-sm h-100">
           <div class="card-header bg-gradient-primary text-white">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0 text-white">Upcoming Sessions</h5>
-              <span class="badge bg-light text-primary">{{ upcoming_seances_count }} sessions in the next 7 days</span>
+              <h5 class="mb-0 text-white">Répartition des Sessions</h5>
+              <span class="badge bg-light text-primary">{{ upcoming_seances_count }} sessions dans les 7 prochains jours</span>
             </div>
           </div>
           <div class="card-body">
             <div class="chart-container" style="height: 300px">
-              <canvas id="upcomingSessionsChart"></canvas>
+              <canvas id="sessionStatusChart"></canvas>
             </div>
           </div>
         </div>
@@ -172,13 +172,13 @@
         <div class="card shadow-sm h-100">
           <div class="card-header bg-gradient-info text-white">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0 text-white">Trainer Activity</h5>
-              <span class="badge bg-light text-info">{{ formateurs_count }} active trainers</span>
+              <h5 class="mb-0 text-white">Activité des Formateurs</h5>
+              <span class="badge bg-light text-info">{{ formateurs_count }} formateurs actifs</span>
             </div>
           </div>
           <div class="card-body">
             <div class="chart-container" style="height: 300px">
-              <canvas id="formateursActivityChart"></canvas>
+              <canvas id="formateurHeuresChart"></canvas>
             </div>
           </div>
         </div>
@@ -526,17 +526,87 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     {% if user.is_authenticated %}
-    // Chart for upcoming sessions
-    var upcomingCtx = document.getElementById('upcomingSessionsChart').getContext('2d');
-    var upcomingChart = new Chart(upcomingCtx, {
+    // Donut chart pour la répartition des sessions par statut
+    var sessionStatusCtx = document.getElementById('sessionStatusChart').getContext('2d');
+    var sessionStatusChart = new Chart(sessionStatusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: {{ session_status_labels|safe }},
+        datasets: [{
+          data: {{ session_status_counts|safe }},
+          backgroundColor: [
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(153, 102, 255, 0.7)'
+          ],
+          borderColor: [
+            'rgba(75, 192, 192, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(153, 102, 255, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                var label = context.label || '';
+                var value = context.raw || 0;
+                var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                var percentage = Math.round((value / total) * 100);
+                return label + ': ' + value + ' (' + percentage + '%)';
+              }
+            }
+          }
+        },
+        cutout: '60%'
+      }
+    });
+    
+    // Bar chart pour les heures par formateur
+    var formateurHeuresCtx = document.getElementById('formateurHeuresChart').getContext('2d');
+    var formateurHeuresChart = new Chart(formateurHeuresCtx, {
       type: 'bar',
       data: {
-        labels: {{ upcoming_days|safe }},
+        labels: {{ formateur_names|safe }},
         datasets: [{
-          label: 'Scheduled sessions',
-          data: {{ upcoming_counts|safe }},
-          backgroundColor: 'rgba(54, 162, 235, 0.5)',
-          borderColor: 'rgba(54, 162, 235, 1)',
+          label: 'Heures de formation',
+          data: {{ formateur_heures|safe }},
+          backgroundColor: [
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(153, 102, 255, 0.7)',
+            'rgba(255, 99, 132, 0.7)',
+            'rgba(255, 159, 64, 0.7)',
+            'rgba(201, 203, 207, 0.7)',
+            'rgba(54, 162, 235, 0.7)',
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(255, 206, 86, 0.7)'
+          ],
+          borderColor: [
+            'rgba(54, 162, 235, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(201, 203, 207, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 206, 86, 1)'
+          ],
           borderWidth: 1
         }]
       },
@@ -546,42 +616,27 @@
         scales: {
           y: {
             beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Heures'
+            }
+          },
+          x: {
             ticks: {
-              precision: 0
+              autoSkip: false,
+              maxRotation: 45,
+              minRotation: 45
             }
           }
         },
         plugins: {
-          legend: {
-            display: false
-          }
-        }
-      }
-    });
-    
-    // Chart for trainer activity
-    var formateursCtx = document.getElementById('formateursActivityChart').getContext('2d');
-    var formateursChart = new Chart(formateursCtx, {
-      type: 'line',
-      data: {
-        labels: ['2 weeks', '10 days', '1 week', '5 days', '4 days', '3 days', '2 days', 'Yesterday', 'Today'],
-        datasets: [{
-          label: 'Trainer activity',
-          data: {{ activite_formateurs|default:"[1, 3, 2, 5, 4, 6, 3, 4, 5]"|safe }},
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 2,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              precision: 0
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                var label = context.dataset.label || '';
+                var value = context.raw || 0;
+                return label + ': ' + value + ' heures';
+              }
             }
           }
         }

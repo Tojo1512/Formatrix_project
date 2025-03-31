@@ -165,9 +165,54 @@ def formateur_register(request):
     Cette fonction gère à la fois la création d'un utilisateur dans auth.User
     et d'un profil dans le modèle Formateur.
     """
-    # Interdire les nouvelles inscriptions
-    messages.error(request, "Les inscriptions de nouveaux formateurs sont temporairement désactivées. Veuillez contacter l'administrateur.")
-    return redirect('login')
+    if request.method == 'POST':
+        form = FormateurRegistrationForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                # Créer l'utilisateur
+                user = form.save()
+                
+                # Créer le profil formateur associé
+                formateur = Formateur(
+                    user=user,
+                    nom=form.cleaned_data['nom'],
+                    prenom=form.cleaned_data['prenom'],
+                    email=form.cleaned_data['email'],
+                    telephone=form.cleaned_data['telephone'],
+                    date_naissance=form.cleaned_data['date_naissance'],
+                    adresse=form.cleaned_data['adresse'],
+                    ville=form.cleaned_data['ville'],
+                    specialites=form.cleaned_data['specialites'],
+                    niveau_expertise=form.cleaned_data['niveau_expertise'],
+                    type_formateur=form.cleaned_data['type_formateur'],
+                    disponibilite=form.cleaned_data['disponibilite'],
+                    notes=form.cleaned_data['notes'],
+                    statut='active'  # Par défaut, le formateur est actif
+                )
+                
+                # Gérer les fichiers uploadés
+                if 'cv' in request.FILES:
+                    formateur.cv = request.FILES['cv']
+                if 'photo' in request.FILES:
+                    formateur.photo = request.FILES['photo']
+                
+                formateur.save()
+                
+                # Connecter l'utilisateur
+                login(request, user)
+                
+                messages.success(request, f"Inscription réussie ! Bienvenue {formateur.prenom} {formateur.nom}.")
+                return redirect('home')
+            except Exception as e:
+                messages.error(request, f"Une erreur est survenue lors de l'inscription : {str(e)}")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        form = FormateurRegistrationForm()
+    
+    return render(request, 'formateurs/formateur_register.html', {'form': form})
 
 class FormateurCoursListView(LoginRequiredMixin, ListView):
     model = Cours
