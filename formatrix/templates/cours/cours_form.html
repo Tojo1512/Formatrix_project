@@ -84,24 +84,6 @@
             {{ form.duree_heures }}
             {% include "includes/field_errors.html" with field=form.duree_heures %}
           </div>
-
-          <div class="form-group {% if form.frais_par_participant.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.frais_par_participant.id_for_label }}">
-              <i class="fas fa-coins"></i>
-              Fee per participant (Ar)
-            </label>
-            {{ form.frais_par_participant }}
-            {% include "includes/field_errors.html" with field=form.frais_par_participant %}
-          </div>
-
-          <div class="form-group {% if form.periode_mois.errors %}has-error{% endif %}">
-            <label class="form-label" for="{{ form.periode_mois.id_for_label }}">
-              <i class="fas fa-calendar-alt"></i>
-              Period (months)
-            </label>
-            {{ form.periode_mois }}
-            {% include "includes/field_errors.html" with field=form.periode_mois %}
-          </div>
         </div>
       </div>
 
@@ -171,15 +153,6 @@
           </label>
           {{ form.horaire }}
           {% include "includes/field_errors.html" with field=form.horaire %}
-        </div>
-
-        <div class="form-group {% if form.start_time.errors %}has-error{% endif %}">
-          <label class="form-label" for="{{ form.start_time.id_for_label }}">
-            <i class="fas fa-calendar-plus"></i>
-            Start Time
-          </label>
-          {{ form.start_time }}
-          {% include "includes/field_errors.html" with field=form.start_time %}
         </div>
 
         {% if object.cours_id %}

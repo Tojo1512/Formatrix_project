@@ -23,30 +23,72 @@
   
   .badge-statut-brouillon {
     background-color: #6c757d;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
   }
   
   .badge-statut-emise {
     background-color: #007bff;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
   }
   
   .badge-statut-payee {
     background-color: #28a745;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
   }
   
   .badge-statut-annulee {
     background-color: #dc3545;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
   }
   
   .badge-type-individuelle {
     background-color: #17a2b8;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
   }
   
   .badge-type-entreprise {
     background-color: #6610f2;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
   }
   
   .badge-type-sponsor {
     background-color: #fd7e14;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
   }
 </style>
 {% endblock %}
@@ -210,20 +252,30 @@
               <td>{{ facture.numero_facture }}</td>
               <td>{{ facture.date_emission|date:"d/m/Y" }}</td>
               <td>{{ facture.destinataire_nom }}</td>
-              <td>
-                <span class="badge badge-type-{{ facture.type_facture }}">
-                  {% for value, label in type_facture_choices %}
-                    {% if value == facture.type_facture %}{{ label }}{% endif %}
-                  {% endfor %}
-                </span>
+              <td class="text-center">
+                {% if facture.type_facture == 'individuelle' %}
+                  <span class="badge bg-info text-white">Individuelle</span>
+                {% elif facture.type_facture == 'entreprise' %}
+                  <span class="badge bg-primary text-white">Entreprise</span>
+                {% elif facture.type_facture == 'sponsor' %}
+                  <span class="badge bg-warning text-white">Sponsor</span>
+                {% else %}
+                  <span class="badge bg-secondary text-white">{{ facture.get_type_facture_display }}</span>
+                {% endif %}
               </td>
               <td>{{ facture.montant_ttc|floatformat:2 }} €</td>
-              <td>
-                <span class="badge badge-statut-{{ facture.statut }}">
-                  {% for value, label in statut_choices %}
-                    {% if value == facture.statut %}{{ label }}{% endif %}
-                  {% endfor %}
-                </span>
+              <td class="text-center">
+                {% if facture.statut == 'brouillon' %}
+                  <span class="badge bg-secondary text-white">Brouillon</span>
+                {% elif facture.statut == 'emise' %}
+                  <span class="badge bg-primary text-white">Émise</span>
+                {% elif facture.statut == 'payee' %}
+                  <span class="badge bg-success text-white">Payée</span>
+                {% elif facture.statut == 'annulee' %}
+                  <span class="badge bg-danger text-white">Annulée</span>
+                {% else %}
+                  <span class="badge bg-secondary text-white">{{ facture.get_statut_display }}</span>
+                {% endif %}
               </td>
               <td>
                 <div class="btn-group" role="group">

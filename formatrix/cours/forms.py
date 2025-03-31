@@ -21,31 +21,19 @@ class CoursForm(forms.ModelForm):
         required=True
     )
 
-    start_time = forms.DateTimeField(
-        widget=forms.DateTimeInput(
-            attrs={
-                'class': 'form-control',
-                'type': 'datetime-local'
-            }
-        ),
-        required=True
-    )
     class Meta:
         model = Cours
         fields = [
             'nom_cours',
             'description',
             'niveau',
-            'frais_par_participant',
             'duree_heures',
-            'periode_mois',
             'type_cours',
             'objectifs',
             'prerequis',
             'materiel_requis',
             'horaire',
-            'statut_approbation',
-            'start_time'
+            'statut_approbation'
         ]
         widgets = {
             'nom_cours': forms.TextInput(attrs={
@@ -61,18 +49,8 @@ class CoursForm(forms.ModelForm):
                 'placeholder': 'Required level',
                 'class': 'form-control'
             }),
-            'frais_par_participant': forms.NumberInput(attrs={
-                'placeholder': 'Fees in Ariary',
-                'class': 'form-control',
-                'min': '0'
-            }),
             'duree_heures': forms.NumberInput(attrs={
                 'placeholder': 'Duration in hours',
-                'class': 'form-control',
-                'min': '1'
-            }),
-            'periode_mois': forms.NumberInput(attrs={
-                'placeholder': 'Duration in months',
                 'class': 'form-control',
                 'min': '1'
             }),
@@ -127,11 +105,9 @@ class CoursForm(forms.ModelForm):
         # Configuration of required/optional fields
         self.fields['prerequis'].required = False
         self.fields['materiel_requis'].required = False
-        self.fields['periode_mois'].required = False
 
         # Add validators
         self.fields['duree_heures'].validators.append(MinValueValidator(1))
-        self.fields['frais_par_participant'].validators.append(MinValueValidator(0))
         
         # Approval status management
         if not self.instance.pk:  # If it's a creation
@@ -140,18 +116,9 @@ class CoursForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        type_cours = cleaned_data.get('type_cours')
-        periode_mois = cleaned_data.get('periode_mois')
         duree_heures = cleaned_data.get('duree_heures')
-        frais = cleaned_data.get('frais_par_participant')
-
-        if type_cours == 'long' and not periode_mois:
-            self.add_error('periode_mois', 'Period in months is required for long courses')
 
         if duree_heures is not None and duree_heures <= 0:
             self.add_error('duree_heures', 'Duration must be greater than 0')
-
-        if frais is not None and frais < 0:
-            self.add_error('frais_par_participant', 'Fees cannot be negative')
 
         return cleaned_data

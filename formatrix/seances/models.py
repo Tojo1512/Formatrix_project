@@ -26,6 +26,7 @@ class Seance(models.Model):
         null=True,  # Permettre temporairement null
         default=None  # Valeur par défaut None
     )
+    duree = models.IntegerField(default=1, verbose_name="Durée (mois)", help_text="Durée de la séance en mois")
     formateurs = models.ManyToManyField(
         Formateur,
         related_name='seances_assignees',

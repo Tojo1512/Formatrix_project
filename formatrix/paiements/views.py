@@ -627,7 +627,6 @@ def generer_facture(request):
             montant_ht = form.cleaned_data['montant_ht']
             taux_tva = form.cleaned_data['taux_tva']
             generer_pdf = form.cleaned_data['generer_pdf']
-            envoyer_email = form.cleaned_data['envoyer_email']
             
             try:
                 # Générer la facture
@@ -662,7 +661,7 @@ def generer_facture(request):
                     # Créer une ligne de facture par défaut
                     LigneFacture.objects.create(
                         facture=facture,
-                        description=f"Formation: {facture.inscription.seance.cours.nom_cours}",
+                        description=f"Formation: {inscription.seance.cours.nom_cours}",
                         quantite=1,
                         prix_unitaire_ht=montant_ht,
                         taux_tva=taux_tva,
@@ -678,12 +677,6 @@ def generer_facture(request):
                     # La génération du PDF est gérée par la vue telecharger_facture_pdf
                     # Nous redirigeons simplement vers cette vue
                     return redirect('paiements:telecharger-facture', facture_id=facture.facture_id)
-                
-                # Envoyer par email si demandé
-                if envoyer_email:
-                    # L'envoi par email est géré par la vue envoyer_facture_email
-                    # Nous redirigeons simplement vers cette vue
-                    return redirect('paiements:envoyer-facture', facture_id=facture.facture_id)
                 
                 return redirect('paiements:facture-detail', facture_id=facture.facture_id)
             

@@ -235,6 +235,7 @@
           </div>
         </div>
       </div>
+      {% if user.is_staff %}
       <div class="col-md-3">
         <div class="card stats-card warning">
           <div class="card-body">
@@ -250,9 +251,11 @@
           </div>
         </div>
       </div>
+      {% endif %}
     </div>
 
     <!-- Dernières inscriptions -->
+    {% if user.is_staff %}
     <div class="row mb-4">
       <div class="col-12">
         <h5 class="section-title">Dernières inscriptions</h5>
@@ -304,6 +307,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
     <!-- Sections principales du tableau de bord -->
     <div class="row mb-4">
@@ -332,6 +336,7 @@
       </div>
       
       <!-- Inscriptions -->
+      {% if user.is_staff %}
       <div class="col-md-4 mb-4">
         <div class="card dashboard-card h-100">
           <div class="card-body text-center p-4">
@@ -351,8 +356,10 @@
           </div>
         </div>
       </div>
+      {% endif %}
       
       <!-- Formateurs -->
+      {% if user.is_staff %}
       <div class="col-md-4 mb-4">
         <div class="card dashboard-card h-100">
           <div class="card-body text-center p-4">
@@ -372,8 +379,10 @@
           </div>
         </div>
       </div>
+      {% endif %}
     </div>
     
+    {% if user.is_staff %}
     <div class="row mb-4">
       <div class="col-12">
         <h5 class="section-title">Administration</h5>
@@ -441,6 +450,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
   {% endif %}
 </div>
 {% endblock %}

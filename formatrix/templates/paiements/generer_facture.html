@@ -159,20 +159,6 @@
               {% endif %}
             </div>
           </div>
-          
-          <div class="col-md-6 mb-3">
-            <div class="form-check">
-              {{ form.envoyer_email }}
-              <label class="form-check-label" for="{{ form.envoyer_email.id_for_label }}">
-                Envoyer la facture par email
-              </label>
-              {% if form.envoyer_email.errors %}
-              <div class="invalid-feedback d-block">
-                {{ form.envoyer_email.errors }}
-              </div>
-              {% endif %}
-            </div>
-          </div>
         </div>
       </div>
       

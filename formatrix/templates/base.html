@@ -208,6 +208,7 @@
               </div>
             </li>
             
+            {% if user.is_staff %}
             <li class="nav-item {% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#inscriptionsMenu" {% if 'inscription' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-clipboard-list"></i>
@@ -286,6 +287,7 @@
                 </ul>
               </div>
             </li>
+            {% endif %}
             
             <li class="nav-section">
               <span class="sidebar-mini-icon">
@@ -316,6 +318,7 @@
               </div>
             </li>
             
+            {% if user.is_staff %}
             <li class="nav-item {% if 'client' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#clientsMenu" {% if 'client' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'client' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-users"></i>
@@ -337,7 +340,9 @@
                 </ul>
               </div>
             </li>
+            {% endif %}
             
+            {% if user.is_staff %}
             <li class="nav-item {% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#formateursMenu" {% if 'formateur' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-chalkboard-teacher"></i>
@@ -359,7 +364,9 @@
                 </ul>
               </div>
             </li>
+            {% endif %}
             
+            {% if user.is_staff %}
             <li class="nav-section">
               <span class="sidebar-mini-icon">
                 <i class="fa fa-ellipsis-h"></i>
@@ -398,6 +405,7 @@
                 </ul>
               </div>
             </li>
+            {% endif %}
             
             {% if user.is_staff %}
               <li class="nav-item">

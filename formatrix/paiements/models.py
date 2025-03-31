@@ -277,40 +277,42 @@ class Facture(models.Model):
         # Déterminer le type de facture en fonction du type d'inscription
         if inscription.type_inscription == 'individuelle':
             type_facture = 'individuelle'
-            destinataire_nom = f"{inscription.apprenant.prenom} {inscription.apprenant.nom}"
-            destinataire_adresse = inscription.apprenant.adresse
-            destinataire_email = inscription.apprenant.email
-            destinataire_telephone = inscription.apprenant.telephone
+            # Utiliser uniquement le nom complet de l'apprenant pour éviter des erreurs
+            # d'attributs manquants comme 'prenom'
+            destinataire_nom = str(inscription.apprenant)
+            destinataire_adresse = getattr(inscription.apprenant, 'adresse', 'Adresse non spécifiée')
+            destinataire_email = getattr(inscription.apprenant, 'email', '')
+            destinataire_telephone = getattr(inscription.apprenant, 'telephone', '')
             destinataire_siret = None
         elif inscription.type_inscription in ['entreprise', 'groupe']:
             type_facture = 'entreprise'
             if inscription.client:
                 destinataire_nom = inscription.client.nom_entite
-                destinataire_adresse = inscription.client.adresse_siege
-                destinataire_email = inscription.client.email
-                destinataire_telephone = inscription.client.telephone
-                destinataire_siret = inscription.client.numero_immatriculation
+                destinataire_adresse = getattr(inscription.client, 'adresse_siege', 'Adresse non spécifiée')
+                destinataire_email = getattr(inscription.client, 'email', '')
+                destinataire_telephone = getattr(inscription.client, 'telephone', '')
+                destinataire_siret = getattr(inscription.client, 'numero_immatriculation', '')
             else:
                 # Fallback si pas d'entreprise
-                destinataire_nom = f"{inscription.apprenant.prenom} {inscription.apprenant.nom}"
-                destinataire_adresse = inscription.apprenant.adresse
-                destinataire_email = inscription.apprenant.email
-                destinataire_telephone = inscription.apprenant.telephone
+                destinataire_nom = str(inscription.apprenant)
+                destinataire_adresse = getattr(inscription.apprenant, 'adresse', 'Adresse non spécifiée')
+                destinataire_email = getattr(inscription.apprenant, 'email', '')
+                destinataire_telephone = getattr(inscription.apprenant, 'telephone', '')
                 destinataire_siret = None
         elif inscription.sponsor:
             type_facture = 'sponsor'
             destinataire_nom = inscription.sponsor.nom_entite
-            destinataire_adresse = inscription.sponsor.adresse_siege
-            destinataire_email = inscription.sponsor.email
-            destinataire_telephone = inscription.sponsor.telephone
-            destinataire_siret = inscription.sponsor.numero_immatriculation
+            destinataire_adresse = getattr(inscription.sponsor, 'adresse_siege', 'Adresse non spécifiée')
+            destinataire_email = getattr(inscription.sponsor, 'email', '')
+            destinataire_telephone = getattr(inscription.sponsor, 'telephone', '')
+            destinataire_siret = getattr(inscription.sponsor, 'numero_immatriculation', '')
         else:
             # Par défaut, facturer à l'apprenant
             type_facture = 'individuelle'
-            destinataire_nom = f"{inscription.apprenant.prenom} {inscription.apprenant.nom}"
-            destinataire_adresse = inscription.apprenant.adresse
-            destinataire_email = inscription.apprenant.email
-            destinataire_telephone = inscription.apprenant.telephone
+            destinataire_nom = str(inscription.apprenant)
+            destinataire_adresse = getattr(inscription.apprenant, 'adresse', 'Adresse non spécifiée')
+            destinataire_email = getattr(inscription.apprenant, 'email', '')
+            destinataire_telephone = getattr(inscription.apprenant, 'telephone', '')
             destinataire_siret = None
         
         # Déterminer le montant à facturer

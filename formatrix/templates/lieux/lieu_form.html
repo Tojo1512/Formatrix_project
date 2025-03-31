@@ -6,92 +6,179 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="form-container">
   <div class="form-header">
-    <h2 class="form-title">
-      {% if form.instance.pk %}
-        Modifier le lieu
-      {% else %}
-        Créer un nouveau lieu
-      {% endif %}
-    </h2>
+    <h1 class="form-title">
+      <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+      {% if form.instance.pk %}Modifier{% else %}Créer{% endif %} un lieu
+    </h1>
+    <a href="{{ request.GET.next|default:'/' }}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Retour
+    </a>
   </div>
 
-  <form method="post" class="form-content">
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
     {% csrf_token %}
     
-    {% if form.errors %}
-    <div class="alert alert-danger">
-      <h4 class="alert-heading">Des erreurs ont été trouvées dans le formulaire</h4>
-      <ul>
-        {% for field in form %}
-          {% for error in field.errors %}
-            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-          {% endfor %}
-        {% endfor %}
-        {% for error in form.non_field_errors %}
-          <li>{{ error }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-    
+    <!-- Informations du lieu -->
     <div class="form-section">
-      <div class="form-group">
-        <label for="{{ form.lieu.id_for_label }}">Nom du lieu</label>
-        {{ form.lieu }}
-        {% if form.lieu.help_text %}
-          <small class="form-text text-muted">{{ form.lieu.help_text }}</small>
-        {% endif %}
-      </div>
-
-      <div class="form-group">
-        <label for="{{ form.adresse.id_for_label }}">Adresse complète</label>
-        {{ form.adresse }}
-        {% if form.adresse.help_text %}
-          <small class="form-text text-muted">{{ form.adresse.help_text }}</small>
-        {% endif %}
-      </div>
-
-      <div class="form-group">
-        <label for="{{ form.personne_contact.id_for_label }}">Personne de contact</label>
-        {{ form.personne_contact }}
-        {% if form.personne_contact.help_text %}
-          <small class="form-text text-muted">{{ form.personne_contact.help_text }}</small>
-        {% endif %}
-      </div>
-
-      <div class="form-group">
-        <label for="{{ form.telephone.id_for_label }}">Téléphone</label>
-        {{ form.telephone }}
-        {% if form.telephone.help_text %}
-          <small class="form-text text-muted">{{ form.telephone.help_text }}</small>
-        {% endif %}
-      </div>
-
-      <div class="form-group">
-        <label for="{{ form.mobile.id_for_label }}">Mobile</label>
-        {{ form.mobile }}
-        {% if form.mobile.help_text %}
-          <small class="form-text text-muted">{{ form.mobile.help_text }}</small>
-        {% endif %}
+      <h3 class="section-title">
+        <i class="fas fa-map-marker-alt"></i>
+        Informations du lieu
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.lieu.errors %}has-error{% endif %}">
+            <label for="{{ form.lieu.id_for_label }}">
+              Nom du lieu <span class="text-danger">*</span>
+            </label>
+            {{ form.lieu }}
+            {% if form.lieu.errors %}
+            <div class="error-message">
+              {% for error in form.lieu.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.lieu.help_text %}
+            <small class="form-text text-muted">{{ form.lieu.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group {% if form.adresse.errors %}has-error{% endif %}">
+            <label for="{{ form.adresse.id_for_label }}">
+              Adresse complète <span class="text-danger">*</span>
+            </label>
+            {{ form.adresse }}
+            {% if form.adresse.errors %}
+            <div class="error-message">
+              {% for error in form.adresse.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.adresse.help_text %}
+            <small class="form-text text-muted">{{ form.adresse.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
-
+    
+    <!-- Contact -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-phone"></i>
+        Coordonnées de contact
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group {% if form.personne_contact.errors %}has-error{% endif %}">
+            <label for="{{ form.personne_contact.id_for_label }}">
+              Personne de contact
+            </label>
+            {{ form.personne_contact }}
+            {% if form.personne_contact.errors %}
+            <div class="error-message">
+              {% for error in form.personne_contact.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.personne_contact.help_text %}
+            <small class="form-text text-muted">{{ form.personne_contact.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
+            <label for="{{ form.telephone.id_for_label }}">
+              Téléphone
+            </label>
+            {{ form.telephone }}
+            {% if form.telephone.errors %}
+            <div class="error-message">
+              {% for error in form.telephone.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.telephone.help_text %}
+            <small class="form-text text-muted">{{ form.telephone.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="form-group {% if form.mobile.errors %}has-error{% endif %}">
+            <label for="{{ form.mobile.id_for_label }}">
+              Mobile
+            </label>
+            {{ form.mobile }}
+            {% if form.mobile.errors %}
+            <div class="error-message">
+              {% for error in form.mobile.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.mobile.help_text %}
+            <small class="form-text text-muted">{{ form.mobile.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Boutons de soumission -->
     <div class="form-actions">
-      <a href="{{ request.GET.next|default:'/' }}" class="btn btn-outline">Annuler</a>
       <button type="submit" class="btn btn-primary">
-        {% if form.instance.pk %}
-          Mettre à jour
-        {% else %}
-          Créer
-        {% endif %}
+        <i class="fas fa-save"></i>
+        {% if form.instance.pk %}Mettre à jour{% else %}Créer{% endif %}
       </button>
+      <a href="{{ request.GET.next|default:'/' }}" class="btn btn-secondary">
+        <i class="fas fa-times"></i>
+        Annuler
+      </a>
     </div>
   </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    // Initialisation des éventuels widgets si nécessaire
+  });
+</script>
 {% endblock %} 

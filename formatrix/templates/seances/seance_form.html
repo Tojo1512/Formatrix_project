@@ -146,7 +146,7 @@
       </h3>
       
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="form-group {% if form.nombre_places.errors %}has-error{% endif %}">
             <label for="{{ form.nombre_places.id_for_label }}">
               Nombre de places <span class="text-danger">*</span>
@@ -165,7 +165,26 @@
           </div>
         </div>
         
-        <div class="col-md-6">
+        <div class="col-md-4">
+          <div class="form-group {% if form.duree.errors %}has-error{% endif %}">
+            <label for="{{ form.duree.id_for_label }}">
+              Durée (mois) <span class="text-danger">*</span>
+            </label>
+            <input type="number" name="duree" min="1" class="form-control" id="{{ form.duree.id_for_label }}" placeholder="Durée en mois" value="{{ form.duree.value|default:'1' }}" required>
+            {% if form.duree.errors %}
+            <div class="error-message">
+              {% for error in form.duree.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.duree.help_text %}
+            <small class="form-text text-muted">{{ form.duree.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-4">
           <div class="form-group {% if form.prix.errors %}has-error{% endif %}">
             <label for="{{ form.prix.id_for_label }}">
               Prix (€) <span class="text-danger">*</span>

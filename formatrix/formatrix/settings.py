@@ -112,14 +112,23 @@ WSGI_APPLICATION = 'formatrix.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Configuration PostgreSQL standard (commentée temporairement)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.postgresql'),
+#         'NAME': os.environ.get('DATABASE_NAME', 'formatrix'),
+#         'USER': os.environ.get('DATABASE_USER', 'postgres'),
+#         'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'root'),
+#         'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
+#         'PORT': os.environ.get('DATABASE_PORT', '5432'),
+#     }
+# }
+
+# Configuration SQLite (temporairement activée)
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.postgresql'),
-        'NAME': os.environ.get('DATABASE_NAME', 'formatrix'),
-        'USER': os.environ.get('DATABASE_USER', 'formatrix'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'formatrix'),
-        'HOST': os.environ.get('DATABASE_HOST', 'localhost'),
-        'PORT': os.environ.get('DATABASE_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

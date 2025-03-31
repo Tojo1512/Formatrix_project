@@ -505,13 +505,6 @@ class GenerationFactureForm(forms.Form):
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
     
-    envoyer_email = forms.BooleanField(
-        required=False,
-        initial=False,
-        label="Envoyer par email",
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
-    )
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         

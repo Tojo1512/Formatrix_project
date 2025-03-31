@@ -12,6 +12,7 @@ class SeanceForm(forms.ModelForm):
             'lieu',
             'date',
             'cours',
+            'duree',
             'formateurs',
             'nombre_places',
             'prix',
@@ -25,6 +26,11 @@ class SeanceForm(forms.ModelForm):
             'lieu': forms.Select(attrs={'class': 'form-control'}),
             'cours': forms.Select(attrs={
                 'class': 'form-control'
+            }),
+            'duree': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '1',
+                'placeholder': 'Durée en mois'
             }),
             'nombre_places': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -41,6 +47,7 @@ class SeanceForm(forms.ModelForm):
             'lieu': 'Lieu',
             'date': 'Date',
             'cours': 'Cours',
+            'duree': 'Durée (mois)',
             'formateurs': 'Formateurs assignés',
             'nombre_places': 'Nombre de places',
             'prix': 'Prix',
@@ -67,9 +74,13 @@ class SeanceForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         nombre_places = cleaned_data.get('nombre_places')
+        duree = cleaned_data.get('duree')
         
         if nombre_places is not None and nombre_places < 1:
             self.add_error('nombre_places', "Le nombre de places doit être au moins 1.")
+        
+        if duree is not None and duree < 1:
+            self.add_error('duree', "La durée doit être d'au moins 1 mois.")
         
         return cleaned_data
 
