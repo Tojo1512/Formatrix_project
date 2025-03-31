@@ -12,7 +12,7 @@ class ApprenantViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def statistiques(self, request):
-        """Retourne des statistiques sur les apprenants"""
+        """Returns statistics about learners"""
         stats = {
             'total': Apprenant.objects.count(),
             'par_genre': dict(Apprenant.objects.values('sexe').annotate(total=Count('apprenant_id'))),
@@ -24,12 +24,12 @@ class ApprenantViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def par_ville(self, request):
-        """Retourne les apprenants groupés par ville"""
+        """Returns learners grouped by city"""
         stats = dict(Apprenant.objects.values('ville').annotate(total=Count('apprenant_id')))
         return Response(stats)
 
     @action(detail=False, methods=['get'])
     def count(self, request):
-        """Retourne le nombre total d'apprenants"""
+        """Returns the total number of learners"""
         count = Apprenant.objects.count()
         return Response({'count': count})

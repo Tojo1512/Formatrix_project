@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -123,7 +123,7 @@
 <body>
   {% if user.is_authenticated %}
   <div class="wrapper">
-    <!-- Sidebar pour les utilisateurs connectés -->
+    <!-- Sidebar for connected users -->
     <div class="sidebar" data-background-color="blue">
       <div class="sidebar-logo">
         <!-- Logo Header -->
@@ -148,7 +148,7 @@
             <li class="nav-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
               <a href="{% url 'home' %}">
                 <i class="fas fa-home"></i>
-                <p>Accueil</p>
+                <p>Home</p>
               </a>
             </li>
             
@@ -156,25 +156,25 @@
               <span class="sidebar-mini-icon">
                 <i class="fa fa-ellipsis-h"></i>
               </span>
-              <h4 class="text-section">Gestion de formation</h4>
+              <h4 class="text-section">Training Management</h4>
             </li>
             
             <li class="nav-item {% if 'cours' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#coursesMenu" {% if 'cours' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'cours' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-book"></i>
-                <p>Cours</p>
+                <p>Courses</p>
                 <span class="caret"></span>
               </a>
               <div class="collapse {% if 'cours' in request.resolver_match.url_name %}show{% endif %}" id="coursesMenu">
                 <ul class="nav nav-collapse">
                   <li>
                     <a href="{% url 'cours:cours-list' %}" class="{% if request.resolver_match.url_name == 'cours-list' %}active{% endif %}">
-                      <span class="sub-item">Tous les cours</span>
+                      <span class="sub-item">All courses</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'cours:cours-create' %}" class="{% if request.resolver_match.url_name == 'cours-create' %}active{% endif %}">
-                      <span class="sub-item">Ajouter un cours</span>
+                      <span class="sub-item">Add a course</span>
                     </a>
                   </li>
                 </ul>
@@ -184,24 +184,24 @@
             <li class="nav-item {% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#seancesMenu" {% if 'seance' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'seance' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-calendar-alt"></i>
-                <p>Séances</p>
+                <p>Sessions</p>
                 <span class="caret"></span>
               </a>
               <div class="collapse {% if 'seance' in request.resolver_match.url_name %}show{% endif %}" id="seancesMenu">
                 <ul class="nav nav-collapse">
                   <li>
                     <a href="{% url 'seances:seance-list' %}" class="{% if request.resolver_match.url_name == 'seance-list' %}active{% endif %}">
-                      <span class="sub-item">Toutes les séances</span>
+                      <span class="sub-item">All sessions</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'seances:seance-create' %}" class="{% if request.resolver_match.url_name == 'seance-create' %}active{% endif %}">
-                      <span class="sub-item">Ajouter une séance</span>
+                      <span class="sub-item">Add a session</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'seances:seance-list' %}?filtre=absences" class="{% if request.resolver_match.url_name == 'seance-list' and request.GET.filtre == 'absences' %}active{% endif %}">
-                      <span class="sub-item">Gestion des absences</span>
+                      <span class="sub-item">Absence management</span>
                     </a>
                   </li>
                 </ul>
@@ -212,24 +212,24 @@
             <li class="nav-item {% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#inscriptionsMenu" {% if 'inscription' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-clipboard-list"></i>
-                <p>Inscriptions</p>
+                <p>Registrations</p>
                 <span class="caret"></span>
               </a>
               <div class="collapse {% if 'inscription' in request.resolver_match.url_name %}show{% endif %}" id="inscriptionsMenu">
                 <ul class="nav nav-collapse">
                   <li>
                     <a href="{% url 'inscriptions:inscription-list' %}" class="{% if request.resolver_match.url_name == 'inscription-list' %}active{% endif %}">
-                      <span class="sub-item">Toutes les inscriptions</span>
+                      <span class="sub-item">All registrations</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'inscriptions:inscription-create' %}" class="{% if request.resolver_match.url_name == 'inscription-create' %}active{% endif %}">
-                      <span class="sub-item">Ajouter une inscription</span>
+                      <span class="sub-item">Add a registration</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'inscriptions:inscription-multiple' %}" class="{% if request.resolver_match.url_name == 'inscription-multiple' %}active{% endif %}">
-                      <span class="sub-item">Inscription multiple</span>
+                      <span class="sub-item">Multiple registration</span>
                     </a>
                   </li>
                 </ul>
@@ -239,49 +239,49 @@
             <li class="nav-item {% if 'paiement' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#paiementsMenu" {% if 'paiement' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'paiement' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-money-bill-wave"></i>
-                <p>Paiements</p>
+                <p>Payments</p>
                 <span class="caret"></span>
               </a>
               <div class="collapse {% if 'paiement' in request.resolver_match.url_name %}show{% endif %}" id="paiementsMenu">
                 <ul class="nav nav-collapse">
                   <li>
                     <a href="{% url 'paiements:tableau-bord' %}" class="{% if request.resolver_match.url_name == 'tableau-bord' %}active{% endif %}">
-                      <span class="sub-item">Tableau de bord</span>
+                      <span class="sub-item">Dashboard</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'paiements:paiement-list' %}" class="{% if request.resolver_match.url_name == 'paiement-list' %}active{% endif %}">
-                      <span class="sub-item">Tous les paiements</span>
+                      <span class="sub-item">All payments</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'paiements:paiement-create' %}" class="{% if request.resolver_match.url_name == 'paiement-create' %}active{% endif %}">
-                      <span class="sub-item">Ajouter un paiement</span>
+                      <span class="sub-item">Add a payment</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'paiements:plan-list' %}" class="{% if request.resolver_match.url_name == 'plan-list' %}active{% endif %}">
-                      <span class="sub-item">Plans de paiement</span>
+                      <span class="sub-item">Payment plans</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'paiements:paiement-formateur-list' %}" class="{% if request.resolver_match.url_name == 'paiement-formateur-list' %}active{% endif %}">
-                      <span class="sub-item">Paiements formateurs</span>
+                      <span class="sub-item">Trainer payments</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'paiements:paiement-formateur-create' %}" class="{% if request.resolver_match.url_name == 'paiement-formateur-create' %}active{% endif %}">
-                      <span class="sub-item">Payer un formateur</span>
+                      <span class="sub-item">Pay a trainer</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'paiements:facture-list' %}" class="{% if request.resolver_match.url_name == 'facture-list' %}active{% endif %}">
-                      <span class="sub-item">Factures</span>
+                      <span class="sub-item">Invoices</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'paiements:generer-facture' %}" class="{% if request.resolver_match.url_name == 'generer-facture' %}active{% endif %}">
-                      <span class="sub-item">Générer une facture</span>
+                      <span class="sub-item">Generate an invoice</span>
                     </a>
                   </li>
                 </ul>
@@ -293,25 +293,25 @@
               <span class="sidebar-mini-icon">
                 <i class="fa fa-ellipsis-h"></i>
               </span>
-              <h4 class="text-section">Gestion des personnes</h4>
+              <h4 class="text-section">People Management</h4>
             </li>
             
             <li class="nav-item {% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#apprenantsMenu" {% if 'apprenant' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'apprenant' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-user-graduate"></i>
-                <p>Apprenants</p>
+                <p>Learners</p>
                 <span class="caret"></span>
               </a>
               <div class="collapse {% if 'apprenant' in request.resolver_match.url_name %}show{% endif %}" id="apprenantsMenu">
                 <ul class="nav nav-collapse">
                   <li>
                     <a href="{% url 'apprenants:apprenant-list' %}" class="{% if request.resolver_match.url_name == 'apprenant-list' %}active{% endif %}">
-                      <span class="sub-item">Tous les apprenants</span>
+                      <span class="sub-item">All learners</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'apprenants:apprenant-create' %}" class="{% if request.resolver_match.url_name == 'apprenant-create' %}active{% endif %}">
-                      <span class="sub-item">Ajouter un apprenant</span>
+                      <span class="sub-item">Add a learner</span>
                     </a>
                   </li>
                 </ul>
@@ -329,12 +329,12 @@
                 <ul class="nav nav-collapse">
                   <li>
                     <a href="/clients/liste/" class="{% if request.resolver_match.url_name == 'client-list' %}active{% endif %}">
-                      <span class="sub-item">Tous les clients</span>
+                      <span class="sub-item">All clients</span>
                     </a>
                   </li>
                   <li>
                     <a href="/clients/creer/" class="{% if request.resolver_match.url_name == 'client-create' %}active{% endif %}">
-                      <span class="sub-item">Ajouter un client</span>
+                      <span class="sub-item">Add a client</span>
                     </a>
                   </li>
                 </ul>
@@ -346,19 +346,19 @@
             <li class="nav-item {% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#formateursMenu" {% if 'formateur' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'formateur' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-chalkboard-teacher"></i>
-                <p>Formateurs</p>
+                <p>Trainers</p>
                 <span class="caret"></span>
               </a>
               <div class="collapse {% if 'formateur' in request.resolver_match.url_name %}show{% endif %}" id="formateursMenu">
                 <ul class="nav nav-collapse">
                   <li>
                     <a href="{% url 'formateurs:formateur-list' %}" class="{% if request.resolver_match.url_name == 'formateur-list' %}active{% endif %}">
-                      <span class="sub-item">Tous les formateurs</span>
+                      <span class="sub-item">All trainers</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'formateurs:formateur-create' %}" class="{% if request.resolver_match.url_name == 'formateur-create' %}active{% endif %}">
-                      <span class="sub-item">Ajouter un formateur</span>
+                      <span class="sub-item">Add a trainer</span>
                     </a>
                   </li>
                 </ul>
@@ -371,35 +371,35 @@
               <span class="sidebar-mini-icon">
                 <i class="fa fa-ellipsis-h"></i>
               </span>
-              <h4 class="text-section">Analyses et rapports</h4>
+              <h4 class="text-section">Analysis and Reports</h4>
             </li>
             
             <li class="nav-item {% if 'rapport' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#rapportsMenu" {% if 'rapport' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'rapport' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-chart-bar"></i>
-                <p>Rapports statistiques</p>
+                <p>Statistical Reports</p>
                 <span class="caret"></span>
               </a>
               <div class="collapse {% if 'rapport' in request.resolver_match.url_name %}show{% endif %}" id="rapportsMenu">
                 <ul class="nav nav-collapse">
                   <li>
                     <a href="{% url 'rapports:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                      <span class="sub-item">Tableau de bord</span>
+                      <span class="sub-item">Dashboard</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'rapports:demographique' %}" class="{% if request.resolver_match.url_name == 'demographique' %}active{% endif %}">
-                      <span class="sub-item">Rapport démographique</span>
+                      <span class="sub-item">Demographic report</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'rapports:ressources' %}" class="{% if request.resolver_match.url_name == 'ressources' %}active{% endif %}">
-                      <span class="sub-item">Utilisation des ressources</span>
+                      <span class="sub-item">Resource usage</span>
                     </a>
                   </li>
                   <li>
                     <a href="{% url 'rapports:clients' %}" class="{% if request.resolver_match.url_name == 'clients' %}active{% endif %}">
-                      <span class="sub-item">Rapport clients</span>
+                      <span class="sub-item">Client report</span>
                     </a>
                   </li>
                 </ul>
@@ -422,7 +422,7 @@
     <!-- End Sidebar -->
 
     <div class="main-panel">
-      <!-- Navbar simplifiée pour les utilisateurs connectés -->
+      <!-- Simplified navbar for connected users -->
       <div class="main-header">
         <nav class="navbar navbar-header navbar-expand-lg">
           <div class="container-fluid">
@@ -434,32 +434,32 @@
               </button>
             </div>
             
-            <!-- Informations utilisateur et déconnexion à droite -->
+            <!-- User information and logout on the right -->
             <ul class="navbar-nav ms-auto align-items-center">
               <li class="nav-item">
                 <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} me-3">
                   {% if user.is_staff %}
-                    <i class="fas fa-user-shield me-1"></i>Administrateur
+                    <i class="fas fa-user-shield me-1"></i>Administrator
                   {% else %}
-                    <i class="fas fa-chalkboard-teacher me-1"></i>Formateur
+                    <i class="fas fa-chalkboard-teacher me-1"></i>Trainer
                   {% endif %}
                 </span>
               </li>
               
               {% if user.is_staff %}
-              <!-- Icône de notification pour les administrateurs -->
+              <!-- Notification icon for administrators -->
               <li class="nav-item dropdown me-2">
                 <a class="nav-link btn-notification" href="#" id="navbarNotifications" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="fas fa-bell"></i>
                   <span id="notification-counter" class="notification-badge d-none">0</span>
                 </a>
-                <!-- Le contenu du dropdown sera chargé par AJAX -->
+                <!-- Dropdown content will be loaded by AJAX -->
                 <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow" aria-labelledby="navbarNotifications">
                   <div class="text-center p-3">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
-                      <span class="visually-hidden">Chargement...</span>
+                      <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="mb-0 mt-1">Chargement des notifications...</p>
+                    <p class="mb-0 mt-1">Loading notifications...</p>
                   </div>
                 </div>
               </li>
@@ -472,13 +472,13 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                   <a class="dropdown-item" href="#">
-                    <i class="fas fa-user-cog me-2"></i>Profil
+                    <i class="fas fa-user-cog me-2"></i>Profile
                   </a>
                   <div class="dropdown-divider"></div>
                   <form method="post" action="{% url 'logout' %}" class="px-2">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger btn-sm w-100">
-                      <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                      <i class="fas fa-sign-out-alt me-2"></i>Logout
                     </button>
                   </form>
                 </div>
@@ -500,15 +500,15 @@
             <nav>
               <ul class="nav">
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Aide</a>
+                  <a class="nav-link" href="#">Help</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Mentions légales</a>
+                  <a class="nav-link" href="#">Legal</a>
                 </li>
               </ul>
             </nav>
             <div class="copyright">
-              &copy; {% now "Y" %} Formatrix. Tous droits réservés.
+              &copy; {% now "Y" %} Formatrix. All rights reserved.
             </div>
           </div>
         </div>
@@ -516,7 +516,7 @@
     </div>
   </div>
   {% else %}
-  <!-- Page non-authentifiée -->
+  <!-- Non-authenticated page -->
   <div class="guest-wrapper">
     {% if not show_splash %}
     <div class="main-header shadow-sm">
@@ -534,11 +534,11 @@
             <div class="auth-actions">
               <a href="{% url 'login' %}" class="btn btn-outline-primary me-2">
                 <i class="fas fa-sign-in-alt me-1"></i>
-                <span>Connexion</span>
+                <span>Login</span>
               </a>
               <a href="{% url 'formateurs:formateur-register' %}" class="btn btn-primary">
                 <i class="fas fa-user-plus me-1"></i>
-                <span>Inscription</span>
+                <span>Sign up</span>
               </a>
             </div>
           </div>
@@ -560,15 +560,15 @@
           <nav>
             <ul class="nav">
               <li class="nav-item">
-                <a class="nav-link" href="#">Aide</a>
+                <a class="nav-link" href="#">Help</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Mentions légales</a>
+                <a class="nav-link" href="#">Legal</a>
               </li>
             </ul>
           </nav>
           <div class="copyright">
-            &copy; {% now "Y" %} Formatrix. Tous droits réservés.
+            &copy; {% now "Y" %} Formatrix. All rights reserved.
           </div>
         </div>
       </div>
@@ -600,7 +600,7 @@
   {% block extra_js %}
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Gestion de la sidebar en mode mobile
+      // Managing sidebar in mobile mode
       const sidenavTogglers = document.querySelectorAll('.sidenav-toggler');
       sidenavTogglers.forEach(function(toggler) {
         toggler.addEventListener('click', function() {
@@ -608,14 +608,14 @@
         });
       });
       
-      // Initialiser les menus déroulants
+      // Initialize dropdown menus
       var navItems = document.querySelectorAll('.nav-item');
       navItems.forEach(function (item) {
         var link = item.querySelector('[data-bs-toggle="collapse"]');
         if (link) {
           var menu = document.querySelector(link.getAttribute('href'));
           if (menu) {
-            // Vérifier si le menu doit être ouvert
+            // Check if menu should be open
             var shouldBeActive = item.classList.contains('active') ||
               menu.querySelectorAll('.active').length > 0 ||
               window.location.pathname.includes(link.getAttribute('href').substring(1));
@@ -628,7 +628,7 @@
         }
       });
 
-      // Pour le nouveau template - activer les éléments du sous-menu
+      // For the new template - activate submenu items
       $(".nav-collapse a").each(function () {
         if ($(this).attr('href') === window.location.pathname) {
           $(this).addClass('active');
@@ -644,7 +644,7 @@
   {% if user.is_authenticated and user.is_staff %}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Fonction pour mettre à jour le compteur de notifications
+      // Function to update the notification counter
       function updateNotificationCounter() {
         fetch('{% url "notifications:get_unread_count" %}')
           .then(response => response.json())
@@ -661,10 +661,10 @@
           });
       }
       
-      // Mettre à jour le compteur au chargement
+      // Update counter at loading
       updateNotificationCounter();
       
-      // Charger les notifications au clic sur l'icône
+      // Load notifications on click on the icon
       const notificationButton = document.getElementById('navbarNotifications');
       if (notificationButton) {
         let isLoaded = false;
@@ -673,7 +673,7 @@
           if (!isLoaded) {
             const dropdownMenu = this.nextElementSibling;
             
-            // Charger les notifications via AJAX
+            // Load notifications via AJAX
             fetch('{% url "notifications:notification_list" %}')
               .then(response => response.text())
               .then(html => {
@@ -691,11 +691,11 @@
                     };
                   });
                 
-                // On va créer manuellement le contenu du dropdown
+                // We'll manually create the dropdown content
                 let dropdownContent = `
                   <div class="dropdown-header d-flex align-items-center py-3">
                     <span class="h6 mb-0 flex-grow-1">Notifications</span>
-                    <a href="{% url 'notifications:mark_all_read' %}" class="text-muted me-2 fs-xs" id="mark-all-read">Tout marquer comme lu</a>
+                    <a href="{% url 'notifications:mark_all_read' %}" class="text-muted me-2 fs-xs" id="mark-all-read">Mark all as read</a>
                   </div>
                   <div class="dropdown-divider my-0"></div>
                   <div class="notification-list overflow-auto" style="max-height: 300px;">`;
@@ -725,7 +725,7 @@
                   dropdownContent += `
                     <div class="text-center py-4">
                       <i class="fas fa-bell-slash fa-2x text-muted mb-2"></i>
-                      <p class="text-muted">Aucune notification</p>
+                      <p class="text-muted">No notifications</p>
                     </div>
                   `;
                 }
@@ -734,13 +734,13 @@
                   </div>
                   <div class="dropdown-divider my-0"></div>
                   <a href="{% url 'notifications:notification_list' %}" class="dropdown-item text-center py-2">
-                    <span class="text-primary">Voir toutes les notifications</span>
+                    <span class="text-primary">View all notifications</span>
                   </a>
                 `;
                 
                 dropdownMenu.innerHTML = dropdownContent;
                 
-                // Ajouter les écouteurs d'événements
+                // Add event listeners
                 initNotificationEvents();
                 
                 isLoaded = true;
@@ -748,9 +748,9 @@
           }
         });
         
-        // Fonction pour initialiser les événements des notifications
+        // Function to initialize notification events
         function initNotificationEvents() {
-          // Marquer une notification comme lue au clic
+          // Mark a notification as read on click
           const notificationItems = document.querySelectorAll('.notification-item');
           notificationItems.forEach(item => {
             item.addEventListener('click', function(e) {
@@ -759,7 +759,7 @@
               const relatedId = this.dataset.relatedId;
               const notificationType = this.querySelector('.avatar i').classList.contains('fa-book') ? 'new_course' : 'new_trainer';
               
-              // Marquer comme lu via AJAX
+              // Mark as read via AJAX
               fetch(`{% url 'notifications:mark_notification_read' 0 %}`.replace('0', notificationId), {
                 method: 'GET',
                 headers: {
@@ -768,14 +768,14 @@
               })
               .then(response => response.json())
               .then(data => {
-                // Enlever la classe unread
+                // Remove unread class
                 this.classList.remove('unread');
                 this.querySelector('.badge')?.remove();
                 
-                // Mettre à jour le compteur
+                // Update counter
                 updateNotificationCounter();
                 
-                // Rediriger vers la page correspondante
+                // Redirect to the corresponding page
                 if (notificationType === 'new_course') {
                   window.location.href = `/cours/detail/${relatedId}/`;
                 } else if (notificationType === 'new_trainer') {
@@ -785,7 +785,7 @@
             });
           });
           
-          // Marquer toutes les notifications comme lues
+          // Mark all notifications as read
           document.getElementById('mark-all-read')?.addEventListener('click', function(e) {
             e.preventDefault();
             
@@ -797,13 +797,13 @@
             })
             .then(response => response.json())
             .then(data => {
-              // Mise à jour visuelle
+              // Visual update
               document.querySelectorAll('.notification-item.unread').forEach(item => {
                 item.classList.remove('unread');
                 item.querySelector('.badge')?.remove();
               });
               
-              // Mettre à jour le compteur
+              // Update counter
               updateNotificationCounter();
             });
           });

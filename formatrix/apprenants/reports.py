@@ -12,22 +12,22 @@ class RapportsDemographiquesView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Récupérer tous les apprenants
+        # Get all learners
         all_apprenants = Apprenant.objects.all()
         
-        # Récupérer les hommes et les femmes
+        # Get men and women
         hommes = Apprenant.objects.filter(sexe='M')
         femmes = Apprenant.objects.filter(sexe='F')
         
-        # Statistiques par genre et tranche d'âge
+        # Statistics by gender and age group
         stats_age_hommes = {}
         stats_age_femmes = {}
         
-        # Statistiques par genre et niveau académique
+        # Statistics by gender and academic level
         stats_niveau_hommes = {}
         stats_niveau_femmes = {}
         
-        # Initialiser les dictionnaires avec des zéros
+        # Initialize dictionaries with zeros
         categories_age = [x[0] for x in Apprenant.CATEGORIE_AGE_CHOICES]
         niveaux_academiques = [x[0] for x in Apprenant.NIVEAU_ACADEMIQUE_CHOICES]
         
@@ -39,7 +39,7 @@ class RapportsDemographiquesView(TemplateView):
             stats_niveau_hommes[niveau] = 0
             stats_niveau_femmes[niveau] = 0
         
-        # Remplir les dictionnaires manuellement
+        # Fill dictionaries manually
         for homme in hommes:
             stats_age_hommes[homme.categorie_age] = stats_age_hommes.get(homme.categorie_age, 0) + 1
             stats_niveau_hommes[homme.niveau_academique] = stats_niveau_hommes.get(homme.niveau_academique, 0) + 1
@@ -48,23 +48,23 @@ class RapportsDemographiquesView(TemplateView):
             stats_age_femmes[femme.categorie_age] = stats_age_femmes.get(femme.categorie_age, 0) + 1
             stats_niveau_femmes[femme.niveau_academique] = stats_niveau_femmes.get(femme.niveau_academique, 0) + 1
         
-        # Calculer les totaux à partir des sommes des valeurs
+        # Calculate totals from sum of values
         total_hommes_age = sum(stats_age_hommes.values())
         total_hommes_niveau = sum(stats_niveau_hommes.values())
         total_femmes_age = sum(stats_age_femmes.values())
         total_femmes_niveau = sum(stats_niveau_femmes.values())
         
-        # Utiliser les totaux calculés
+        # Use calculated totals
         total_hommes = total_hommes_age
         total_femmes = total_femmes_age
         total_apprenants = total_hommes + total_femmes
         
-        # Vérifier la cohérence
+        # Check consistency
         if total_hommes_age != total_hommes_niveau:
-            logger.warning(f"Incohérence détectée entre les totaux d'âge et de niveau pour les hommes: {total_hommes_age} != {total_hommes_niveau}")
+            logger.warning(f"Inconsistency detected between age and level totals for men: {total_hommes_age} != {total_hommes_niveau}")
         
         if total_femmes_age != total_femmes_niveau:
-            logger.warning(f"Incohérence détectée entre les totaux d'âge et de niveau pour les femmes: {total_femmes_age} != {total_femmes_niveau}")
+            logger.warning(f"Inconsistency detected between age and level totals for women: {total_femmes_age} != {total_femmes_niveau}")
         
         context.update({
             'stats_age_hommes': stats_age_hommes,

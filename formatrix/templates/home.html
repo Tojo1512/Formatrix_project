@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Accueil - Formatrix{% endblock %}
+{% block title %}Home - Formatrix{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -97,11 +97,11 @@
 {% block content %}
 <div class="page-inner py-4">
   <div class="page-header mb-4">
-    <h4 class="page-title">Tableau de bord</h4>
+    <h4 class="page-title">Dashboard</h4>
   </div>
 
   {% if user.is_authenticated %}
-    <!-- Section de bienvenue -->
+    <!-- Welcome section -->
     <div class="row mb-4">
       <div class="col-md-12">
         <div class="card welcome-card">
@@ -115,13 +115,13 @@
                 {% endif %}
               </div>
               <div class="welcome-content">
-                <h4 class="fw-bold mb-1">Bonjour, {{ user.username }}</h4>
+                <h4 class="fw-bold mb-1">Hello, {{ user.username }}</h4>
                 <div class="d-flex align-items-center mb-2">
                   <span class="badge {% if user.is_staff %}bg-danger{% else %}bg-primary{% endif %} px-3 py-2 rounded-pill">
                     {% if user.is_staff %}
-                      <i class="fas fa-user-shield me-1"></i>Administrateur
+                      <i class="fas fa-user-shield me-1"></i>Administrator
                     {% else %}
-                      <i class="fas fa-chalkboard-teacher me-1"></i>Formateur
+                      <i class="fas fa-chalkboard-teacher me-1"></i>Trainer
                     {% endif %}
                   </span>
                   {% if user.email %}
@@ -130,15 +130,15 @@
                 </div>
                 <p class="text-muted mb-0">
                   {% if user.is_staff %}
-                    Vous avez accès à toutes les fonctionnalités d'administration de la plateforme.
+                    You have access to all administration features of the platform.
                   {% else %}
-                    Vous avez accès aux fonctionnalités de gestion des formations.
+                    You have access to training management features.
                   {% endif %}
                 </p>
               </div>
               <div class="ms-auto">
                 <a href="{% url 'admin:auth_user_change' user.id %}" class="btn btn-sm btn-outline-primary rounded-pill">
-                  <i class="fas fa-user-cog me-1"></i>Mon profil
+                  <i class="fas fa-user-cog me-1"></i>My profile
                 </a>
               </div>
             </div>
@@ -147,17 +147,17 @@
       </div>
     </div>
 
-    <!-- Graphiques d'activité - Mis en avant -->
+    <!-- Activity charts - Featured -->
     <div class="row mb-4">
       <div class="col-12">
-        <h5 class="section-title">Activité de la plateforme</h5>
+        <h5 class="section-title">Platform Activity</h5>
       </div>
       <div class="col-md-6">
         <div class="card shadow-sm h-100">
           <div class="card-header bg-gradient-primary text-white">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0 text-white">Séances à venir</h5>
-              <span class="badge bg-light text-primary">{{ upcoming_seances_count }} séances dans les 7 prochains jours</span>
+              <h5 class="mb-0 text-white">Upcoming Sessions</h5>
+              <span class="badge bg-light text-primary">{{ upcoming_seances_count }} sessions in the next 7 days</span>
             </div>
           </div>
           <div class="card-body">
@@ -172,8 +172,8 @@
         <div class="card shadow-sm h-100">
           <div class="card-header bg-gradient-info text-white">
             <div class="d-flex justify-content-between align-items-center">
-              <h5 class="mb-0 text-white">Activité des formateurs</h5>
-              <span class="badge bg-light text-info">{{ formateurs_count }} formateurs actifs</span>
+              <h5 class="mb-0 text-white">Trainer Activity</h5>
+              <span class="badge bg-light text-info">{{ formateurs_count }} active trainers</span>
             </div>
           </div>
           <div class="card-body">
@@ -185,10 +185,10 @@
       </div>
     </div>
 
-    <!-- Statistiques rapides -->
+    <!-- Quick statistics -->
     <div class="row mb-4">
       <div class="col-12">
-        <h5 class="section-title">Statistiques</h5>
+        <h5 class="section-title">Statistics</h5>
       </div>
       <div class="col-md-3">
         <div class="card stats-card primary">
@@ -198,7 +198,7 @@
                 <i class="fas fa-users fa-2x text-primary"></i>
               </div>
               <div>
-                <h6 class="text-muted mb-1">Apprenants</h6>
+                <h6 class="text-muted mb-1">Learners</h6>
                 <h4 class="mb-0">{{ apprenants_count }}</h4>
               </div>
             </div>
@@ -213,7 +213,7 @@
                 <i class="fas fa-calendar-alt fa-2x text-success"></i>
               </div>
               <div>
-                <h6 class="text-muted mb-1">Séances</h6>
+                <h6 class="text-muted mb-1">Sessions</h6>
                 <h4 class="mb-0">{{ seances_count }}</h4>
               </div>
             </div>
@@ -228,7 +228,7 @@
                 <i class="fas fa-book fa-2x text-info"></i>
               </div>
               <div>
-                <h6 class="text-muted mb-1">Cours</h6>
+                <h6 class="text-muted mb-1">Courses</h6>
                 <h4 class="mb-0">{{ cours_count }}</h4>
               </div>
             </div>
@@ -254,11 +254,11 @@
       {% endif %}
     </div>
 
-    <!-- Dernières inscriptions -->
+    <!-- Latest registrations -->
     {% if user.is_staff %}
     <div class="row mb-4">
       <div class="col-12">
-        <h5 class="section-title">Dernières inscriptions</h5>
+        <h5 class="section-title">Latest Registrations</h5>
       </div>
       <div class="col-md-12">
         <div class="card shadow-sm">
@@ -267,11 +267,11 @@
               <table class="table table-hover">
                 <thead class="table-light">
                   <tr>
-                    <th scope="col">Apprenant</th>
-                    <th scope="col">Formation</th>
+                    <th scope="col">Learner</th>
+                    <th scope="col">Course</th>
                     <th scope="col">Date</th>
                     <th scope="col">Client</th>
-                    <th scope="col">Statut</th>
+                    <th scope="col">Status</th>
                     <th scope="col" class="text-end">Actions</th>
                   </tr>
                 </thead>
@@ -296,7 +296,7 @@
                   {% empty %}
                   <tr>
                     <td colspan="6" class="text-center py-4">
-                      <i class="fas fa-info-circle text-muted me-2"></i> Aucune inscription récente
+                      <i class="fas fa-info-circle text-muted me-2"></i> No recent registration
                     </td>
                   </tr>
                   {% endfor %}
@@ -309,33 +309,33 @@
     </div>
     {% endif %}
 
-    <!-- Sections principales du tableau de bord -->
+    <!-- Main dashboard sections -->
     <div class="row mb-4">
       <div class="col-12">
-        <h5 class="section-title">Gestion de la plateforme</h5>
+        <h5 class="section-title">Platform Management</h5>
       </div>
-      <!-- Gestion des Cours -->
+      <!-- Course Management -->
       <div class="col-md-4 mb-4">
         <div class="card dashboard-card h-100">
           <div class="card-body text-center p-4">
             <div class="dashboard-icon text-primary">
               <i class="fas fa-book"></i>
             </div>
-            <h5 class="card-title">Gestion des Cours</h5>
-            <p class="card-text">Créez et gérez vos cours, programmes et matériels pédagogiques.</p>
+            <h5 class="card-title">Course Management</h5>
+            <p class="card-text">Create and manage your courses, programs, and educational materials.</p>
             <div class="mt-4">
               <a href="{% url 'cours:cours-list' %}" class="btn btn-primary">
-                <i class="fas fa-list me-1"></i> Liste des cours
+                <i class="fas fa-list me-1"></i> Course List
               </a>
               <a href="{% url 'cours:cours-create' %}" class="btn btn-outline-primary mt-2">
-                <i class="fas fa-plus me-1"></i> Nouveau cours
+                <i class="fas fa-plus me-1"></i> New Course
               </a>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- Inscriptions -->
+      <!-- Registrations -->
       {% if user.is_staff %}
       <div class="col-md-4 mb-4">
         <div class="card dashboard-card h-100">
@@ -343,14 +343,14 @@
             <div class="dashboard-icon text-success">
               <i class="fas fa-user-graduate"></i>
             </div>
-            <h5 class="card-title">Inscriptions</h5>
-            <p class="card-text">Gérez les inscriptions des apprenants aux différentes formations.</p>
+            <h5 class="card-title">Registrations</h5>
+            <p class="card-text">Manage learner registrations for different courses.</p>
             <div class="mt-4">
               <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-success">
-                <i class="fas fa-list me-1"></i> Liste des inscriptions
+                <i class="fas fa-list me-1"></i> Registration List
               </a>
               <a href="{% url 'inscriptions:inscription-multiple' %}" class="btn btn-outline-success mt-2">
-                <i class="fas fa-users me-1"></i> Inscription multiple
+                <i class="fas fa-users me-1"></i> Multiple Registration
               </a>
             </div>
           </div>
@@ -358,7 +358,7 @@
       </div>
       {% endif %}
       
-      <!-- Formateurs -->
+      <!-- Trainers -->
       {% if user.is_staff %}
       <div class="col-md-4 mb-4">
         <div class="card dashboard-card h-100">
@@ -366,14 +366,14 @@
             <div class="dashboard-icon text-info">
               <i class="fas fa-chalkboard-teacher"></i>
             </div>
-            <h5 class="card-title">Formateurs</h5>
-            <p class="card-text">Gérez l'équipe de formateurs et leurs disponibilités.</p>
+            <h5 class="card-title">Trainers</h5>
+            <p class="card-text">Manage the trainer team and their availability.</p>
             <div class="mt-4">
               <a href="{% url 'formateurs:formateur-list' %}" class="btn btn-info">
-                <i class="fas fa-list me-1"></i> Liste des formateurs
+                <i class="fas fa-list me-1"></i> Trainer List
               </a>
               <a href="{% url 'formateurs:formateur-create' %}" class="btn btn-outline-info mt-2">
-                <i class="fas fa-plus me-1"></i> Nouveau formateur
+                <i class="fas fa-plus me-1"></i> New Trainer
               </a>
             </div>
           </div>
@@ -387,60 +387,60 @@
       <div class="col-12">
         <h5 class="section-title">Administration</h5>
       </div>
-      <!-- Facturation -->
+      <!-- Billing -->
       <div class="col-md-4 mb-4">
         <div class="card dashboard-card h-100">
           <div class="card-body text-center p-4">
             <div class="dashboard-icon text-warning">
               <i class="fas fa-file-invoice-dollar"></i>
             </div>
-            <h5 class="card-title">Facturation</h5>
-            <p class="card-text">Gérez les factures, paiements et suivez les transactions financières.</p>
+            <h5 class="card-title">Billing</h5>
+            <p class="card-text">Manage invoices, payments, and track financial transactions.</p>
             <div class="mt-4">
               <a href="{% url 'paiements:facture-list' %}" class="btn btn-warning">
-                <i class="fas fa-list me-1"></i> Liste des factures
+                <i class="fas fa-list me-1"></i> Invoice List
               </a>
               <a href="{% url 'paiements:facture-create' %}" class="btn btn-outline-warning mt-2">
-                <i class="fas fa-plus me-1"></i> Nouvelle facture
+                <i class="fas fa-plus me-1"></i> New Invoice
               </a>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- Rapports -->
+      <!-- Reports -->
       <div class="col-md-4 mb-4">
         <div class="card dashboard-card h-100">
           <div class="card-body text-center p-4">
             <div class="dashboard-icon text-danger">
               <i class="fas fa-chart-bar"></i>
             </div>
-            <h5 class="card-title">Rapports</h5>
-            <p class="card-text">Consultez les statistiques et générez des rapports détaillés.</p>
+            <h5 class="card-title">Reports</h5>
+            <p class="card-text">View statistics and generate detailed reports.</p>
             <div class="mt-4">
               <a href="{% url 'rapports:clients' %}" class="btn btn-danger">
-                <i class="fas fa-chart-pie me-1"></i> Rapports clients
+                <i class="fas fa-chart-pie me-1"></i> Client Reports
               </a>
               <a href="{% url 'rapports:dashboard' %}" class="btn btn-outline-danger mt-2">
-                <i class="fas fa-file-export me-1"></i> Tableau de bord
+                <i class="fas fa-file-export me-1"></i> Dashboard
               </a>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- Paramètres -->
+      <!-- Settings -->
       <div class="col-md-4 mb-4">
         <div class="card dashboard-card h-100">
           <div class="card-body text-center p-4">
             <div class="dashboard-icon text-secondary">
               <i class="fas fa-cogs"></i>
             </div>
-            <h5 class="card-title">Paramètres</h5>
-            <p class="card-text">Configurez les paramètres de la plateforme et gérez les accès utilisateurs.</p>
+            <h5 class="card-title">Settings</h5>
+            <p class="card-text">Configure platform settings and manage user access.</p>
             <div class="mt-4">
               <a href="{% url 'admin:auth_user_changelist' %}" class="btn btn-secondary">
-                <i class="fas fa-user-cog me-1"></i> Gestion des utilisateurs
+                <i class="fas fa-user-cog me-1"></i> User Management
               </a>
               <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary mt-2">
                 <i class="fas fa-cog me-1"></i> Configuration

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Bienvenue sur Formatrix{% endblock %}
+{% block title %}Welcome to Formatrix{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -127,7 +127,7 @@
   <div class="welcome-card">
     <div class="welcome-header">
       <h1>Formatrix</h1>
-      <p>Plateforme de gestion de formations professionnelles</p>
+      <p>Professional Training Management Platform</p>
     </div>
     <div class="welcome-body">
       <div class="user-types">
@@ -135,10 +135,10 @@
           <div class="user-icon admin">
             <i class="fas fa-user-shield"></i>
           </div>
-          <h3>Administrateur</h3>
-          <p>Accédez à toutes les fonctionnalités d'administration de la plateforme.</p>
+          <h3>Administrator</h3>
+          <p>Access all administration features of the platform.</p>
           <a href="{% url 'login' %}" class="btn btn-primary btn-connect">
-            <i class="fas fa-sign-in-alt me-2"></i>Connexion
+            <i class="fas fa-sign-in-alt me-2"></i>Login
           </a>
         </div>
         
@@ -146,10 +146,10 @@
           <div class="user-icon formateur">
             <i class="fas fa-chalkboard-teacher"></i>
           </div>
-          <h3>Formateur</h3>
-          <p>Gérez vos cours et suivez vos apprenants.</p>
+          <h3>Trainer</h3>
+          <p>Manage your courses and monitor your learners.</p>
           <a href="{% url 'login' %}" class="btn btn-success btn-connect">
-            <i class="fas fa-sign-in-alt me-2"></i>Connexion
+            <i class="fas fa-sign-in-alt me-2"></i>Login
           </a>
         </div>
       </div>

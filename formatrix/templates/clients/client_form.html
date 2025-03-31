@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if object.clientid %}Modifier{% else %}Créer{% endif %} un client - Formatrix{% endblock %}
+{% block title %}{% if object.clientid %}Edit{% else %}Create{% endif %} Client - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
@@ -13,15 +13,15 @@
     <div class="col-md-8">
       <h1>
         {% if object %}
-          <i class="fas fa-edit"></i> Modifier un client
+          <i class="fas fa-edit"></i> Edit Client
         {% else %}
-          <i class="fas fa-plus-circle"></i> Ajouter un client
+          <i class="fas fa-plus-circle"></i> Add Client
         {% endif %}
       </h1>
     </div>
     <div class="col-md-4 text-right">
       <a href="{% url 'clients:client-list' %}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Retour
+        <i class="fas fa-arrow-left"></i> Back
       </a>
     </div>
   </div>
@@ -39,11 +39,11 @@
 
   {% if form.errors %}
     <div class="alert alert-danger">
-      <i class="fas fa-exclamation-triangle"></i> Veuillez corriger les erreurs ci-dessous
+      <i class="fas fa-exclamation-triangle"></i> Please correct the errors below
     </div>
   {% endif %}
   
-  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+  <p class="text-muted">Fill in all required fields marked with a <span class="text-danger">*</span></p>
 
   {% if form.non_field_errors %}
   <div class="alert alert-danger">
@@ -56,11 +56,11 @@
   <form method="post" novalidate>
     {% csrf_token %}
     
-    <!-- Informations de l'entité -->
+    <!-- Entity Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-building"></i>
-        Informations de l'entité
+        Entity Information
       </h3>
       <div class="row">
         <div class="col-md-6">
@@ -77,13 +77,13 @@
         <div class="col-md-6">
           <div class="form-group {% if form.sigle.errors %}has-error{% endif %}">
             <label for="{{ form.sigle.id_for_label }}" class="form-label">
-              Sigle/Acronyme
+              Acronym
             </label>
             {{ form.sigle }}
             {% if form.sigle.errors %}
             <div class="error-message">{{ form.sigle.errors.0 }}</div>
             {% endif %}
-            <small class="text-muted">Optionnel. Exemple: ONU, UNESCO, etc.</small>
+            <small class="text-muted">Optional. Example: UN, UNESCO, etc.</small>
           </div>
         </div>
       </div>
@@ -103,13 +103,13 @@
         <div class="col-md-6">
           <div class="form-group {% if form.typeclientid.errors %}has-error{% endif %}">
             <label for="{{ form.typeclientid.id_for_label }}" class="form-label">
-              Type de client
+              Client Type
             </label>
             {{ form.typeclientid }}
             {% if form.typeclientid.errors %}
             <div class="error-message">{{ form.typeclientid.errors.0 }}</div>
             {% endif %}
-            <small class="text-muted">Ce champ est optionnel. Vous pourrez définir le type plus tard.</small>
+            <small class="text-muted">This field is optional. You can define the type later.</small>
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.site_web.errors %}has-error{% endif %}">
             <label for="{{ form.site_web.id_for_label }}" class="form-label">
-              Site web
+              Website
             </label>
             {{ form.site_web }}
             {% if form.site_web.errors %}
@@ -129,7 +129,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.numero_immatriculation.errors %}has-error{% endif %}">
             <label for="{{ form.numero_immatriculation.id_for_label }}" class="form-label">
-              Numéro d'immatriculation
+              Registration Number
             </label>
             {{ form.numero_immatriculation }}
             {% if form.numero_immatriculation.errors %}
@@ -140,17 +140,17 @@
       </div>
     </div>
     
-    <!-- Adresse et localisation -->
+    <!-- Address and Location -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-map-marker-alt"></i>
-        Adresse et localisation
+        Address and Location
       </h3>
       <div class="row">
         <div class="col-md-12">
           <div class="form-group {% if form.adresse_siege.errors %}has-error{% endif %}">
             <label for="{{ form.adresse_siege.id_for_label }}" class="form-label">
-              Adresse du siège
+              Headquarters Address
             </label>
             {{ form.adresse_siege }}
             {% if form.adresse_siege.errors %}
@@ -164,7 +164,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.ville.errors %}has-error{% endif %}">
             <label for="{{ form.ville.id_for_label }}" class="form-label">
-              Ville
+              City
             </label>
             {{ form.ville }}
             {% if form.ville.errors %}
@@ -175,7 +175,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.localite.errors %}has-error{% endif %}">
             <label for="{{ form.localite.id_for_label }}" class="form-label">
-              Localité
+              Location
             </label>
             {{ form.localite }}
             {% if form.localite.errors %}
@@ -186,11 +186,11 @@
       </div>
     </div>
     
-    <!-- Informations de contact -->
+    <!-- Contact Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-address-card"></i>
-        Informations de contact
+        Contact Information
       </h3>
       <div class="row">
         <div class="col-md-6">
@@ -207,7 +207,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
             <label for="{{ form.telephone.id_for_label }}" class="form-label">
-              Téléphone
+              Phone
             </label>
             {{ form.telephone }}
             {% if form.telephone.errors %}
@@ -221,7 +221,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.personne_contact.errors %}has-error{% endif %}">
             <label for="{{ form.personne_contact.id_for_label }}" class="form-label">
-              Personne de contact
+              Contact Person
             </label>
             {{ form.personne_contact }}
             {% if form.personne_contact.errors %}
@@ -232,7 +232,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.fonction_contact.errors %}has-error{% endif %}">
             <label for="{{ form.fonction_contact.id_for_label }}" class="form-label">
-              Fonction du contact
+              Contact Role
             </label>
             {{ form.fonction_contact }}
             {% if form.fonction_contact.errors %}
@@ -246,7 +246,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.email_contact.errors %}has-error{% endif %}">
             <label for="{{ form.email_contact.id_for_label }}" class="form-label">
-              Email du contact
+              Contact Email
             </label>
             {{ form.email_contact }}
             {% if form.email_contact.errors %}
@@ -257,7 +257,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.telephone_contact.errors %}has-error{% endif %}">
             <label for="{{ form.telephone_contact.id_for_label }}" class="form-label">
-              Téléphone du contact
+              Contact Phone
             </label>
             {{ form.telephone_contact }}
             {% if form.telephone_contact.errors %}
@@ -269,12 +269,13 @@
     </div>
     
     <div class="form-actions">
-      <a href="{% url 'clients:client-list' %}" class="btn btn-outline">
-        <i class="fas fa-times"></i> Annuler
-      </a>
       <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save"></i> Enregistrer
+        <i class="fas fa-save"></i>
+        {% if object %}Save Changes{% else %}Create Client{% endif %}
       </button>
+      <a href="{% url 'clients:client-list' %}" class="btn btn-outline-secondary ms-2">
+        <i class="fas fa-times"></i> Cancel
+      </a>
     </div>
   </form>
 </div>

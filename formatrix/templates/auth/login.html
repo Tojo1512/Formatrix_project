@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Connexion - Formatrix{% endblock %}
+{% block title %}Login - Formatrix{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -100,9 +100,9 @@
       <div class="card auth-card">
         <div class="auth-header">
           <h4 class="text-white mb-0 text-center">
-            <i class="fas fa-sign-in-alt me-2"></i>Connexion
+            <i class="fas fa-sign-in-alt me-2"></i>Login
           </h4>
-          <p class="text-white-50 text-center mb-0 mt-2">Accédez à votre compte Formatrix</p>
+          <p class="text-white-50 text-center mb-0 mt-2">Access your Formatrix account</p>
         </div>
         <div class="card-body p-4">
           {% if form.errors %}
@@ -112,7 +112,7 @@
                 <i class="fas fa-exclamation-triangle"></i>
               </div>
               <div class="flex-grow-1">
-                <strong>Erreur</strong> - Identifiant ou mot de passe incorrect.
+                <strong>Error</strong> - Incorrect username or password.
               </div>
             </div>
           </div>
@@ -122,28 +122,28 @@
             {% csrf_token %}
             
             <div class="form-group mb-4">
-              <label class="form-label">Nom d'utilisateur</label>
+              <label class="form-label">Username</label>
               <div class="input-group">
                 <span class="input-group-text bg-primary text-white">
                   <i class="fas fa-user"></i>
                 </span>
-                <input type="text" name="username" id="id_username" class="form-control" placeholder="Entrez votre nom d'utilisateur" required>
+                <input type="text" name="username" id="id_username" class="form-control" placeholder="Enter your username" required>
               </div>
             </div>
 
             <div class="form-group mb-4">
-              <label class="form-label">Mot de passe</label>
+              <label class="form-label">Password</label>
               <div class="input-group">
                 <span class="input-group-text bg-primary text-white">
                   <i class="fas fa-lock"></i>
                 </span>
-                <input type="password" name="password" id="id_password" class="form-control" placeholder="Entrez votre mot de passe" required>
+                <input type="password" name="password" id="id_password" class="form-control" placeholder="Enter your password" required>
                 <button type="button" class="btn btn-outline-secondary toggle-password" data-target="id_password">
                   <i class="fas fa-eye"></i>
                 </button>
               </div>
               <div class="mt-2 text-end">
-                <a href="{% url 'password_reset' %}" class="text-primary fw-bold">Mot de passe oublié ?</a>
+                <a href="{% url 'password_reset' %}" class="text-primary fw-bold">Forgot password?</a>
               </div>
             </div>
 
@@ -151,21 +151,21 @@
 
             <div class="form-group mb-4 mt-4">
               <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
-                <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                <i class="fas fa-sign-in-alt me-2"></i>Login
               </button>
             </div>
           </form>
           
           <div class="divider">
-            <span>Pas encore de compte ?</span>
+            <span>Don't have an account yet?</span>
           </div>
           
           <div class="auth-options">
             <a href="{% url 'admin-register' %}" class="btn btn-lg auth-option-btn admin text-white">
-              <i class="fas fa-user-shield me-2"></i>Administrateur
+              <i class="fas fa-user-shield me-2"></i>Administrator
             </a>
             <a href="{% url 'formateurs:formateur-register' %}" class="btn btn-lg auth-option-btn formateur text-white">
-              <i class="fas fa-chalkboard-teacher me-2"></i>Formateur
+              <i class="fas fa-chalkboard-teacher me-2"></i>Trainer
             </a>
           </div>
         </div>
