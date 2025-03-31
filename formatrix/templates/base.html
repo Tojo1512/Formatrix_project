@@ -454,12 +454,13 @@
             <!-- Removed debug info section as requested -->
             
             {% if user.is_staff %}
-              <li class="nav-item">
+              <!-- Administration link commented out as requested -->
+              <!-- <li class="nav-item">
                 <a href="{% url 'admin:index' %}">
                   <i class="fas fa-cog"></i>
                   <p>Administration</p>
                 </a>
-              </li>
+              </li> -->
             {% endif %}
           </ul>
         </div>
