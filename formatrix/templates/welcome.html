@@ -137,9 +137,14 @@
           </div>
           <h3>Administrator</h3>
           <p>Access all administration features of the platform.</p>
-          <a href="{% url 'login' %}" class="btn btn-primary btn-connect">
-            <i class="fas fa-sign-in-alt me-2"></i>Login
-          </a>
+          <div class="d-flex flex-column gap-2">
+            <a href="{% url 'login' %}" class="btn btn-primary btn-connect">
+              <i class="fas fa-sign-in-alt me-2"></i>Login
+            </a>
+            <a href="{% url 'admin-register' %}" class="btn btn-outline-primary btn-connect">
+              <i class="fas fa-user-plus me-2"></i>Register
+            </a>
+          </div>
         </div>
         
         <div class="user-type-card formateur">
@@ -148,9 +153,14 @@
           </div>
           <h3>Trainer</h3>
           <p>Manage your courses and monitor your learners.</p>
-          <a href="{% url 'login' %}" class="btn btn-success btn-connect">
-            <i class="fas fa-sign-in-alt me-2"></i>Login
-          </a>
+          <div class="d-flex flex-column gap-2">
+            <a href="{% url 'login' %}" class="btn btn-success btn-connect">
+              <i class="fas fa-sign-in-alt me-2"></i>Login
+            </a>
+            <a href="{% url 'formateurs:formateur-register' %}" class="btn btn-outline-success btn-connect">
+              <i class="fas fa-user-plus me-2"></i>Register
+            </a>
+          </div>
         </div>
       </div>
     </div>
