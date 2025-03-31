@@ -53,22 +53,22 @@
     <div class="ms-auto">
       <div class="btn-group">
         <a href="{% url 'formateurs:formateur-update' formateur.formateurid %}" class="btn btn-warning">
-          <i class="fas fa-edit me-2"></i>Modifier
+          <i class="fas fa-edit me-2"></i>Edit
         </a>
         <a href="{% url 'formateurs:formateur-list' %}" class="btn btn-secondary">
-          <i class="fas fa-arrow-left me-2"></i>Retour
+          <i class="fas fa-arrow-left me-2"></i>Back
         </a>
       </div>
     </div>
   </div>
 
   <div class="row">
-    <!-- Colonne de gauche -->
+    <!-- Left Column -->
     <div class="col-md-6">
-      <!-- Informations personnelles -->
+      <!-- Personal Information -->
       <div class="info-card">
         <div class="info-card-header">
-          <i class="fas fa-user me-2"></i>Informations personnelles
+          <i class="fas fa-user me-2"></i>Personal Information
         </div>
         <div class="info-card-body">
           <div class="profile-photo-container mb-4">
@@ -84,7 +84,7 @@
           </div>
           
           <div class="info-item">
-            <div class="info-label">Nom complet</div>
+            <div class="info-label">Full Name</div>
             <div class="info-value">{{ formateur.prenom }} {{ formateur.nom }}</div>
           </div>
           <div class="info-item">
@@ -92,43 +92,43 @@
             <div class="info-value">{{ formateur.email }}</div>
           </div>
           <div class="info-item">
-            <div class="info-label">Téléphone</div>
+            <div class="info-label">Phone</div>
             <div class="info-value">{{ formateur.telephone }}</div>
           </div>
           <div class="info-item">
-            <div class="info-label">Date de naissance</div>
+            <div class="info-label">Date of Birth</div>
             <div class="info-value">{{ formateur.date_naissance|date:"d/m/Y" }}</div>
           </div>
           <div class="info-item">
-            <div class="info-label">Adresse</div>
+            <div class="info-label">Address</div>
             <div class="info-value">{{ formateur.adresse }}</div>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Colonne de droite -->
+    <!-- Right Column -->
     <div class="col-md-6">
-      <!-- Informations professionnelles -->
+      <!-- Professional Information -->
       <div class="info-card">
         <div class="info-card-header">
-          <i class="fas fa-briefcase me-2"></i>Informations professionnelles
+          <i class="fas fa-briefcase me-2"></i>Professional Information
         </div>
         <div class="info-card-body">
           <div class="info-item">
-            <div class="info-label">Type de formateur</div>
+            <div class="info-label">Trainer Type</div>
             <div class="info-value">
               <span class="badge bg-info">{{ formateur.get_type_formateur_display }}</span>
             </div>
           </div>
           <div class="info-item">
-            <div class="info-label">Niveau d'expertise</div>
+            <div class="info-label">Expertise Level</div>
             <div class="info-value">
               <span class="badge bg-secondary">{{ formateur.get_niveau_expertise_display }}</span>
             </div>
           </div>
           <div class="info-item">
-            <div class="info-label">Statut</div>
+            <div class="info-label">Status</div>
             <div class="info-value">
               <span class="badge {% if formateur.statut == 'actif' %}bg-success{% elif formateur.statut == 'inactif' %}bg-danger{% else %}bg-warning{% endif %}">
                 {{ formateur.get_statut_display }}
@@ -136,19 +136,19 @@
             </div>
           </div>
           <div class="info-item">
-            <div class="info-label">Spécialités</div>
+            <div class="info-label">Specialties</div>
             <div class="info-value">
               {% if specialites_list %}
                 {% for specialite in specialites_list %}
                   <span class="badge bg-primary me-1 mb-1">{{ specialite }}</span>
                 {% endfor %}
               {% else %}
-                <span class="text-muted">Aucune spécialité définie</span>
+                <span class="text-muted">No specialties defined</span>
               {% endif %}
             </div>
           </div>
           <div class="info-item">
-            <div class="info-label">Disponibilité</div>
+            <div class="info-label">Availability</div>
             <div class="info-value">{{ formateur.disponibilite|linebreaks }}</div>
           </div>
         </div>
@@ -156,15 +156,15 @@
     </div>
   </div>
   
-  <!-- Cours assignés -->
+  <!-- Assigned Courses -->
   <div class="info-card mt-4">
     <div class="info-card-header d-flex justify-content-between align-items-center">
       <div>
-        <i class="fas fa-book me-2"></i>Cours assignés
+        <i class="fas fa-book me-2"></i>Assigned Courses
       </div>
       <div>
         <a href="{% url 'formateurs:formateur-cours-detail' formateur.formateurid %}" class="btn btn-sm btn-primary">
-          <i class="fas fa-list me-1"></i> Voir tous les cours
+          <i class="fas fa-list me-1"></i> View All Courses
         </a>
       </div>
     </div>
@@ -174,10 +174,10 @@
           <table class="table table-hover">
             <thead>
               <tr>
-                <th>Nom du cours</th>
+                <th>Course Name</th>
                 <th>Type</th>
-                <th>Niveau</th>
-                <th>Statut</th>
+                <th>Level</th>
+                <th>Status</th>
                 <th class="text-end">Actions</th>
               </tr>
             </thead>
@@ -209,14 +209,14 @@
           {% if formateur.cours_assignes.all.count > 5 %}
             <div class="text-center mt-3">
               <a href="{% url 'formateurs:formateur-cours-detail' formateur.formateurid %}" class="btn btn-outline-primary">
-                Voir tous les cours ({{ formateur.cours_assignes.all.count }})
+                View All Courses ({{ formateur.cours_assignes.all.count }})
               </a>
             </div>
           {% endif %}
         </div>
       {% else %}
         <div class="alert alert-info">
-          <i class="fas fa-info-circle me-2"></i>Ce formateur n'est assigné à aucun cours pour le moment.
+          <i class="fas fa-info-circle me-2"></i>This trainer is not assigned to any courses yet.
         </div>
       {% endif %}
     </div>
@@ -224,14 +224,14 @@
   
   <div class="d-flex justify-content-between mt-3">
     <a href="{% url 'formateurs:formateur-list' %}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+      <i class="fas fa-arrow-left me-2"></i>Back to List
     </a>
     <div>
       <a href="{% url 'formateurs:formateur-update' formateur.formateurid %}" class="btn btn-warning">
-        <i class="fas fa-edit me-2"></i>Modifier
+        <i class="fas fa-edit me-2"></i>Edit
       </a>
       <a href="{% url 'formateurs:formateur-delete' formateur.formateurid %}" class="btn btn-danger ms-2">
-        <i class="fas fa-trash me-2"></i>Supprimer
+        <i class="fas fa-trash me-2"></i>Delete
       </a>
     </div>
   </div>

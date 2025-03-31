@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if object.formateurid %}Modifier{% else %}Ajouter{% endif %} un Formateur - Formatrix{% endblock %}
+{% block title %}{% if object.formateurid %}Edit{% else %}Add{% endif %} a Trainer - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
@@ -161,15 +161,15 @@
   <div class="form-header">
     <h1 class="form-title">
       <i class="fas {% if object.formateurid %}fa-edit{% else %}fa-user-plus{% endif %}"></i>
-      {% if object.formateurid %}Modifier{% else %}Ajouter{% endif %} un Formateur
+      {% if object.formateurid %}Edit{% else %}Add{% endif %} a Trainer
     </h1>
     <a href="{% url 'formateurs:formateur-list' %}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left"></i> Retour
+      <i class="fas fa-arrow-left"></i> Back
     </a>
   </div>
 
   <div class="form-legend">
-    <span class="required">*</span> indique un champ obligatoire
+    <span class="required">*</span> indicates a required field
   </div>
 
   {% if messages %}
@@ -186,16 +186,16 @@
   <form method="post" enctype="multipart/form-data" novalidate id="formateur-form">
     {% csrf_token %}
     
-    <!-- Informations personnelles -->
+    <!-- Personal Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-user"></i>
-        Informations personnelles
+        Personal Information
       </h3>
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.prenom.id_for_label }}">Prénom <span class="required">*</span></label>
+            <label for="{{ form.prenom.id_for_label }}">First Name <span class="required">*</span></label>
             {{ form.prenom }}
             {% if form.prenom.errors %}
             <div class="invalid-feedback">
@@ -208,7 +208,7 @@
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.nom.id_for_label }}">Nom <span class="required">*</span></label>
+            <label for="{{ form.nom.id_for_label }}">Last Name <span class="required">*</span></label>
             {{ form.nom }}
             {% if form.nom.errors %}
             <div class="invalid-feedback">
@@ -224,7 +224,7 @@
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.date_naissance.id_for_label }}">Date de naissance <span class="required">*</span></label>
+            <label for="{{ form.date_naissance.id_for_label }}">Date of Birth <span class="required">*</span></label>
             {{ form.date_naissance }}
             {% if form.date_naissance.errors %}
             <div class="invalid-feedback">
@@ -253,7 +253,7 @@
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.telephone.id_for_label }}">Téléphone <span class="required">*</span></label>
+            <label for="{{ form.telephone.id_for_label }}">Phone <span class="required">*</span></label>
             {{ form.telephone }}
             {% if form.telephone.errors %}
             <div class="invalid-feedback">
@@ -266,7 +266,7 @@
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.adresse.id_for_label }}">Adresse <span class="required">*</span></label>
+            <label for="{{ form.adresse.id_for_label }}">Address <span class="required">*</span></label>
             {{ form.adresse }}
             {% if form.adresse.errors %}
             <div class="invalid-feedback">
@@ -282,7 +282,7 @@
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.ville.id_for_label }}">Ville <span class="required">*</span></label>
+            <label for="{{ form.ville.id_for_label }}">City <span class="required">*</span></label>
             {{ form.ville }}
             {% if form.ville.errors %}
             <div class="invalid-feedback">
@@ -296,16 +296,16 @@
       </div>
     </div>
     
-    <!-- Informations professionnelles -->
+    <!-- Professional Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-briefcase"></i>
-        Informations professionnelles
+        Professional Information
       </h3>
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.type_formateur.id_for_label }}">Type de formateur <span class="required">*</span></label>
+            <label for="{{ form.type_formateur.id_for_label }}">Trainer Type <span class="required">*</span></label>
             {{ form.type_formateur }}
             {% if form.type_formateur.errors %}
             <div class="invalid-feedback">
@@ -318,7 +318,7 @@
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.niveau_expertise.id_for_label }}">Niveau d'expertise <span class="required">*</span></label>
+            <label for="{{ form.niveau_expertise.id_for_label }}">Expertise Level <span class="required">*</span></label>
             {{ form.niveau_expertise }}
             {% if form.niveau_expertise.errors %}
             <div class="invalid-feedback">
@@ -334,7 +334,7 @@
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.specialites.id_for_label }}">Spécialités</label>
+            <label for="{{ form.specialites.id_for_label }}">Specialties</label>
             {{ form.specialites }}
             {% if form.specialites.errors %}
             <div class="invalid-feedback">
@@ -343,12 +343,12 @@
               {% endfor %}
             </div>
             {% endif %}
-            <small class="form-text text-muted">Séparez les spécialités par des virgules</small>
+            <small class="form-text text-muted">Separate specialties with commas</small>
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label for="{{ form.statut.id_for_label }}">Statut <span class="required">*</span></label>
+            <label for="{{ form.statut.id_for_label }}">Status <span class="required">*</span></label>
             {{ form.statut }}
             {% if form.statut.errors %}
             <div class="invalid-feedback">
@@ -364,7 +364,7 @@
       <div class="row">
         <div class="col-md-12">
           <div class="form-group">
-            <label for="{{ form.disponibilite.id_for_label }}">Disponibilité</label>
+            <label for="{{ form.disponibilite.id_for_label }}">Availability</label>
             {{ form.disponibilite }}
             {% if form.disponibilite.errors %}
             <div class="invalid-feedback">
@@ -378,28 +378,28 @@
       </div>
     </div>
     
-    <!-- Documents et Photo -->
+    <!-- Documents and Photo -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-file-alt"></i>
-        Documents et Photo
+        Documents and Photo
       </h3>
       
       <!-- Photo upload -->
       <div class="row mb-4">
         <div class="col-md-12">
-          <label class="form-label">Photo de profil</label>
+          <label class="form-label">Profile Photo</label>
           <div class="file-upload-container">
             <div class="file-preview" id="photo-preview">
               {% if object.photo %}
-                <img src="{{ object.photo.url }}" alt="Photo du formateur">
+                <img src="{{ object.photo.url }}" alt="Trainer photo">
                 <div class="file-name">{{ object.photo.name|slice:"12:" }}</div>
                 <div class="file-size">{{ object.photo.size|filesizeformat }}</div>
               {% else %}
                 <i class="fas fa-user-circle"></i>
                 <div class="upload-instructions">
-                  <strong>Cliquez ou glissez une image ici</strong>
-                  <div>Formats acceptés: JPG, PNG, GIF (max 5MB)</div>
+                  <strong>Click or drop an image here</strong>
+                  <div>Accepted formats: JPG, PNG, GIF (max 5MB)</div>
                 </div>
               {% endif %}
             </div>
@@ -409,10 +409,10 @@
             </div>
             <div class="file-controls">
               <label for="{{ form.photo.id_for_label }}" class="file-label">
-                <i class="fas fa-upload me-2"></i>Choisir une photo
+                <i class="fas fa-upload me-2"></i>Choose a photo
               </label>
               <button type="button" class="file-remove-btn" id="photo-remove">
-                <i class="fas fa-trash me-2"></i>Supprimer
+                <i class="fas fa-trash me-2"></i>Delete
               </button>
             </div>
             {% if form.photo.errors %}
@@ -429,7 +429,7 @@
       <!-- CV upload -->
       <div class="row">
         <div class="col-md-12">
-          <label class="form-label">CV</label>
+          <label class="form-label">Resume/CV</label>
           <div class="file-upload-container">
             <div class="file-preview" id="cv-preview">
               {% if object.cv %}
@@ -439,8 +439,8 @@
               {% else %}
                 <i class="fas fa-file-upload"></i>
                 <div class="upload-instructions">
-                  <strong>Cliquez ou glissez un fichier ici</strong>
-                  <div>Formats acceptés: PDF, DOC, DOCX (max 10MB)</div>
+                  <strong>Click or drop a file here</strong>
+                  <div>Accepted formats: PDF, DOC, DOCX (max 10MB)</div>
                 </div>
               {% endif %}
             </div>
@@ -450,10 +450,10 @@
             </div>
             <div class="file-controls">
               <label for="{{ form.cv.id_for_label }}" class="file-label">
-                <i class="fas fa-upload me-2"></i>Choisir un CV
+                <i class="fas fa-upload me-2"></i>Choose a resume
               </label>
               <button type="button" class="file-remove-btn" id="cv-remove">
-                <i class="fas fa-trash me-2"></i>Supprimer
+                <i class="fas fa-trash me-2"></i>Delete
               </button>
             </div>
             {% if form.cv.errors %}
@@ -470,10 +470,10 @@
     
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save"></i> Enregistrer
+        <i class="fas fa-save"></i> Save
       </button>
       <a href="{% url 'formateurs:formateur-list' %}" class="btn btn-secondary">
-        <i class="fas fa-times"></i> Annuler
+        <i class="fas fa-times"></i> Cancel
       </a>
     </div>
   </form>
@@ -482,7 +482,7 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Fonction pour formater la taille des fichiers
+    // Function to format file size
     function formatFileSize(bytes) {
       if (bytes === 0) return '0 Bytes';
       const k = 1024;
@@ -491,7 +491,7 @@
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
     
-    // Fonction pour vérifier la taille du fichier
+    // Function to check file size
     function checkFileSize(file, maxSize) {
       if (file.size > maxSize) {
         return false;
@@ -499,7 +499,7 @@
       return true;
     }
     
-    // Fonction pour simuler la progression de l'upload
+    // Function to simulate upload progress
     function simulateProgress(progressBar) {
       let width = 0;
       const interval = setInterval(function() {
@@ -511,46 +511,46 @@
         }
       }, 50);
       
-      // Réinitialiser après 2 secondes
+      // Reset after 2 seconds
       setTimeout(function() {
         progressBar.style.width = '0%';
         progressBar.parentElement.style.display = 'none';
       }, 2000);
     }
     
-    // Configuration pour l'upload de photo
+    // Photo upload configuration
     const photoInput = document.getElementById('{{ form.photo.id_for_label }}');
     const photoPreview = document.getElementById('photo-preview');
     const photoProgress = document.getElementById('photo-progress');
     const photoRemoveBtn = document.getElementById('photo-remove');
     
     if (photoInput && photoPreview) {
-      // Afficher le bouton de suppression si une photo existe déjà
+      // Show the delete button if a photo already exists
       if (photoPreview.querySelector('img')) {
         photoRemoveBtn.style.display = 'block';
       }
       
-      // Gérer le changement de fichier
+      // Handle file change
       photoInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-          // Vérifier la taille du fichier
+          // Check file size
           const maxSize = parseInt(this.dataset.maxSize);
           if (!checkFileSize(file, maxSize)) {
-            alert('Le fichier est trop volumineux. La taille maximale est de 5MB.');
+            alert('The file is too large. Maximum size is 5MB.');
             this.value = '';
             return;
           }
           
-          // Afficher la barre de progression
+          // Show progress bar
           photoProgress.parentElement.style.display = 'block';
           simulateProgress(photoProgress);
           
-          // Lire et afficher l'image
+          // Read and display the image
           const reader = new FileReader();
           reader.onload = function(e) {
             photoPreview.innerHTML = `
-              <img src="${e.target.result}" alt="Photo du formateur">
+              <img src="${e.target.result}" alt="Trainer photo">
               <div class="file-name">${file.name}</div>
               <div class="file-size">${formatFileSize(file.size)}</div>
             `;
@@ -560,7 +560,7 @@
         }
       });
       
-      // Gérer le glisser-déposer
+      // Handle drag and drop
       ['dragenter', 'dragover'].forEach(eventName => {
         photoPreview.addEventListener(eventName, function(e) {
           e.preventDefault();
@@ -588,55 +588,55 @@
         }
       });
       
-      // Gérer la suppression de la photo
+      // Handle photo removal
       photoRemoveBtn.addEventListener('click', function() {
         photoInput.value = '';
         photoPreview.innerHTML = `
           <i class="fas fa-user-circle"></i>
           <div class="upload-instructions">
-            <strong>Cliquez ou glissez une image ici</strong>
-            <div>Formats acceptés: JPG, PNG, GIF (max 5MB)</div>
+            <strong>Click or drop an image here</strong>
+            <div>Accepted formats: JPG, PNG, GIF (max 5MB)</div>
           </div>
         `;
         this.style.display = 'none';
       });
     }
     
-    // Configuration pour l'upload de CV
+    // CV upload configuration
     const cvInput = document.getElementById('{{ form.cv.id_for_label }}');
     const cvPreview = document.getElementById('cv-preview');
     const cvProgress = document.getElementById('cv-progress');
     const cvRemoveBtn = document.getElementById('cv-remove');
     
     if (cvInput && cvPreview) {
-      // Afficher le bouton de suppression si un CV existe déjà
+      // Show the delete button if a CV already exists
       if (cvPreview.querySelector('.file-name') && !cvPreview.querySelector('.upload-instructions')) {
         cvRemoveBtn.style.display = 'block';
       }
       
-      // Gérer le changement de fichier
+      // Handle file change
       cvInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-          // Vérifier la taille du fichier
+          // Check file size
           const maxSize = parseInt(this.dataset.maxSize);
           if (!checkFileSize(file, maxSize)) {
-            alert('Le fichier est trop volumineux. La taille maximale est de 10MB.');
+            alert('The file is too large. Maximum size is 10MB.');
             this.value = '';
             return;
           }
           
-          // Afficher la barre de progression
+          // Show progress bar
           cvProgress.parentElement.style.display = 'block';
           simulateProgress(cvProgress);
           
-          // Déterminer l'icône en fonction du type de fichier
+          // Determine icon based on file type
           let fileIcon = 'fa-file-pdf';
           if (file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
             fileIcon = 'fa-file-word';
           }
           
-          // Afficher les informations du fichier
+          // Display file information
           cvPreview.innerHTML = `
             <i class="fas ${fileIcon}"></i>
             <div class="file-name">${file.name}</div>
@@ -646,7 +646,7 @@
         }
       });
       
-      // Gérer le glisser-déposer
+      // Handle drag and drop
       ['dragenter', 'dragover'].forEach(eventName => {
         cvPreview.addEventListener(eventName, function(e) {
           e.preventDefault();
@@ -674,27 +674,27 @@
         }
       });
       
-      // Gérer la suppression du CV
+      // Handle CV removal
       cvRemoveBtn.addEventListener('click', function() {
         cvInput.value = '';
         cvPreview.innerHTML = `
           <i class="fas fa-file-upload"></i>
           <div class="upload-instructions">
-            <strong>Cliquez ou glissez un fichier ici</strong>
-            <div>Formats acceptés: PDF, DOC, DOCX (max 10MB)</div>
+            <strong>Click or drop a file here</strong>
+            <div>Accepted formats: PDF, DOC, DOCX (max 10MB)</div>
           </div>
         `;
         this.style.display = 'none';
       });
     }
     
-    // Validation du formulaire avant soumission
+    // Form validation before submission
     const form = document.getElementById('formateur-form');
     if (form) {
       form.addEventListener('submit', function(e) {
         let isValid = true;
         
-        // Vérifier les champs requis
+        // Check required fields
         const requiredFields = form.querySelectorAll('[required]');
         requiredFields.forEach(field => {
           if (!field.value.trim()) {
@@ -707,7 +707,7 @@
         
         if (!isValid) {
           e.preventDefault();
-          alert('Veuillez remplir tous les champs obligatoires.');
+          alert('Please fill in all required fields.');
         }
       });
     }

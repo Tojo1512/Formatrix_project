@@ -34,7 +34,7 @@ class FormateurForm(forms.ModelForm):
         if email:
             email = email.lower()
             if Formateur.objects.filter(email=email).exclude(pk=self.instance.pk if self.instance else None).exists():
-                raise forms.ValidationError("Un formateur avec cet email existe déjà.")
+                raise forms.ValidationError("A trainer with this email already exists.")
         return email
 
     def clean_telephone(self):
@@ -44,7 +44,7 @@ class FormateurForm(forms.ModelForm):
             telephone = ''.join(filter(str.isdigit, telephone))
             # Vérifier la longueur
             if len(telephone) < 8 or len(telephone) > 15:
-                raise forms.ValidationError("Le numéro de téléphone doit contenir entre 8 et 15 chiffres.")
+                raise forms.ValidationError("The phone number must contain between 8 and 15 digits.")
         return telephone
 
     def clean_date_naissance(self):
@@ -53,9 +53,9 @@ class FormateurForm(forms.ModelForm):
             from datetime import date
             age = (date.today() - date_naissance).days / 365.25
             if age < 18:
-                raise forms.ValidationError("Le formateur doit avoir au moins 18 ans.")
+                raise forms.ValidationError("The trainer must be at least 18 years old.")
             if age > 70:
-                raise forms.ValidationError("L'âge semble incorrect. Veuillez vérifier la date de naissance.")
+                raise forms.ValidationError("The age seems incorrect. Please verify the birth date.")
         return date_naissance
 
     def clean_date_embauche(self):
@@ -63,5 +63,5 @@ class FormateurForm(forms.ModelForm):
         date_naissance = self.cleaned_data.get('date_naissance')
         if date_embauche and date_naissance:
             if date_embauche < date_naissance:
-                raise forms.ValidationError("La date d'embauche ne peut pas être antérieure à la date de naissance.")
+                raise forms.ValidationError("The hire date cannot be earlier than the birth date.")
         return date_embauche 

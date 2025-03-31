@@ -70,10 +70,10 @@ class FormateurCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         try:
             formateur = form.save()
-            messages.success(self.request, f'Le formateur {formateur.get_full_name()} a été créé avec succès!')
+            messages.success(self.request, f'Trainer {formateur.get_full_name()} has been created successfully!')
             return redirect('formateurs:formateur-detail', pk=formateur.formateurid)
         except Exception as e:
-            messages.error(self.request, f'Erreur lors de la création du formateur: {str(e)}')
+            messages.error(self.request, f'Error creating trainer: {str(e)}')
             return self.form_invalid(form)
 
 class FormateurUpdateView(LoginRequiredMixin, UpdateView):
@@ -88,10 +88,10 @@ class FormateurUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         try:
             formateur = form.save()
-            messages.success(self.request, f'Le formateur {formateur.get_full_name()} a été mis à jour avec succès!')
+            messages.success(self.request, f'Trainer {formateur.get_full_name()} has been updated successfully!')
             return redirect(self.get_success_url())
         except Exception as e:
-            messages.error(self.request, f'Erreur lors de la mise à jour du formateur: {str(e)}')
+            messages.error(self.request, f'Error updating trainer: {str(e)}')
             return self.form_invalid(form)
 
 class FormateurDetailView(LoginRequiredMixin, DetailView):
@@ -109,7 +109,7 @@ class FormateurDetailView(LoginRequiredMixin, DetailView):
         else:
             context['specialites_list'] = []
         # Ajouter les cours actifs
-        context['cours_actifs'] = formateur.get_cours_actifs()
+        context['cours_actifs'] = formateur.get_active_courses()
         return context
 
 class FormateurDeleteView(LoginRequiredMixin, DeleteView):
@@ -120,23 +120,23 @@ class FormateurDeleteView(LoginRequiredMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         formateur = self.get_object()
-        messages.success(request, f'Le formateur {formateur.get_full_name()} a été supprimé avec succès!')
+        messages.success(request, f'Trainer {formateur.get_full_name()} has been deleted successfully!')
         return super().delete(request, *args, **kwargs)
 
 class FormateurRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    nom = forms.CharField(max_length=100, required=True, label="Nom")
-    prenom = forms.CharField(max_length=100, required=True, label="Prénom")
-    telephone = forms.CharField(max_length=20, required=False, label="Téléphone")
-    date_naissance = forms.DateField(required=False, label="Date de naissance", widget=forms.DateInput(attrs={'type': 'date'}))
-    adresse = forms.CharField(max_length=200, required=False, label="Adresse")
-    ville = forms.CharField(max_length=100, required=False, label="Ville")
-    code_postal = forms.CharField(max_length=10, required=False, label="Code postal")
-    type_formateur = forms.ChoiceField(choices=Formateur.TYPE_CHOICES, required=True, label="Type de formateur")
-    niveau_expertise = forms.ChoiceField(choices=Formateur.NIVEAU_CHOICES, required=True, label="Niveau d'expertise")
-    specialites = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=True, label="Spécialités")
-    disponibilite = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=True, label="Disponibilité")
-    cv = forms.FileField(required=False, label="CV")
+    nom = forms.CharField(max_length=100, required=True, label="Last Name")
+    prenom = forms.CharField(max_length=100, required=True, label="First Name")
+    telephone = forms.CharField(max_length=20, required=False, label="Phone")
+    date_naissance = forms.DateField(required=False, label="Birth Date", widget=forms.DateInput(attrs={'type': 'date'}))
+    adresse = forms.CharField(max_length=200, required=False, label="Address")
+    ville = forms.CharField(max_length=100, required=False, label="City")
+    code_postal = forms.CharField(max_length=10, required=False, label="Postal Code")
+    type_formateur = forms.ChoiceField(choices=Formateur.TYPE_CHOICES, required=True, label="Trainer Type")
+    niveau_expertise = forms.ChoiceField(choices=Formateur.LEVEL_CHOICES, required=True, label="Expertise Level")
+    specialites = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=True, label="Specialties")
+    disponibilite = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=True, label="Availability")
+    cv = forms.FileField(required=False, label="Resume/CV")
     photo = forms.ImageField(required=False, label="Photo")
     notes = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}), required=False, label="Notes")
 
@@ -183,21 +183,21 @@ def formateur_register(request):
                     cv=form.cleaned_data.get('cv'),
                     photo=form.cleaned_data.get('photo'),
                     notes=form.cleaned_data.get('notes', ''),
-                    statut='actif',
+                    statut='active',
                     date_embauche=timezone.now().date()
                 )
                 formateur.save()
                 
                 # Connecter l'utilisateur
                 login(request, user)
-                messages.success(request, "Inscription réussie ! Bienvenue sur Formatrix.")
+                messages.success(request, "Registration successful! Welcome to Formatrix.")
                 
                 # Rediriger vers le dashboard formateur ou la page d'accueil
                 return redirect('formateurs:formateur-detail', pk=formateur.formateurid)
             except Exception as e:
-                messages.error(request, f"Une erreur est survenue lors de l'inscription : {str(e)}")
+                messages.error(request, f"An error occurred during registration: {str(e)}")
         else:
-            print(f"Erreurs de formulaire : {form.errors}")
+            print(f"Form errors: {form.errors}")
     else:
         form = FormateurRegistrationForm()
     
@@ -241,20 +241,10 @@ class FormateurCoursListView(LoginRequiredMixin, ListView):
             
             if formateur:
                 context['formateur'] = formateur
-                context['page_title'] = f"Cours assignés à {formateur.prenom} {formateur.nom}"
+                context['page_title'] = f"Courses assigned to {formateur.prenom} {formateur.nom}"
             else:
-                context['page_title'] = "Vos cours"
+                context['page_title'] = "Your courses"
         except Formateur.DoesNotExist:
-            context['page_title'] = "Vos cours"
+            context['page_title'] = "Your courses"
         
-        # Ajout de filtres
-        status_filter = self.request.GET.get('status', '')
-        search = self.request.GET.get('search', '')
-        
-        if status_filter:
-            context['status_filter'] = status_filter
-        
-        if search:
-            context['search_query'] = search
-            
         return context 

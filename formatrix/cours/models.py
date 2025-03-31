@@ -68,7 +68,7 @@ class Cours(models.Model):
         super().save(*args, **kwargs)
 
     @property
-    def alerte_expiration(self):
+    def alert_expiration(self):
         """Returns True if the expiration date is less than 3 months away"""
         if self.date_expiration_validite:
             aujourd_hui = timezone.now().date()
@@ -77,7 +77,7 @@ class Cours(models.Model):
         return False
 
     @property
-    def est_expire(self):
+    def is_expired(self):
         """Returns True if the course has expired"""
         if self.date_expiration_validite:
             return timezone.now().date() > self.date_expiration_validite
