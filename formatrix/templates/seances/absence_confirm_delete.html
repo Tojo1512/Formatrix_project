@@ -1,182 +1,83 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Delete Absence - Formatrix{% endblock %}
+{% block title %}Delete Absence Record - Formatrix{% endblock %}
 
 {% block extra_css %}
-<style>
-  .card-container {
-    max-width: 700px;
-    margin: 30px auto;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-  }
-  
-  .confirm-header {
-    margin-bottom: 30px;
-    text-align: center;
-    color: #e74c3c;
-  }
-  
-  .confirm-header i {
-    font-size: 48px;
-    margin-bottom: 20px;
-    display: block;
-  }
-  
-  .confirm-content {
-    margin-bottom: 30px;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border-left: 4px solid #e74c3c;
-  }
-  
-  .absence-details {
-    margin-top: 20px;
-    margin-bottom: 30px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-  }
-  
-  .detail-item {
-    margin-bottom: 10px;
-    display: flex;
-  }
-  
-  .detail-label {
-    font-weight: 600;
-    min-width: 150px;
-    color: #495057;
-  }
-  
-  .detail-value {
-    color: #212529;
-  }
-  
-  .confirm-actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
-  
-  .btn-danger {
-    background-color: #e74c3c;
-    border-color: #e74c3c;
-    color: white;
-  }
-  
-  .btn-danger:hover {
-    background-color: #c0392b;
-    border-color: #c0392b;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/delete.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="page-inner py-5">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <div class="card">
-          <div class="card-header bg-danger text-white">
-            <h4 class="mb-0">Delete Absence</h4>
-          </div>
-          <div class="card-body">
-            <div class="alert alert-danger mb-4">
-              <i class="fas fa-exclamation-triangle fa-lg me-2"></i>
-              <strong>Warning:</strong> This action cannot be undone.
-            </div>
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Delete Confirmation</h1>
+    <div class="ms-auto">
+      <a href="{% url 'seances:absence_list' absence.seance.seance_id %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back
+      </a>
+    </div>
+  </div>
 
-            <div class="mb-4">
-              <h5>Are you sure you want to delete this absence record?</h5>
-              <p class="text-muted">
-                Deleting this absence record will permanently remove it from the system. Any replacement arrangements related to this absence will no longer be tracked.
-              </p>
-            </div>
-
-            <div class="absence-info bg-light p-3 rounded mb-4">
-              <h6 class="border-bottom pb-2 mb-3">Absence Details</h6>
-              <dl class="row">
-                <dt class="col-sm-4">Trainer:</dt>
-                <dd class="col-sm-8">{{ object.formateur.nom_formateur }}</dd>
-                
-                <dt class="col-sm-4">Date:</dt>
-                <dd class="col-sm-8">{{ object.date_absence|date:"l, F j, Y" }}</dd>
-                
-                <dt class="col-sm-4">Reason:</dt>
-                <dd class="col-sm-8">{{ object.get_raison_display }}</dd>
-                
-                <dt class="col-sm-4">Status:</dt>
-                <dd class="col-sm-8">
-                  <span class="badge {% if object.statut == 'pending' %}bg-warning{% elif object.statut == 'approved' %}bg-success{% elif object.statut == 'rejected' %}bg-danger{% endif %}">
-                    {{ object.get_statut_display }}
-                  </span>
-                </dd>
-                
-                <dt class="col-sm-4">Related session:</dt>
-                <dd class="col-sm-8">
-                  {% if object.seance %}
-                    <a href="{% url 'seances:seance-detail' object.seance.seance_id %}">
-                      {{ object.seance.cours.nom_cours }} ({{ object.seance.date_debut|date:"d/m/Y" }})
-                    </a>
-                  {% else %}
-                    <span class="text-muted">No session linked</span>
-                  {% endif %}
-                </dd>
-                
-                <dt class="col-sm-4">Replacement:</dt>
-                <dd class="col-sm-8">
-                  {% if object.formateur_remplacant %}
-                    {{ object.formateur_remplacant.nom_formateur }}
-                  {% else %}
-                    <span class="text-muted">No replacement assigned</span>
-                  {% endif %}
-                </dd>
-              </dl>
-            </div>
-
-            <form method="post">
-              {% csrf_token %}
-              
-              <div class="form-group mb-3">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="confirmDelete" required>
-                  <label class="form-check-label" for="confirmDelete">
-                    I understand that this action cannot be undone
-                  </label>
-                </div>
-              </div>
-              
-              <div class="d-flex justify-content-between">
-                <a href="{% url 'seances:absence-list' %}" class="btn btn-secondary">
-                  <i class="fas fa-arrow-left me-1"></i> Cancel
-                </a>
-                <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>
-                  <i class="fas fa-trash me-1"></i> Delete Absence
-                </button>
-              </div>
-            </form>
-          </div>
+  <div class="delete-card">
+    <div class="p-4">
+      <div class="alert-warning-custom d-flex">
+        <div class="me-3">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <div>
+          <h4 class="mb-2">Warning!</h4>
+          <p class="mb-0">Are you sure you want to delete the absence record for <strong>{{ absence.formateur_absent.get_full_name }}</strong> on <strong>{{ absence.date_absence|date:"d/m/Y" }}</strong>? This action cannot be undone.</p>
         </div>
       </div>
+      
+      <h5 class="mb-3">Absence Details</h5>
+      <table class="info-table mb-4">
+        <tbody>
+          <tr>
+            <th>Session:</th>
+            <td>{{ absence.seance.cours.nom_cours }} ({{ absence.seance.date|date:"d/m/Y" }})</td>
+          </tr>
+          <tr>
+            <th>Absent Trainer:</th>
+            <td>{{ absence.formateur_absent.get_full_name }}</td>
+          </tr>
+          <tr>
+            <th>Absence Date:</th>
+            <td>{{ absence.date_absence|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <th>Reason:</th>
+            <td>{{ absence.get_raison_display }}</td>
+          </tr>
+          {% if absence.formateur_remplacant %}
+          <tr>
+            <th>Replacement:</th>
+            <td>{{ absence.formateur_remplacant.get_full_name }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <th>Status:</th>
+            <td>
+              <span class="badge {% if absence.est_remplace %}bg-success{% else %}bg-danger{% endif %}">
+                {% if absence.est_remplace %}Replaced{% else %}Not replaced{% endif %}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <form method="post" action="{% url 'seances:absence_delete' absence.absence_id %}">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'seances:absence_list' absence.seance.seance_id %}" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i>Cancel
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash me-2"></i>Confirm Deletion
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const confirmDeleteCheckbox = document.getElementById('confirmDelete');
-    const deleteBtn = document.getElementById('deleteBtn');
-    
-    confirmDeleteCheckbox.addEventListener('change', function() {
-      deleteBtn.disabled = !this.checked;
-    });
-  });
-</script>
 {% endblock %} 

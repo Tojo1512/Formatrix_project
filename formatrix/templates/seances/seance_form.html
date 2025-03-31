@@ -1,478 +1,278 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
 
-{% block title %}
-  {% if form.instance.seance_id %}
-    Edit Session - Formatrix
-  {% else %}
-    New Session - Formatrix
-  {% endif %}
-{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Session - Formatrix{% endblock %}
 
 {% block extra_css %}
-<style>
-  .help-text {
-    color: #6c757d;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-  }
-  
-  .required-field::after {
-    content: "*";
-    color: #dc3545;
-    margin-left: 4px;
-  }
-  
-  .session-preview {
-    border-radius: 8px;
-    background-color: #f8f9fa;
-    padding: 20px;
-    margin-top: 20px;
-    border-left: 4px solid #007bff;
-  }
-  
-  .custom-section {
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid #dee2e6;
-    background-color: #fff;
-  }
-  
-  .section-title {
-    border-bottom: 1px solid #dee2e6;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1.5rem;
-    font-weight: 500;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="page-inner py-3">
-  <div class="page-header mb-4">
-    <div class="d-flex justify-content-between align-items-center">
-      <h1 class="page-title">
-        {% if form.instance.seance_id %}
-          Edit Session
-        {% else %}
-          New Session
-        {% endif %}
-      </h1>
-      <a href="{% url 'seances:seance-list' %}" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Back to list
-      </a>
-    </div>
+<div class="form-container">
+  <div class="form-header">
+    <h1 class="form-title">
+      <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
+      {% if form.instance.pk %}Edit{% else %}Create{% endif %} Session
+    </h1>
+    <a href="{% url 'seances:seance-list' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
   </div>
-  
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <form method="post" id="seanceForm" novalidate>
-        {% csrf_token %}
-        
-        <!-- Hidden fields for recurring sessions -->
-        <input type="hidden" name="recurring" id="recurring" value="0">
-        <input type="hidden" name="recurring_pattern" id="recurring_pattern" value="">
-        <input type="hidden" name="recurring_until" id="recurring_until" value="">
-        
-        <!-- Alert for recurring sessions if editing an existing session -->
-        {% if form.instance.seance_id %}
-          <div class="alert alert-warning" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            <strong>Warning:</strong> You are editing an existing session. Changes will only apply to this instance.
-          </div>
-        {% endif %}
-        
-        <!-- Main form sections -->
-        <div class="row">
-          <div class="col-md-8">
-            <!-- Session Information -->
-            <div class="custom-section">
-              <h3 class="section-title">Session Information</h3>
-              
-              <div class="row mb-4">
-                <div class="col-md-12">
-                  {{ form.cours|as_crispy_field }}
-                </div>
-              </div>
-              
-              <div class="row mb-4">
-                <div class="col-md-12">
-                  {{ form.formateur|as_crispy_field }}
-                </div>
-              </div>
-              
-              <div class="row mb-4">
-                <div class="col-md-12">
-                  {{ form.lieu|as_crispy_field }}
-                </div>
-              </div>
-              
-              <div class="row mb-4">
-                <div class="col-md-4">
-                  {{ form.date_debut|as_crispy_field }}
-                </div>
-                <div class="col-md-4">
-                  {{ form.heure_debut|as_crispy_field }}
-                </div>
-                <div class="col-md-4">
-                  {{ form.heure_fin|as_crispy_field }}
-                </div>
-              </div>
-              
-              <div class="row mb-4">
-                <div class="col-md-6">
-                  {{ form.nombre_places|as_crispy_field }}
-                </div>
-                <div class="col-md-6">
-                  {{ form.statut|as_crispy_field }}
-                </div>
-              </div>
+
+  {% if messages %}
+  <div>
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="text-muted">Fill in all required fields marked with <span class="text-danger">*</span></p>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- General Information -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-info-circle"></i>
+        General Information
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.cours.errors %}has-error{% endif %}">
+            <label for="{{ form.cours.id_for_label }}">
+              Course <span class="text-danger">*</span>
+            </label>
+            {{ form.cours }}
+            {% if form.cours.errors %}
+            <div class="error-message">
+              {% for error in form.cours.errors %}
+              {{ error }}
+              {% endfor %}
             </div>
-            
-            <!-- Description and Additional Info -->
-            <div class="custom-section">
-              <h3 class="section-title">Additional Information</h3>
-              
-              <div class="row mb-4">
-                <div class="col-md-12">
-                  {{ form.description|as_crispy_field }}
-                </div>
-              </div>
-              
-              <div class="row mb-4">
-                <div class="col-md-12">
-                  {{ form.notes_internes|as_crispy_field }}
-                </div>
-              </div>
-            </div>
-            
-            <!-- Recurring Options (only for new sessions) -->
-            {% if not form.instance.seance_id %}
-              <div class="custom-section">
-                <h3 class="section-title">Recurring Options</h3>
-                
-                <div class="form-check mb-3">
-                  <input class="form-check-input" type="checkbox" id="isRecurring">
-                  <label class="form-check-label" for="isRecurring">
-                    Make this a recurring session
-                  </label>
-                </div>
-                
-                <div id="recurringOptions" style="display: none;">
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <label for="patternSelect" class="form-label required-field">Recurrence Pattern</label>
-                      <select class="form-select" id="patternSelect">
-                        <option value="">Select a pattern</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="biweekly">Bi-weekly</option>
-                        <option value="monthly">Monthly</option>
-                      </select>
-                    </div>
-                    
-                    <div class="col-md-6">
-                      <label for="untilDate" class="form-label required-field">Until Date</label>
-                      <input type="date" class="form-control" id="untilDate">
-                      <div class="help-text">
-                        The last date for which a session will be created
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div id="previewRecurring" class="mt-3"></div>
-                </div>
-              </div>
             {% endif %}
-            
-            <div class="d-flex justify-content-between mt-4">
-              <a href="{% url 'seances:seance-list' %}" class="btn btn-outline-secondary">Cancel</a>
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-1"></i> 
-                {% if form.instance.seance_id %}
-                  Save Changes
-                {% else %}
-                  Create Session
-                {% endif %}
-              </button>
-            </div>
-          </div>
-          
-          <div class="col-md-4">
-            <!-- Session Preview -->
-            <div class="card mb-4">
-              <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Session Preview</h5>
-              </div>
-              <div class="card-body" id="preview">
-                <div class="text-center py-4">
-                  <i class="fas fa-info-circle mb-3 text-muted" style="font-size: 2rem;"></i>
-                  <p class="text-muted">Fill in the form to see a preview of the session</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Help & Tips -->
-            <div class="card mb-4">
-              <div class="card-header bg-info text-white">
-                <h5 class="mb-0">Help & Tips</h5>
-              </div>
-              <div class="card-body">
-                <ul class="list-unstyled">
-                  <li class="mb-2">
-                    <i class="fas fa-info-circle text-info me-2"></i>
-                    <strong>Trainer Assignment:</strong> Make sure the selected trainer is available on the chosen date and time
-                  </li>
-                  <li class="mb-2">
-                    <i class="fas fa-info-circle text-info me-2"></i>
-                    <strong>Location:</strong> Check that the selected location has enough capacity for the specified number of places
-                  </li>
-                  <li class="mb-2">
-                    <i class="fas fa-info-circle text-info me-2"></i>
-                    <strong>Time:</strong> The end time must be later than the start time
-                  </li>
-                  <li class="mb-2">
-                    <i class="fas fa-info-circle text-info me-2"></i>
-                    <strong>Recurring Sessions:</strong> When creating recurring sessions, multiple instances will be created based on the pattern
-                  </li>
-                </ul>
-              </div>
-            </div>
+            {% if form.cours.help_text %}
+            <small class="form-text text-muted">{{ form.cours.help_text }}</small>
+            {% endif %}
           </div>
         </div>
-      </form>
+        
+        <div class="col-md-6">
+          <div class="form-group {% if form.lieu.errors %}has-error{% endif %}">
+            <label for="{{ form.lieu.id_for_label }}">
+              Location <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              {{ form.lieu }}
+              <div class="input-group-append">
+                <a href="{% url 'lieux:lieu-create' %}?next={{ request.path }}" class="btn btn-primary">
+                  <i class="fas fa-plus"></i> Add
+                </a>
+              </div>
+            </div>
+            {% if form.lieu.errors %}
+            <div class="error-message">
+              {% for error in form.lieu.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.lieu.help_text %}
+            <small class="form-text text-muted">{{ form.lieu.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.date.errors %}has-error{% endif %}">
+            <label for="{{ form.date.id_for_label }}">
+              Date <span class="text-danger">*</span>
+            </label>
+            {{ form.date }}
+            {% if form.date.errors %}
+            <div class="error-message">
+              {% for error in form.date.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.date.help_text %}
+            <small class="form-text text-muted">{{ form.date.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group {% if form.statut.errors %}has-error{% endif %}">
+            <label for="{{ form.statut.id_for_label }}">
+              Status <span class="text-danger">*</span>
+            </label>
+            {{ form.statut }}
+            {% if form.statut.errors %}
+            <div class="error-message">
+              {% for error in form.statut.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.statut.help_text %}
+            <small class="form-text text-muted">{{ form.statut.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+    
+    <!-- Capacity and Price -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-users"></i>
+        Capacity and Price
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group {% if form.nombre_places.errors %}has-error{% endif %}">
+            <label for="{{ form.nombre_places.id_for_label }}">
+              Number of spots <span class="text-danger">*</span>
+            </label>
+            {{ form.nombre_places }}
+            {% if form.nombre_places.errors %}
+            <div class="error-message">
+              {% for error in form.nombre_places.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.nombre_places.help_text %}
+            <small class="form-text text-muted">{{ form.nombre_places.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="form-group {% if form.duree.errors %}has-error{% endif %}">
+            <label for="{{ form.duree.id_for_label }}">
+              Duration (months) <span class="text-danger">*</span>
+            </label>
+            <input type="number" name="duree" min="1" class="form-control" id="{{ form.duree.id_for_label }}" placeholder="Duration in months" value="{{ form.duree.value|default:'1' }}" required>
+            {% if form.duree.errors %}
+            <div class="error-message">
+              {% for error in form.duree.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.duree.help_text %}
+            <small class="form-text text-muted">{{ form.duree.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="form-group {% if form.prix.errors %}has-error{% endif %}">
+            <label for="{{ form.prix.id_for_label }}">
+              Price (€) <span class="text-danger">*</span>
+            </label>
+            {{ form.prix }}
+            {% if form.prix.errors %}
+            <div class="error-message">
+              {% for error in form.prix.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.prix.help_text %}
+            <small class="form-text text-muted">{{ form.prix.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Trainers -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <i class="fas fa-chalkboard-teacher"></i>
+        Trainers
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label for="id_formateurs">
+              Assigned trainers <span class="text-danger">*</span>
+            </label>
+            <select name="formateurs" id="id_formateurs" class="form-control" multiple size="5" required>
+              {% for formateur in formateurs_actifs %}
+                <option value="{{ formateur.formateurid }}" {% if formateur in object.formateurs.all %}selected{% endif %}>
+                  {{ formateur.prenom }} {{ formateur.nom }}
+                </option>
+              {% endfor %}
+            </select>
+            <small class="form-text text-muted">Select the trainers who will lead this session.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Submission buttons -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i>
+        {% if form.instance.pk %}Update{% else %}Create{% endif %}
+      </button>
+      <a href="{% url 'seances:seance-list' %}" class="btn btn-secondary">
+        <i class="fas fa-times"></i>
+        Cancel
+      </a>
+    </div>
+  </form>
 </div>
 
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Apply Bootstrap classes to form fields
-    const formControls = document.querySelectorAll('.form-control');
-    formControls.forEach(control => {
-      if (control.classList.contains('is-invalid')) {
-        control.addEventListener('input', function() {
-          control.classList.remove('is-invalid');
-          const feedbackElement = control.nextElementSibling;
-          if (feedbackElement && feedbackElement.classList.contains('invalid-feedback')) {
-            feedbackElement.style.display = 'none';
-          }
-        });
-      }
+  $(document).ready(function() {
+    // Initialize selectors with Select2
+    $('#id_cours').select2({
+      placeholder: "Select a course",
+      allowClear: true
     });
     
-    // Preview functionality
-    function updatePreview() {
-      const coursSelect = document.getElementById('id_cours');
-      const formateurSelect = document.getElementById('id_formateur');
-      const lieuSelect = document.getElementById('id_lieu');
-      const dateDebutInput = document.getElementById('id_date_debut');
-      const heureDebutInput = document.getElementById('id_heure_debut');
-      const heureFinInput = document.getElementById('id_heure_fin');
-      const nombrePlacesInput = document.getElementById('id_nombre_places');
-      
-      const previewElement = document.getElementById('preview');
-      
-      // Check if all required fields are filled
-      if (
-        coursSelect.value && 
-        formateurSelect.value && 
-        lieuSelect.value && 
-        dateDebutInput.value && 
-        heureDebutInput.value && 
-        heureFinInput.value && 
-        nombrePlacesInput.value
-      ) {
-        // Get readable values from select options
-        const coursText = coursSelect.options[coursSelect.selectedIndex].text;
-        const formateurText = formateurSelect.options[formateurSelect.selectedIndex].text;
-        const lieuText = lieuSelect.options[lieuSelect.selectedIndex].text;
-        
-        // Format the date
-        const dateObj = new Date(dateDebutInput.value);
-        const formattedDate = dateObj.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        });
-        
-        // Create the preview HTML
-        previewElement.innerHTML = `
-          <h5 class="mb-3">${coursText}</h5>
-          <p class="mb-2">
-            <i class="fas fa-calendar-alt text-primary me-2"></i>
-            <strong>Date:</strong> ${formattedDate}
-          </p>
-          <p class="mb-2">
-            <i class="fas fa-clock text-primary me-2"></i>
-            <strong>Time:</strong> ${heureDebutInput.value} - ${heureFinInput.value}
-          </p>
-          <p class="mb-2">
-            <i class="fas fa-map-marker-alt text-primary me-2"></i>
-            <strong>Location:</strong> ${lieuText}
-          </p>
-          <p class="mb-2">
-            <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
-            <strong>Trainer:</strong> ${formateurText}
-          </p>
-          <p class="mb-2">
-            <i class="fas fa-users text-primary me-2"></i>
-            <strong>Capacity:</strong> ${nombrePlacesInput.value} places
-          </p>
-        `;
-      } else {
-        previewElement.innerHTML = `
-          <div class="text-center py-4">
-            <i class="fas fa-info-circle mb-3 text-muted" style="font-size: 2rem;"></i>
-            <p class="text-muted">Fill in the form to see a preview of the session</p>
-          </div>
-        `;
-      }
-    }
-    
-    // Add event listeners to form fields for preview update
-    const previewFields = [
-      'id_cours', 'id_formateur', 'id_lieu', 'id_date_debut', 
-      'id_heure_debut', 'id_heure_fin', 'id_nombre_places'
-    ];
-    
-    previewFields.forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.addEventListener('change', updatePreview);
-        field.addEventListener('input', updatePreview);
-      }
+    $('#id_lieu').select2({
+      placeholder: "Select a location",
+      allowClear: true
     });
     
-    // Initial preview update
-    updatePreview();
+    $('#id_formateurs').select2({
+      placeholder: "Select at least two trainers",
+      allowClear: true
+    });
     
-    // Recurring session functionality
-    const isRecurringCheckbox = document.getElementById('isRecurring');
-    const recurringOptionsDiv = document.getElementById('recurringOptions');
-    const recurringHiddenInput = document.getElementById('recurring');
-    const recurringPatternInput = document.getElementById('recurring_pattern');
-    const recurringUntilInput = document.getElementById('recurring_until');
-    const patternSelect = document.getElementById('patternSelect');
-    const untilDateInput = document.getElementById('untilDate');
-    const previewRecurringDiv = document.getElementById('previewRecurring');
-    
-    if (isRecurringCheckbox) {
-      isRecurringCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-          recurringOptionsDiv.style.display = 'block';
-          recurringHiddenInput.value = '1';
-        } else {
-          recurringOptionsDiv.style.display = 'none';
-          recurringHiddenInput.value = '0';
-          recurringPatternInput.value = '';
-          recurringUntilInput.value = '';
-        }
-      });
-    }
-    
-    if (patternSelect && untilDateInput) {
-      function updateRecurringPreview() {
-        const pattern = patternSelect.value;
-        const untilDate = untilDateInput.value;
-        recurringPatternInput.value = pattern;
-        recurringUntilInput.value = untilDate;
-        
-        if (pattern && untilDate) {
-          const dateObj = new Date(document.getElementById('id_date_debut').value);
-          const untilObj = new Date(untilDate);
-          
-          // Calculate instances based on pattern
-          let instances = 0;
-          let dateText = '';
-          
-          if (pattern === 'daily') {
-            const diffTime = Math.abs(untilObj - dateObj);
-            instances = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-            dateText = 'every day';
-          } else if (pattern === 'weekly') {
-            const diffTime = Math.abs(untilObj - dateObj);
-            instances = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)) + 1;
-            dateText = 'every week on ' + dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-          } else if (pattern === 'biweekly') {
-            const diffTime = Math.abs(untilObj - dateObj);
-            instances = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 14)) + 1;
-            dateText = 'every two weeks on ' + dateObj.toLocaleDateString('en-US', { weekday: 'long' });
-          } else if (pattern === 'monthly') {
-            const months = (untilObj.getFullYear() - dateObj.getFullYear()) * 12 + 
-                           (untilObj.getMonth() - dateObj.getMonth()) + 1;
-            instances = months + 1;
-            dateText = 'on the ' + dateObj.getDate() + ' of each month';
-          }
-          
-          // Generate preview text
-          const startFormatted = dateObj.toLocaleDateString('en-US', { 
-            day: 'numeric', 
-            month: 'long', 
-            year: 'numeric' 
-          });
-          
-          const endFormatted = untilObj.toLocaleDateString('en-US', { 
-            day: 'numeric', 
-            month: 'long', 
-            year: 'numeric' 
-          });
-          
-          previewRecurringDiv.innerHTML = `
-            <div class="alert alert-info">
-              <i class="fas fa-info-circle me-2"></i>
-              <strong>Recurring Preview:</strong> This will create ${instances} session(s) ${dateText}, 
-              from ${startFormatted} to ${endFormatted}.
-            </div>
-          `;
-        } else {
-          previewRecurringDiv.innerHTML = '';
-        }
-      }
-      
-      patternSelect.addEventListener('change', updateRecurringPreview);
-      untilDateInput.addEventListener('change', updateRecurringPreview);
-      
-      // Make sure the until date is after the start date
-      document.getElementById('id_date_debut').addEventListener('change', function() {
-        untilDateInput.min = this.value;
-        if (untilDateInput.value && untilDateInput.value < this.value) {
-          untilDateInput.value = this.value;
-        }
-        updateRecurringPreview();
-      });
-    }
-    
-    // Form validation
-    document.getElementById('seanceForm').addEventListener('submit', function(event) {
-      let isValid = true;
-      
-      // Check if recurring is enabled and validate its fields
-      if (
-        isRecurringCheckbox && 
-        isRecurringCheckbox.checked && 
-        recurringHiddenInput.value === '1'
-      ) {
-        if (!patternSelect.value) {
-          isValid = false;
-          alert('Please select a recurrence pattern');
-        }
-        
-        if (!untilDateInput.value) {
-          isValid = false;
-          alert('Please select an end date for the recurring sessions');
-        }
-      }
-      
-      if (!isValid) {
-        event.preventDefault();
-      }
+    // Initialize datepicker
+    $('#id_date').datepicker({
+      format: 'yyyy-mm-dd',
+      autoclose: true,
+      todayBtn: 'linked',
+      todayHighlight: true,
+      language: 'en'
     });
   });
 </script>

@@ -24,7 +24,7 @@
   <!-- Filters -->
   <div class="filter-card">
     <form method="get" class="row g-3">
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="input-group">
           <span class="input-group-text"><i class="fas fa-search"></i></span>
           <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ search_query }}">
@@ -39,14 +39,6 @@
         </select>
       </div>
       <div class="col-md-2">
-        <select name="client" class="form-select">
-          <option value="">All clients</option>
-          {% for client in clients %}
-            <option value="{{ client.clientid }}" {% if client_filter == client.clientid %}selected{% endif %}>{{ client.nom_entite|truncatechars:15 }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-2">
         <select name="statut" class="form-select">
           <option value="">All statuses</option>
           {% for code, label in status_choices %}
@@ -54,15 +46,20 @@
           {% endfor %}
         </select>
       </div>
-      <div class="col-md-3 d-flex">
-        <button type="submit" class="btn btn-primary me-2">
-          <i class="fas fa-filter me-1"></i>Filter
-        </button>
-        {% if has_active_filters %}
-        <a href="{{ reset_url }}" class="btn btn-outline-secondary">
-          <i class="fas fa-times me-1"></i>Reset
-        </a>
-        {% endif %}
+      <div class="col-md-2">
+        <select name="ordering" class="form-select">
+          <option value="-date_inscription" {% if ordering == '-date_inscription' %}selected{% endif %}>Most recent</option>
+          <option value="date_inscription" {% if ordering == 'date_inscription' %}selected{% endif %}>Oldest</option>
+          <option value="apprenant__nom_apprenant" {% if ordering == 'apprenant__nom_apprenant' %}selected{% endif %}>Name (A-Z)</option>
+          <option value="-apprenant__nom_apprenant" {% if ordering == '-apprenant__nom_apprenant' %}selected{% endif %}>Name (Z-A)</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter me-2"></i>Filter
+          </button>
+        </div>
       </div>
     </form>
   </div>
@@ -74,37 +71,12 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>
-              <a href="?{% if ordering == 'inscription_id' %}-{% endif %}inscription_id{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                ID
-                <i class="fas fa-sort{% if ordering == 'inscription_id' %}-up{% elif ordering == '-inscription_id' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th>
-              <a href="?{% if ordering == 'apprenant__nom_apprenant' %}-{% endif %}apprenant__nom_apprenant{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Learner
-                <i class="fas fa-sort{% if ordering == 'apprenant__nom_apprenant' %}-up{% elif ordering == '-apprenant__nom_apprenant' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th>
-              <a href="?{% if ordering == 'client__nom_entite' %}-{% endif %}client__nom_entite{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Client
-                <i class="fas fa-sort{% if ordering == 'client__nom_entite' %}-up{% elif ordering == '-client__nom_entite' %}-down{% endif %}"></i>
-              </a>
-            </th>
+            <th>ID</th>
+            <th>Learner</th>
+            <th>Client</th>
             <th>Session</th>
-            <th>
-              <a href="?{% if ordering == 'date_inscription' %}-{% endif %}date_inscription{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Date
-                <i class="fas fa-sort{% if ordering == 'date_inscription' %}-up{% elif ordering == '-date_inscription' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th>
-              <a href="?{% if ordering == 'statut_inscription' %}-{% endif %}statut_inscription{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Status
-                <i class="fas fa-sort{% if ordering == 'statut_inscription' %}-up{% elif ordering == '-statut_inscription' %}-down{% endif %}"></i>
-              </a>
-            </th>
+            <th>Date</th>
+            <th>Status</th>
             <th class="text-end">Actions</th>
           </tr>
         </thead>
@@ -112,7 +84,17 @@
           {% for inscription in inscriptions %}
           <tr>
             <td>{{ inscription.inscription_id }}</td>
-            <td>{{ inscription.apprenant.nom_apprenant }}</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm bg-info-light rounded me-2">
+                  <i class="fas fa-user-graduate"></i>
+                </div>
+                <div>
+                  <div class="fw-bold">{{ inscription.apprenant.nom_apprenant }}</div>
+                  <small class="text-muted">ID: {{ inscription.apprenant.apprenant_id }}</small>
+                </div>
+              </div>
+            </td>
             <td>{{ inscription.client.nom_entite }}</td>
             <td>{{ inscription.seance.cours.nom_cours|truncatechars:20 }} - {{ inscription.seance.date|date:"d/m/Y" }}</td>
             <td>{{ inscription.date_inscription|date:"d/m/Y" }}</td>
@@ -147,52 +129,79 @@
       </table>
     </div>
     
-    {% if is_paginated %}
+    <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center p-3">
       <p class="mb-0">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
       <nav aria-label="Pagination navigation">
         <ul class="pagination mb-0">
           {% if page_obj.has_previous %}
-            <li class="page-item">
-              <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="First">
-                <span aria-hidden="true">&laquo;&laquo;</span>
-              </a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="First">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="First">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
           {% endif %}
           
-          <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+          {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+              <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+            {% elif i > page_obj.number|add:"-3" and i < page_obj.number|add:"3" %}
+              <li class="page-item"><a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}">{{ i }}</a></li>
+            {% endif %}
+          {% endfor %}
           
           {% if page_obj.has_next %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Last">
-                <span aria-hidden="true">&raquo;&raquo;</span>
-              </a>
-            </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if seance_filter %}&seance={{ seance_filter }}{% endif %}{% if client_filter %}&client={{ client_filter }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Last">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Last">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+          </li>
           {% endif %}
         </ul>
       </nav>
     </div>
-    {% endif %}
-    
     {% else %}
     <div class="empty-state">
-      <i class="fas fa-clipboard-list"></i>
-      <h4 class="mb-3">No registrations found</h4>
-      {% if has_active_filters %}
-      <a href="{{ reset_url }}" class="btn btn-secondary">Reset filters</a>
-      {% else %}
-      <a href="{% url 'inscriptions:inscription-create' %}" class="btn btn-primary">Create a registration</a>
-      {% endif %}
+      <div class="empty-state-icon">
+        <i class="fas fa-clipboard-list fa-3x"></i>
+      </div>
+      <h3>No registrations found</h3>
+      <p>There are no registrations matching your search criteria.</p>
+      <a href="{% url 'inscriptions:inscription-create' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Create a registration
+      </a>
     </div>
     {% endif %}
   </div>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ cours.nom_cours }} - Formatrix{% endblock %}
+{% block title %}{{ cours.nom_cours }} - Course Details - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/apprenants/detail.css' %}">
@@ -13,7 +13,7 @@
     <h1 class="page-title">{{ cours.nom_cours }}</h1>
     <div class="ms-auto">
       <div class="btn-group">
-        <a href="{% url 'cours:cours-update' cours.cours_id %}" class="btn btn-warning">
+        <a href="{% url 'cours:cours-update' cours.pk %}" class="btn btn-warning">
           <i class="fas fa-edit me-2"></i>Edit
         </a>
         <a href="{% url 'cours:cours-list' %}" class="btn btn-secondary">
@@ -23,29 +23,40 @@
     </div>
   </div>
 
+  {% if messages %}
+  <div class="mb-4">
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %} me-2"></i>
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <div class="row">
-    <!-- Left column -->
-    <div class="col-md-6">
-      <!-- General information -->
-      <div class="info-card">
-        <div class="info-card-header">
-          <i class="fas fa-info-circle me-2"></i>General Information
+    <!-- Left Column -->
+    <div class="col-md-8">
+      <!-- Course Information -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-info-circle me-2"></i>Course Information
+          </h3>
         </div>
-        <div class="info-card-body">
+        <div class="card-body">
           <div class="row">
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Course Name</div>
-                <div class="info-value">{{ cours.nom_cours }}</div>
+                <div class="info-label">Course Type</div>
+                <div class="info-value">{{ cours.get_type_cours_display }}</div>
               </div>
             </div>
             
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Course Type</div>
-                <div class="info-value">
-                  <span class="badge bg-info">{{ cours.get_type_cours_display }}</span>
-                </div>
+                <div class="info-label">Level</div>
+                <div class="info-value">{{ cours.niveau }}</div>
               </div>
             </div>
             
@@ -64,220 +75,243 @@
             
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Level</div>
-                <div class="info-value">{{ cours.niveau|default:"Not specified" }}</div>
+                <div class="info-label">Reference Price</div>
+                <div class="info-value">{{ cours.prix_reference }} €</div>
               </div>
             </div>
             
+            {% if cours.code_certification %}
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Approval Status</div>
+                <div class="info-label">Certification Code</div>
+                <div class="info-value">{{ cours.code_certification }}</div>
+              </div>
+            </div>
+            {% endif %}
+            
+            <div class="col-md-6">
+              <div class="info-item">
+                <div class="info-label">Status</div>
                 <div class="info-value">
-                  {% if cours.statut_approbation == 'en_attente' %}
-                    <span class="badge bg-warning">Pending</span>
-                  {% elif cours.statut_approbation == 'approuve' %}
-                    <span class="badge bg-success">Approved</span>
-                  {% elif cours.statut_approbation == 'refuse' %}
-                    <span class="badge bg-danger">Rejected</span>
-                  {% elif cours.statut_approbation == 'expire' %}
-                    <span class="badge bg-secondary">Expired</span>
-                  {% endif %}
+                  <span class="badge {% if cours.statut_approbation == 'en_attente' %}bg-warning{% elif cours.statut_approbation == 'approuve' %}bg-success{% elif cours.statut_approbation == 'refuse' %}bg-danger{% elif cours.statut_approbation == 'expire' %}bg-secondary{% endif %}">
+                    {{ cours.get_statut_approbation_display }}
+                  </span>
                 </div>
               </div>
             </div>
-            
-            <div class="col-md-6">
-              <div class="info-item">
-                <div class="info-label">Fee per Participant</div>
-                <div class="info-value">{{ cours.frais_par_participant|default:"Not specified" }}</div>
-              </div>
-            </div>
-            
-            <div class="col-md-6">
-              <div class="info-item">
-                <div class="info-label">Schedule</div>
-                <div class="info-value">{{ cours.horaire }}</div>
-              </div>
-            </div>
-            
-            {% if cours.date_approbation %}
-            <div class="col-md-6">
-              <div class="info-item">
-                <div class="info-label">Approval Date</div>
-                <div class="info-value">{{ cours.date_approbation }}</div>
-              </div>
-            </div>
-            {% endif %}
-            
-            {% if cours.date_expiration_validite %}
-            <div class="col-md-6">
-              <div class="info-item">
-                <div class="info-label">Expiration Date</div>
-                <div class="info-value">{{ cours.date_expiration_validite }}</div>
-              </div>
-            </div>
-            {% endif %}
           </div>
         </div>
       </div>
       
-      <!-- Objectives and prerequisites -->
-      <div class="info-card">
-        <div class="info-card-header">
-          <i class="fas fa-bullseye me-2"></i>Objectives and Prerequisites
+      <!-- Course Description -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-book me-2"></i>Description
+          </h3>
         </div>
-        <div class="info-card-body">
-          <div class="info-item">
-            <div class="info-label">Objectives</div>
-            <div class="info-value">{{ cours.objectifs|linebreaks }}</div>
+        <div class="card-body">
+          {% if cours.description %}
+          <div class="rich-text-content">
+            {{ cours.description|safe }}
           </div>
-          
-          {% if cours.prerequis %}
-          <div class="info-item">
-            <div class="info-label">Prerequisites</div>
-            <div class="info-value">{{ cours.prerequis|linebreaks }}</div>
-          </div>
+          {% else %}
+          <p class="text-muted">No detailed description provided.</p>
           {% endif %}
         </div>
       </div>
+      
+      <!-- Course Objectives -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-bullseye me-2"></i>Objectives
+          </h3>
+        </div>
+        <div class="card-body">
+          {% if cours.objectifs %}
+          <div class="rich-text-content">
+            {{ cours.objectifs|safe }}
+          </div>
+          {% else %}
+          <p class="text-muted">No objectives specified.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Prerequisites -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-clipboard-list me-2"></i>Prerequisites
+          </h3>
+        </div>
+        <div class="card-body">
+          {% if cours.prerequis %}
+          <div class="rich-text-content">
+            {{ cours.prerequis|safe }}
+          </div>
+          {% else %}
+          <p class="text-muted">No prerequisites specified.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Required Materials -->
+      {% if cours.materiel_requis %}
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-tools me-2"></i>Required Materials
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="rich-text-content">
+            {{ cours.materiel_requis|safe }}
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
     
-    <!-- Right column -->
-    <div class="col-md-6">
-      <!-- Material and resources -->
-      <div class="info-card">
-        <div class="info-card-header">
-          <i class="fas fa-tools me-2"></i>Material and Resources
+    <!-- Right Column -->
+    <div class="col-md-4">
+      <!-- Course Image -->
+      {% if cours.image_cours %}
+      <div class="card mb-4">
+        <div class="card-img-top course-image">
+          <img src="{{ cours.image_cours.url }}" alt="{{ cours.nom_cours }}" class="img-fluid">
         </div>
-        <div class="info-card-body">
-          {% if cours.materiel_requis %}
-          <div class="info-item">
-            <div class="info-label">Required Material</div>
-            <div class="info-value">{{ cours.materiel_requis|linebreaks }}</div>
+      </div>
+      {% endif %}
+      
+      <!-- Assigned Trainers -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-chalkboard-teacher me-2"></i>Assigned Trainers
+          </h3>
+        </div>
+        <div class="card-body">
+          {% if formateurs %}
+          <div class="trainer-list">
+            {% for formateur in formateurs %}
+            <div class="trainer-item">
+              <div class="trainer-avatar">
+                {% if formateur.photo %}
+                <img src="{{ formateur.photo.url }}" alt="{{ formateur.prenom }} {{ formateur.nom }}">
+                {% else %}
+                <div class="avatar-placeholder">
+                  {{ formateur.prenom|slice:":1" }}{{ formateur.nom|slice:":1" }}
+                </div>
+                {% endif %}
+              </div>
+              <div class="trainer-info">
+                <h5 class="trainer-name">
+                  <a href="{% url 'formateurs:formateur-detail' formateur.pk %}">
+                    {{ formateur.prenom }} {{ formateur.nom }}
+                  </a>
+                </h5>
+                <p class="trainer-title">{{ formateur.specialite }}</p>
+              </div>
+            </div>
+            {% endfor %}
           </div>
           {% else %}
-          <div class="info-item">
-            <div class="info-value text-muted">No material specified</div>
+          <p class="text-muted">No trainers currently assigned to this course.</p>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Upcoming Sessions -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-calendar-alt me-2"></i>Upcoming Sessions
+          </h3>
+          <a href="{% url 'seances:seance-create' %}?cours={{ cours.pk }}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Add Session
+          </a>
+        </div>
+        <div class="card-body">
+          {% if seances %}
+          <div class="list-group">
+            {% for seance in seances %}
+            <a href="{% url 'seances:seance-detail' seance.pk %}" class="list-group-item list-group-item-action">
+              <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ seance.date|date:"d/m/Y" }}</h5>
+                <small>
+                  <span class="badge {% if seance.statut == 'planifiée' %}bg-info{% elif seance.statut == 'en cours' %}bg-primary{% elif seance.statut == 'terminée' %}bg-success{% elif seance.statut == 'annulée' %}bg-danger{% endif %}">
+                    {{ seance.get_statut_display }}
+                  </span>
+                </small>
+              </div>
+              <p class="mb-1">{{ seance.lieu.nom }}</p>
+              <small>
+                Spots: {{ seance.inscriptions.count }}/{{ seance.nombre_places }}
+              </small>
+            </a>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="text-muted">No upcoming sessions scheduled for this course.</p>
+          <div class="text-center mt-3">
+            <a href="{% url 'seances:seance-create' %}?cours={{ cours.pk }}" class="btn btn-primary">
+              <i class="fas fa-plus me-2"></i>Schedule a Session
+            </a>
           </div>
           {% endif %}
         </div>
       </div>
       
-      <!-- Assigned trainers -->
-      <div class="info-card">
-        <div class="info-card-header">
-          <i class="fas fa-chalkboard-teacher me-2"></i>Assigned Trainers
+      <!-- Administrative Actions -->
+      {% if user.is_staff %}
+      <div class="card mb-4">
+        <div class="card-header">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-cogs me-2"></i>Administrative Actions
+          </h3>
         </div>
-        <div class="info-card-body">
-          {% if course_formateurs %}
-          <div class="table-responsive">
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Expertise Level</th>
-                  <th>Specialties</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for formateur in course_formateurs %}
-                <tr>
-                  <td>{{ formateur.get_full_name }}</td>
-                  <td>
-                    <span class="badge badge-info">
-                      {{ formateur.get_type_formateur_display }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge badge-primary">
-                      {{ formateur.get_niveau_expertise_display }}
-                    </span>
-                  </td>
-                  <td>
-                    {% if formateur.specialites %}
-                      {{ formateur.specialites|truncatechars:30 }}
-                    {% else %}
-                      <span class="text-muted">Not specified</span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    <a href="/formateurs/{{ formateur.formateurid }}/" class="btn btn-sm btn-info">
-                      <i class="fas fa-eye"></i>
-                    </a>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+        <div class="card-body">
+          <div class="list-group">
+            {% if cours.statut_approbation == 'en_attente' %}
+            <a href="{% url 'cours:cours-approuver' cours.pk %}" class="list-group-item list-group-item-action text-success">
+              <i class="fas fa-check me-2"></i>Approve Course
+            </a>
+            <a href="{% url 'cours:cours-refuser' cours.pk %}" class="list-group-item list-group-item-action text-danger">
+              <i class="fas fa-times me-2"></i>Reject Course
+            </a>
+            {% elif cours.statut_approbation == 'approuve' %}
+            <a href="{% url 'cours:cours-desapprouver' cours.pk %}" class="list-group-item list-group-item-action text-warning">
+              <i class="fas fa-ban me-2"></i>Revoke Approval
+            </a>
+            {% elif cours.statut_approbation == 'refuse' %}
+            <a href="{% url 'cours:cours-approuver' cours.pk %}" class="list-group-item list-group-item-action text-success">
+              <i class="fas fa-check me-2"></i>Approve Course
+            </a>
+            {% endif %}
+            <a href="{% url 'cours:cours-delete' cours.pk %}" class="list-group-item list-group-item-action text-danger">
+              <i class="fas fa-trash me-2"></i>Delete Course
+            </a>
           </div>
-          {% else %}
-          <div class="empty-state">
-            <i class="fas fa-user-slash empty-icon"></i>
-            <p>No trainers are assigned to this course.</p>
-          </div>
-          {% endif %}
         </div>
       </div>
-      
-      <!-- Course modules -->
-      <div class="info-card">
-        <div class="info-card-header">
-          <i class="fas fa-cubes me-2"></i>Course Modules
-        </div>
-        <div class="info-card-body">
-          {% if cours.modules.all %}
-          <div class="table-responsive">
-            <table class="table table-sm">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th>Duration (hours)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for module in cours.modules.all %}
-                <tr>
-                  <td>{{ module.nom_module }}</td>
-                  <td>{{ module.description }}</td>
-                  <td>{{ module.duree_heures }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          {% else %}
-          <div class="info-item">
-            <div class="info-value text-muted">No modules defined</div>
-          </div>
-          {% endif %}
-        </div>
-      </div>
+      {% endif %}
     </div>
   </div>
   
   <div class="d-flex justify-content-between mt-3">
     <a href="{% url 'cours:cours-list' %}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left me-2"></i>Back to list
+      <i class="fas fa-arrow-left me-2"></i>Back to List
     </a>
     <div>
-      <a href="{% url 'cours:cours-update' cours.cours_id %}" class="btn btn-warning">
+      <a href="{% url 'cours:cours-update' cours.pk %}" class="btn btn-warning">
         <i class="fas fa-edit me-2"></i>Edit
       </a>
       {% if user.is_staff %}
-        {% if cours.statut_approbation == 'en_attente' %}
-          <a href="{% url 'cours:cours-approuver' cours.cours_id %}" class="btn btn-success ms-2">
-            <i class="fas fa-check me-2"></i>Approve
-          </a>
-          <a href="{% url 'cours:cours-refuser' cours.cours_id %}" class="btn btn-danger ms-2">
-            <i class="fas fa-times me-2"></i>Reject
-          </a>
-        {% endif %}
-        <a href="{% url 'cours:cours-delete' cours.cours_id %}" class="btn btn-danger ms-2">
-          <i class="fas fa-trash me-2"></i>Delete
-        </a>
+      <a href="{% url 'cours:cours-delete' cours.pk %}" class="btn btn-danger ms-2">
+        <i class="fas fa-trash me-2"></i>Delete
+      </a>
       {% endif %}
     </div>
   </div>
