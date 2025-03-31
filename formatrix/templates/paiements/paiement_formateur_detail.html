@@ -1,37 +1,37 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Détails du paiement formateur{% endblock %}
+{% block title %}Trainer Payment Details{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-        <h1>Détails du paiement formateur</h1>
+        <h1>Trainer Payment Details</h1>
         <div>
             <a href="{% url 'paiements:paiement-formateur-list' %}" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                <i class="fas fa-arrow-left me-1"></i> Back to list
             </a>
             <a href="{% url 'paiements:paiement-formateur-update' paiement_formateur_id=paiement.paiement_formateur_id %}" class="btn btn-warning">
-                <i class="fas fa-edit me-1"></i> Modifier
+                <i class="fas fa-edit me-1"></i> Edit
             </a>
         </div>
     </div>
     
     <div class="row">
-        <!-- Informations principales -->
+        <!-- Main Information -->
         <div class="col-lg-6 mb-4">
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-info-circle me-1"></i>
-                    Informations principales
+                    Main Information
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">ID du paiement:</div>
+                        <div class="col-md-4 fw-bold">Payment ID:</div>
                         <div class="col-md-8">{{ paiement.paiement_formateur_id }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Formateur:</div>
+                        <div class="col-md-4 fw-bold">Trainer:</div>
                         <div class="col-md-8">
                             <a href="{% url 'formateurs:formateur-detail' paiement.formateur.formateur_id %}">
                                 {{ paiement.formateur.nom }} {{ paiement.formateur.prenom }}
@@ -39,15 +39,15 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Montant:</div>
+                        <div class="col-md-4 fw-bold">Amount:</div>
                         <div class="col-md-8">{{ paiement.montant }} €</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Date de paiement:</div>
+                        <div class="col-md-4 fw-bold">Payment date:</div>
                         <div class="col-md-8">{{ paiement.date_paiement|date:"d/m/Y" }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Statut:</div>
+                        <div class="col-md-4 fw-bold">Status:</div>
                         <div class="col-md-8">
                             <span class="badge {% if paiement.statut == 'paye' %}bg-success{% elif paiement.statut == 'en_attente' %}bg-warning{% elif paiement.statut == 'planifie' %}bg-info{% else %}bg-secondary{% endif %} px-3 py-2">
                                 {{ paiement.get_statut_display }}
@@ -55,55 +55,55 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Mode de paiement:</div>
+                        <div class="col-md-4 fw-bold">Payment method:</div>
                         <div class="col-md-8">{{ paiement.get_mode_paiement_display }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Référence:</div>
+                        <div class="col-md-4 fw-bold">Reference:</div>
                         <div class="col-md-8">{{ paiement.reference|default:"-" }}</div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Détails de calcul -->
+        <!-- Calculation Details -->
         <div class="col-lg-6 mb-4">
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-calculator me-1"></i>
-                    Détails de calcul
+                    Calculation Details
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Période:</div>
+                        <div class="col-md-4 fw-bold">Period:</div>
                         <div class="col-md-8">
-                            Du {{ paiement.periode_debut|date:"d/m/Y" }} au {{ paiement.periode_fin|date:"d/m/Y" }}
+                            From {{ paiement.periode_debut|date:"d/m/Y" }} to {{ paiement.periode_fin|date:"d/m/Y" }}
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Heures travaillées:</div>
-                        <div class="col-md-8">{{ paiement.heures_travaillees }} heures</div>
+                        <div class="col-md-4 fw-bold">Hours worked:</div>
+                        <div class="col-md-8">{{ paiement.heures_travaillees }} hours</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Taux horaire:</div>
-                        <div class="col-md-8">{{ paiement.taux_horaire }} €/heure</div>
+                        <div class="col-md-4 fw-bold">Hourly rate:</div>
+                        <div class="col-md-8">{{ paiement.taux_horaire }} €/hour</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Calcul:</div>
+                        <div class="col-md-4 fw-bold">Calculation:</div>
                         <div class="col-md-8">
-                            {{ paiement.heures_travaillees }} heures × {{ paiement.taux_horaire }} €/heure = {{ paiement.montant }} €
+                            {{ paiement.heures_travaillees }} hours × {{ paiement.taux_horaire }} €/hour = {{ paiement.montant }} €
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Commentaires:</div>
+                        <div class="col-md-4 fw-bold">Comments:</div>
                         <div class="col-md-8">{{ paiement.commentaires|default:"-"|linebreaks }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Date de création:</div>
+                        <div class="col-md-4 fw-bold">Creation date:</div>
                         <div class="col-md-8">{{ paiement.date_creation|date:"d/m/Y H:i" }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Dernière modification:</div>
+                        <div class="col-md-4 fw-bold">Last modified:</div>
                         <div class="col-md-8">{{ paiement.date_modification|date:"d/m/Y H:i" }}</div>
                     </div>
                 </div>
@@ -111,11 +111,11 @@
         </div>
     </div>
     
-    <!-- Séances associées -->
+    <!-- Associated Sessions -->
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-calendar-alt me-1"></i>
-            Séances sur la période ({{ seances|length }})
+            Sessions during the period ({{ seances|length }})
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -123,10 +123,10 @@
                     <thead class="table-light">
                         <tr>
                             <th>Date</th>
-                            <th>Cours</th>
-                            <th>Lieu</th>
-                            <th>Durée</th>
-                            <th>Statut</th>
+                            <th>Course</th>
+                            <th>Location</th>
+                            <th>Duration</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -150,7 +150,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center py-3">Aucune séance trouvée pour cette période</td>
+                            <td colspan="6" class="text-center py-3">No sessions found for this period</td>
                         </tr>
                         {% endfor %}
                     </tbody>

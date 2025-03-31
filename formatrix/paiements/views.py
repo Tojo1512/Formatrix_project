@@ -11,6 +11,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.db import transaction
+from decimal import Decimal
 
 from .models import Paiement, PaiementFormateur, PlanPaiement, Facture, LigneFacture
 from .forms import PaiementForm, PaiementFormateurForm, CalculPaiementFormateurForm, PlanPaiementForm, FactureForm, LigneFactureForm, GenerationFactureForm
@@ -22,7 +23,6 @@ import os
 import csv
 import json
 import datetime
-from decimal import Decimal
 from io import BytesIO
 
 # Import conditionnel de WeasyPrint
@@ -31,7 +31,6 @@ try:
     from weasyprint.text.fonts import FontConfiguration
     WEASYPRINT_AVAILABLE = True
 except (ImportError, OSError):
-    print("WeasyPrint n'est pas disponible. Vérifiez l'installation.")
     WEASYPRINT_AVAILABLE = False
 
 # Import de ReportLab
@@ -139,16 +138,13 @@ class PaiementCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         try:
             # Afficher les données du formulaire pour le débogage
-            print("Données du formulaire valides:", form.cleaned_data)
             messages.success(self.request, 'Paiement créé avec succès.')
             return super().form_valid(form)
         except Exception as e:
-            print(f"Erreur lors de la création du paiement: {e}")
             messages.error(self.request, f"Erreur lors de la création du paiement: {e}")
             return self.form_invalid(form)
     
     def form_invalid(self, form):
-        print("Formulaire invalide. Erreurs:", form.errors)
         messages.error(self.request, f"Le formulaire contient des erreurs: {form.errors}")
         return super().form_invalid(form)
 
@@ -483,8 +479,12 @@ class FactureListView(LoginRequiredMixin, ListView):
         context['total_factures'] = Facture.objects.count()
         context['total_montant'] = Facture.objects.aggregate(total=Sum('montant_ttc'))['total'] or 0
         
+        # Ajouter les choices au contexte pour les templates
+        context['statut_choices'] = Facture.STATUS_CHOICES
+        context['type_facture_choices'] = Facture.INVOICE_TYPE_CHOICES
+        
         # Factures par statut
-        statuts = dict(Facture.STATUT_CHOICES)
+        statuts = dict(Facture.STATUS_CHOICES)
         stats_statut = []
         for code, label in statuts.items():
             count = Facture.objects.filter(statut=code).count()
@@ -498,7 +498,7 @@ class FactureListView(LoginRequiredMixin, ListView):
         context['stats_statut'] = stats_statut
         
         # Factures par type
-        types = dict(Facture.TYPE_FACTURE_CHOICES)
+        types = dict(Facture.INVOICE_TYPE_CHOICES)
         stats_type = []
         for code, label in types.items():
             count = Facture.objects.filter(type_facture=code).count()
@@ -622,6 +622,7 @@ def generer_facture(request):
         form = GenerationFactureForm(request.POST)
         if form.is_valid():
             inscription_id = form.cleaned_data['inscription'].inscription_id
+            inscription = form.cleaned_data['inscription']
             type_facture = form.cleaned_data['type_facture']
             statut_initial = form.cleaned_data['statut_initial']
             montant_ht = form.cleaned_data['montant_ht']
@@ -676,7 +677,7 @@ def generer_facture(request):
                 if generer_pdf:
                     # La génération du PDF est gérée par la vue telecharger_facture_pdf
                     # Nous redirigeons simplement vers cette vue
-                    return redirect('paiements:telecharger-facture', facture_id=facture.facture_id)
+                    return redirect('paiements:facture-pdf', facture_id=facture.facture_id)
                 
                 return redirect('paiements:facture-detail', facture_id=facture.facture_id)
             
@@ -687,7 +688,7 @@ def generer_facture(request):
     
     return render(request, 'paiements/generer_facture.html', {
         'form': form,
-        'titre': 'Générer une facture'
+        'titre': 'Generate Invoice'
     })
 
 @login_required
@@ -816,10 +817,9 @@ def telecharger_facture_pdf(request, facture_id):
         response['Content-Disposition'] = f'attachment; filename="facture_{facture.numero_facture}.pdf"'
         response.write(pdf)
         
+        # Retourner le PDF généré
         return response
-        
     except Exception as e:
-        print(f"Erreur lors de la génération du PDF: {str(e)}")
         messages.error(request, f"Erreur lors de la génération du PDF: {str(e)}")
         return redirect('paiements:facture-detail', facture_id=facture_id)
 
@@ -1135,12 +1135,12 @@ def changer_statut_facture(request, facture_id):
     
     if request.method == 'POST':
         nouveau_statut = request.POST.get('statut')
-        if nouveau_statut in dict(Facture.STATUT_CHOICES):
+        if nouveau_statut in dict(Facture.STATUS_CHOICES):
             ancien_statut = facture.statut
             facture.statut = nouveau_statut
             facture.save()
             
-            messages.success(request, f'Statut de la facture modifié de "{dict(Facture.STATUT_CHOICES)[ancien_statut]}" à "{dict(Facture.STATUT_CHOICES)[nouveau_statut]}".')
+            messages.success(request, f'Statut de la facture modifié de "{dict(Facture.STATUS_CHOICES)[ancien_statut]}" à "{dict(Facture.STATUS_CHOICES)[nouveau_statut]}".')
         else:
             messages.error(request, 'Statut invalide.')
     
@@ -1257,3 +1257,60 @@ def recreer_facture(request, facture_id):
         'titre': f'Recréer la facture {facture_originale.numero_facture}',
         'facture': facture_originale
     })
+
+@login_required
+def emettre_facture(request, facture_id):
+    """Vue pour émettre une facture (changer son statut de brouillon à émise)."""
+    facture = get_object_or_404(Facture, facture_id=facture_id)
+    
+    # Vérifier que la facture est en brouillon
+    if facture.statut != 'brouillon':
+        messages.error(request, "Seules les factures en statut 'Brouillon' peuvent être émises.")
+        return redirect('paiements:facture-detail', facture_id=facture.facture_id)
+    
+    # Changer le statut
+    facture.statut = 'emise'
+    # Définir la date d'émission à aujourd'hui
+    facture.date_emission = timezone.now().date()
+    # Définir la date d'échéance à 30 jours plus tard par défaut si elle n'est pas déjà définie
+    if not facture.date_echeance:
+        facture.date_echeance = facture.date_emission + timezone.timedelta(days=30)
+    facture.save()
+    
+    messages.success(request, f"La facture {facture.numero_facture} a été émise avec succès.")
+    return redirect('paiements:facture-detail', facture_id=facture.facture_id)
+
+@login_required
+def marquer_facture_payee(request, facture_id):
+    """Vue pour marquer une facture comme payée."""
+    facture = get_object_or_404(Facture, facture_id=facture_id)
+    
+    # Vérifier que la facture est émise
+    if facture.statut != 'emise':
+        messages.error(request, "Seules les factures en statut 'Émise' peuvent être marquées comme payées.")
+        return redirect('paiements:facture-detail', facture_id=facture.facture_id)
+    
+    # Changer le statut
+    facture.statut = 'payee'
+    facture.save()
+    
+    messages.success(request, f"La facture {facture.numero_facture} a été marquée comme payée.")
+    return redirect('paiements:facture-detail', facture_id=facture.facture_id)
+
+@login_required
+def annuler_facture(request, facture_id):
+    """Vue pour annuler une facture."""
+    facture = get_object_or_404(Facture, facture_id=facture_id)
+    
+    # Vérifier que la facture n'est pas déjà annulée
+    if facture.statut == 'annulee':
+        messages.error(request, "Cette facture est déjà annulée.")
+        return redirect('paiements:facture-detail', facture_id=facture.facture_id)
+    
+    # Changer le statut
+    ancien_statut = facture.statut
+    facture.statut = 'annulee'
+    facture.save()
+    
+    messages.success(request, f"La facture {facture.numero_facture} a été annulée.")
+    return redirect('paiements:facture-detail', facture_id=facture.facture_id)

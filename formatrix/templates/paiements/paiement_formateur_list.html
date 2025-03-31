@@ -1,30 +1,30 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Paiements formateurs{% endblock %}
+{% block title %}Trainer Payments{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-        <h1>Paiements aux formateurs</h1>
+        <h1>Trainer Payments</h1>
         <div>
             <a href="{% url 'paiements:tableau-bord' %}" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-tachometer-alt me-1"></i> Tableau de bord
+                <i class="fas fa-tachometer-alt me-1"></i> Dashboard
             </a>
             <a href="{% url 'paiements:paiement-formateur-create' %}" class="btn btn-primary">
-                <i class="fas fa-plus me-1"></i> Nouveau paiement
+                <i class="fas fa-plus me-1"></i> New Payment
             </a>
         </div>
     </div>
     
-    <!-- Statistiques -->
+    <!-- Statistics -->
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-3">
             <div class="card bg-primary text-white h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="me-3">
-                            <div class="text-white-75">Total des paiements</div>
+                            <div class="text-white-75">Total Payments</div>
                             <div class="text-lg fw-bold">{{ total_paiements }}</div>
                         </div>
                         <i class="fas fa-money-bill-wave fa-2x text-white-50"></i>
@@ -38,7 +38,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="me-3">
-                            <div class="text-white-75">Montant total</div>
+                            <div class="text-white-75">Total Amount</div>
                             <div class="text-lg fw-bold">{{ montant_total|floatformat:2 }} €</div>
                         </div>
                         <i class="fas fa-euro-sign fa-2x text-white-50"></i>
@@ -52,7 +52,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="me-3">
-                            <div class="text-white-75">Paiements en attente</div>
+                            <div class="text-white-75">Pending Payments</div>
                             <div class="text-lg fw-bold">{{ paiements_en_attente }}</div>
                         </div>
                         <i class="fas fa-clock fa-2x text-white-50"></i>
@@ -66,7 +66,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="me-3">
-                            <div class="text-white-75">Montant en attente</div>
+                            <div class="text-white-75">Pending Amount</div>
                             <div class="text-lg fw-bold">{{ montant_en_attente|floatformat:2 }} €</div>
                         </div>
                         <i class="fas fa-exclamation-circle fa-2x text-white-50"></i>
@@ -76,29 +76,29 @@
         </div>
     </div>
     
-    <!-- Filtres -->
+    <!-- Filters -->
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-filter me-1"></i>
-            Filtres
+            Filters
         </div>
         <div class="card-body">
             <form method="get" class="row g-3">
                 <div class="col-md-3">
-                    <label for="statut" class="form-label">Statut</label>
+                    <label for="statut" class="form-label">Status</label>
                     <select name="statut" id="statut" class="form-select">
-                        <option value="">Tous les statuts</option>
-                        <option value="paye" {% if request.GET.statut == 'paye' %}selected{% endif %}>Payé</option>
-                        <option value="en_attente" {% if request.GET.statut == 'en_attente' %}selected{% endif %}>En attente</option>
-                        <option value="planifie" {% if request.GET.statut == 'planifie' %}selected{% endif %}>Planifié</option>
-                        <option value="annule" {% if request.GET.statut == 'annule' %}selected{% endif %}>Annulé</option>
+                        <option value="">All statuses</option>
+                        <option value="paye" {% if request.GET.statut == 'paye' %}selected{% endif %}>Paid</option>
+                        <option value="en_attente" {% if request.GET.statut == 'en_attente' %}selected{% endif %}>Pending</option>
+                        <option value="planifie" {% if request.GET.statut == 'planifie' %}selected{% endif %}>Scheduled</option>
+                        <option value="annule" {% if request.GET.statut == 'annule' %}selected{% endif %}>Canceled</option>
                     </select>
                 </div>
                 
                 <div class="col-md-3">
-                    <label for="formateur_id" class="form-label">Formateur</label>
+                    <label for="formateur_id" class="form-label">Trainer</label>
                     <select name="formateur_id" id="formateur_id" class="form-select">
-                        <option value="">Tous les formateurs</option>
+                        <option value="">All trainers</option>
                         {% for formateur in formateurs %}
                         <option value="{{ formateur.formateur_id }}" {% if request.GET.formateur_id == formateur.formateur_id|stringformat:'s' %}selected{% endif %}>
                             {{ formateur.nom }} {{ formateur.prenom }}
@@ -108,36 +108,36 @@
                 </div>
                 
                 <div class="col-md-3">
-                    <label for="date_debut" class="form-label">Date début</label>
+                    <label for="date_debut" class="form-label">Start Date</label>
                     <input type="date" class="form-control" id="date_debut" name="date_debut" value="{{ request.GET.date_debut }}">
                 </div>
                 
                 <div class="col-md-3">
-                    <label for="date_fin" class="form-label">Date fin</label>
+                    <label for="date_fin" class="form-label">End Date</label>
                     <input type="date" class="form-control" id="date_fin" name="date_fin" value="{{ request.GET.date_fin }}">
                 </div>
                 
                 <div class="col-12 d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary me-2">
-                        <i class="fas fa-search me-1"></i> Filtrer
+                        <i class="fas fa-search me-1"></i> Filter
                     </button>
                     <a href="{% url 'paiements:paiement-formateur-list' %}" class="btn btn-secondary">
-                        <i class="fas fa-undo me-1"></i> Réinitialiser
+                        <i class="fas fa-undo me-1"></i> Reset
                     </a>
                 </div>
             </form>
         </div>
     </div>
     
-    <!-- Liste des paiements formateurs -->
+    <!-- Trainer Payments List -->
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <i class="fas fa-list me-1"></i>
-                Liste des paiements aux formateurs
+                Trainer Payments List
             </div>
             <a href="{% url 'paiements:paiement-formateur-create' %}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus me-1"></i> Nouveau paiement
+                <i class="fas fa-plus me-1"></i> New Payment
             </a>
         </div>
         <div class="card-body p-0">
@@ -146,13 +146,13 @@
                     <thead class="table-light">
                         <tr>
                             <th>ID</th>
-                            <th>Formateur</th>
-                            <th>Montant</th>
-                            <th>Date paiement</th>
-                            <th>Période</th>
-                            <th>Heures</th>
-                            <th>Taux</th>
-                            <th>Statut</th>
+                            <th>Trainer</th>
+                            <th>Amount</th>
+                            <th>Payment Date</th>
+                            <th>Period</th>
+                            <th>Hours</th>
+                            <th>Rate</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -188,7 +188,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="9" class="text-center py-3">Aucun paiement formateur trouvé</td>
+                            <td colspan="9" class="text-center py-3">No trainer payments found</td>
                         </tr>
                         {% endfor %}
                     </tbody>

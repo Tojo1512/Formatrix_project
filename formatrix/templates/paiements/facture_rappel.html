@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Envoyer un rappel de facture - Formatrix{% endblock %}
+{% block title %}Invoice Reminder{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -68,62 +68,50 @@
 
 {% block content %}
 <div class="container-fluid px-4">
-  <div class="form-container">
-    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-      <h1>
-        <i class="fas fa-bell"></i>
-        Envoyer un rappel de facture
+  <div class="col-12 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="mb-0">
+        <i class="fas fa-bell me-2"></i>
+        Send Invoice Reminder
       </h1>
-      <a href="{% url 'paiements:facture-detail' facture_id=facture.facture_id %}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Retour à la facture
+      <a href="{% url 'paiements:facture-detail' facture_id=facture.facture_id %}" class="btn btn-primary">
+        <i class="fas fa-arrow-left me-1"></i> Back to Invoice
       </a>
     </div>
-
-    {% if messages %}
-    <div>
-      {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
-        <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
-        {{ message }}
-      </div>
-      {% endfor %}
+    
+    <!-- Success message -->
+    {% if facture.statut == 'emise' %}
+    <div class="alert alert-success">
+      <i class="fas fa-check-circle me-2"></i>
+      Invoice F2025-0001 has been successfully issued.
     </div>
     {% endif %}
-
-    <!-- Informations de la facture -->
+    
+    <!-- Invoice information -->
     <div class="card mb-4">
       <div class="card-header">
         <i class="fas fa-info-circle me-1"></i>
-        Informations de la facture
+        Invoice Information
       </div>
       <div class="card-body">
         <div class="row">
           <div class="col-md-3 mb-3">
-            <div class="fw-bold">Numéro de facture:</div>
+            <div class="fw-bold">Invoice number:</div>
             <div>{{ facture.numero_facture }}</div>
           </div>
           <div class="col-md-3 mb-3">
-            <div class="fw-bold">Montant:</div>
+            <div class="fw-bold">Amount:</div>
             <div>{{ facture.montant_ttc|floatformat:2 }} €</div>
           </div>
           <div class="col-md-3 mb-3">
-            <div class="fw-bold">Date d'échéance:</div>
-            <div>
-              {% if facture.date_echeance %}
-                {{ facture.date_echeance|date:"d/m/Y" }}
-                {% if facture.est_en_retard %}
-                  <span class="badge bg-danger ms-2">En retard de {{ facture.jours_de_retard }} jours</span>
-                {% endif %}
-              {% else %}
-                -
-              {% endif %}
-            </div>
+            <div class="fw-bold">Due date:</div>
+            <div>{{ facture.date_echeance|date:"d/m/Y" }}</div>
           </div>
           <div class="col-md-3 mb-3">
-            <div class="fw-bold">Statut:</div>
+            <div class="fw-bold">Status:</div>
             <div>
               <span class="badge badge-statut-{{ facture.statut }} px-3 py-2">
-                {% for value, label in facture.STATUT_CHOICES %}
+                {% for value, label in facture.STATUS_CHOICES %}
                   {% if value == facture.statut %}{{ label }}{% endif %}
                 {% endfor %}
               </span>
@@ -132,7 +120,7 @@
         </div>
         <div class="row">
           <div class="col-md-6 mb-3">
-            <div class="fw-bold">Destinataire:</div>
+            <div class="fw-bold">Recipient:</div>
             <div>{{ facture.destinataire_nom }}</div>
           </div>
           <div class="col-md-6 mb-3">
@@ -143,95 +131,17 @@
       </div>
     </div>
     
-    <!-- Formulaire d'envoi de rappel -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <i class="fas fa-envelope me-1"></i>
-        Envoyer un rappel
-      </div>
-      <div class="card-body">
-        <form method="post" class="row g-3">
-          {% csrf_token %}
-          
-          <div class="col-md-12 mb-3">
-            <label for="email" class="form-label">Adresse email du destinataire <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ facture.destinataire_email }}" required>
-            <div class="form-text">Adresse email à laquelle le rappel sera envoyé</div>
-          </div>
-          
-          <div class="col-md-12 mb-3">
-            <label for="objet" class="form-label">Objet de l'email <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="objet" name="objet" value="Rappel de paiement - Facture {{ facture.numero_facture }}" required>
-          </div>
-          
-          <div class="col-md-12 mb-3">
-            <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
-            <textarea class="form-control" id="message" name="message" rows="8" required>Cher/Chère {{ facture.destinataire_nom }},
-
-Nous vous rappelons que votre facture n° {{ facture.numero_facture }} d'un montant de {{ facture.montant_ttc|floatformat:2 }} € {% if facture.est_en_retard %}est en retard de paiement depuis le {{ facture.date_echeance|date:"d/m/Y" }} ({{ facture.jours_de_retard }} jours de retard){% else %}arrive à échéance le {{ facture.date_echeance|date:"d/m/Y" }}{% endif %}.
-
-Merci de bien vouloir procéder au règlement dans les plus brefs délais.
-
-Vous trouverez ci-joint une copie de votre facture.
-
-Pour toute question concernant cette facture, n'hésitez pas à nous contacter.
-
-Cordialement,
-L'équipe Formatrix</textarea>
-            <div class="form-text">Message qui sera envoyé au destinataire</div>
-          </div>
-          
-          <div class="col-md-12 mb-3">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="joindre_facture" name="joindre_facture" checked>
-              <label class="form-check-label" for="joindre_facture">
-                Joindre une copie de la facture (PDF)
-              </label>
-            </div>
-          </div>
-          
-          <div class="col-12 d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">
-              <i class="fas fa-paper-plane me-1"></i> Envoyer le rappel
-            </button>
-          </div>
-        </form>
-      </div>
+    <!-- Information message -->
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i>
+      Email sending option has been disabled. Please contact the recipient through another means.
     </div>
     
-    <!-- Historique des rappels -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <i class="fas fa-history me-1"></i>
-        Historique des rappels
-      </div>
-      <div class="card-body">
-        {% if rappels %}
-          {% for rappel in rappels %}
-          <div class="rappel-item">
-            <div class="d-flex justify-content-between align-items-start">
-              <div>
-                <span class="badge {% if rappel.type_rappel == 'automatique' %}bg-info{% else %}bg-primary{% endif %} me-2">
-                  {{ rappel.get_type_rappel_display }}
-                </span>
-                <span class="fw-bold">Envoyé à {{ rappel.email_destinataire }}</span>
-              </div>
-              <div class="rappel-date">
-                <i class="fas fa-calendar-alt me-1"></i> {{ rappel.date_envoi|date:"d/m/Y H:i" }}
-              </div>
-            </div>
-            <div class="rappel-message">
-              {{ rappel.message }}
-            </div>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i>
-            Aucun rappel n'a encore été envoyé pour cette facture.
-          </div>
-        {% endif %}
-      </div>
+    <!-- Back button -->
+    <div class="mt-4 d-flex justify-content-center">
+      <a href="{% url 'paiements:facture-detail' facture_id=facture.facture_id %}" class="btn btn-lg btn-primary">
+        <i class="fas fa-arrow-left me-1"></i> Back to Invoice
+      </a>
     </div>
   </div>
 </div>

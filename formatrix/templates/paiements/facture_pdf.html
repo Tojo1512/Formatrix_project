@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Facture {{ facture.numero_facture }}</title>
+    <title>Invoice {{ facture.numero_facture }}</title>
     <style>
         @page {
             size: A4;
@@ -136,7 +136,7 @@
     </style>
 </head>
 <body>
-    <!-- En-tête -->
+    <!-- Header -->
     <table class="header">
         <tr>
             <td style="width: 50%;">
@@ -147,20 +147,20 @@
                 {% endif %}
                 <div style="margin-top: 10px;">
                     <strong>Formatrix</strong><br>
-                    123 Avenue de la Formation<br>
+                    123 Training Avenue<br>
                     75000 Paris<br>
-                    Tél: 01 23 45 67 89<br>
+                    Tel: 01 23 45 67 89<br>
                     Email: contact@formatrix.fr<br>
                     SIRET: 123 456 789 00012<br>
-                    N° TVA: FR12 123 456 789
+                    VAT N°: FR12 123 456 789
                 </div>
             </td>
             <td style="width: 50%; text-align: right;">
-                <div class="facture-title">FACTURE</div>
+                <div class="facture-title">INVOICE</div>
                 <div>N° {{ facture.numero_facture }}</div>
                 <div style="margin-top: 10px;">
                     <span class="badge badge-{{ facture.statut }}">
-                        {% for value, label in facture.STATUT_CHOICES %}
+                        {% for value, label in facture.STATUS_CHOICES %}
                             {% if value == facture.statut %}{{ label }}{% endif %}
                         {% endfor %}
                     </span>
@@ -168,11 +168,11 @@
                 <div style="margin-top: 10px;">
                     <table>
                         <tr>
-                            <td><strong>Date d'émission:</strong></td>
+                            <td><strong>Issue date:</strong></td>
                             <td>{{ facture.date_emission|date:"d/m/Y" }}</td>
                         </tr>
                         <tr>
-                            <td><strong>Date d'échéance:</strong></td>
+                            <td><strong>Due date:</strong></td>
                             <td>{{ facture.date_echeance|date:"d/m/Y" }}</td>
                         </tr>
                     </table>
@@ -181,17 +181,17 @@
         </tr>
     </table>
 
-    <!-- Adresses -->
+    <!-- Addresses -->
     <table style="width: 100%;">
         <tr>
             <td style="width: 50%; vertical-align: top;">
                 <div class="address-box">
-                    <div class="address-title">FACTURÉ À:</div>
+                    <div class="address-title">BILL TO:</div>
                     <div>
                         <strong>{{ facture.destinataire_nom }}</strong><br>
                         {{ facture.destinataire_adresse|linebreaksbr }}<br>
                         {% if facture.destinataire_telephone %}
-                        Tél: {{ facture.destinataire_telephone }}<br>
+                        Tel: {{ facture.destinataire_telephone }}<br>
                         {% endif %}
                         Email: {{ facture.destinataire_email }}<br>
                         {% if facture.destinataire_siret %}
@@ -203,12 +203,12 @@
             <td style="width: 50%; vertical-align: top;">
                 {% if inscription %}
                 <div class="address-box">
-                    <div class="address-title">INFORMATIONS INSCRIPTION:</div>
+                    <div class="address-title">REGISTRATION INFORMATION:</div>
                     <div>
-                        <strong>Apprenant:</strong> {{ inscription.apprenant }}<br>
-                        <strong>Formation:</strong> {{ inscription.seance.cours.nom_cours }}<br>
-                        <strong>Date d'inscription:</strong> {{ inscription.date_inscription|date:"d/m/Y" }}<br>
-                        <strong>Type d'inscription:</strong> 
+                        <strong>Learner:</strong> {{ inscription.apprenant }}<br>
+                        <strong>Course:</strong> {{ inscription.seance.cours.nom_cours }}<br>
+                        <strong>Registration date:</strong> {{ inscription.date_inscription|date:"d/m/Y" }}<br>
+                        <strong>Registration type:</strong> 
                         {% for value, label in inscription.TYPE_INSCRIPTION_CHOICES %}
                             {% if value == inscription.type_inscription %}{{ label }}{% endif %}
                         {% endfor %}
@@ -219,16 +219,16 @@
         </tr>
     </table>
 
-    <!-- Détails de la facture -->
+    <!-- Invoice details -->
     <table class="table">
         <thead>
             <tr>
                 <th style="width: 40%;">Description</th>
-                <th class="text-center" style="width: 10%;">Quantité</th>
-                <th class="text-right" style="width: 15%;">Prix unitaire HT</th>
-                <th class="text-right" style="width: 15%;">Montant HT</th>
-                <th class="text-center" style="width: 5%;">TVA</th>
-                <th class="text-right" style="width: 15%;">Montant TTC</th>
+                <th class="text-center" style="width: 10%;">Quantity</th>
+                <th class="text-right" style="width: 15%;">Unit price (excl. VAT)</th>
+                <th class="text-right" style="width: 15%;">Amount (excl. VAT)</th>
+                <th class="text-center" style="width: 5%;">VAT</th>
+                <th class="text-right" style="width: 15%;">Total amount</th>
             </tr>
         </thead>
         <tbody>
@@ -245,20 +245,20 @@
                 {% endfor %}
             {% else %}
                 <tr>
-                    <td colspan="6" style="text-align: center;">Aucune ligne de facture.</td>
+                    <td colspan="6" style="text-align: center;">No invoice lines.</td>
                 </tr>
             {% endif %}
         </tbody>
     </table>
 
-    <!-- Totaux -->
+    <!-- Totals -->
     <table class="total-table">
         <tr>
             <td class="label">Total HT:</td>
             <td class="value">{{ facture.montant_ht|floatformat:2 }} €</td>
         </tr>
         <tr>
-            <td class="label">TVA ({{ facture.taux_tva }}%):</td>
+            <td class="label">VAT ({{ facture.taux_tva }}%):</td>
             <td class="value">{{ facture.montant_tva|floatformat:2 }} €</td>
         </tr>
         <tr class="total-row">
@@ -267,15 +267,15 @@
         </tr>
     </table>
 
-    <!-- Conditions de paiement -->
+    <!-- Payment conditions -->
     <div class="conditions">
-        <div class="conditions-title">CONDITIONS DE PAIEMENT:</div>
+        <div class="conditions-title">PAYMENT CONDITIONS:</div>
         <div>
             {% if facture.conditions_paiement %}
                 {{ facture.conditions_paiement|linebreaksbr }}
             {% else %}
-                Paiement à réception de facture.<br>
-                Merci d'indiquer le numéro de facture dans votre référence de paiement.
+                Payment upon receipt of invoice.<br>
+                Please indicate the invoice number in your payment reference.
             {% endif %}
         </div>
     </div>
@@ -288,11 +288,11 @@
     </div>
     {% endif %}
 
-    <!-- Pied de page -->
+    <!-- Footer -->
     <div class="footer">
-        <p>Formatrix - Centre de formation professionnelle</p>
-        <p>123 Avenue de la Formation, 75000 Paris - Tél: 01 23 45 67 89</p>
-        <p>SIRET: 123 456 789 00012 - N° TVA: FR12 123 456 789</p>
+        <p>Formatrix - Professional Training Centre</p>
+        <p>123 Training Avenue, 75000 Paris - Tel: 01 23 45 67 89</p>
+        <p>SIRET: 123 456 789 00012 - VAT N°: FR12 123 456 789</p>
         <p>contact@formatrix.fr - www.formatrix.fr</p>
     </div>
 </body>

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if form.instance.paiement_formateur_id %}Modifier{% else %}Nouveau{% endif %} paiement formateur - Formatrix{% endblock %}
+{% block title %}{% if form.instance.paiement_formateur_id %}Edit{% else %}New{% endif %} Trainer Payment - Formatrix{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -65,10 +65,10 @@
   <div class="form-header">
     <h1 class="form-title">
       <i class="fas {% if form.instance.paiement_formateur_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
-      {% if form.instance.paiement_formateur_id %}Modifier{% else %}Nouveau{% endif %} paiement formateur
+      {% if form.instance.paiement_formateur_id %}Edit{% else %}New{% endif %} Trainer Payment
     </h1>
     <a href="{% url 'paiements:paiement-formateur-list' %}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left"></i> Retour à la liste
+      <i class="fas fa-arrow-left"></i> Back to list
     </a>
   </div>
 
@@ -83,7 +83,7 @@
   </div>
   {% endif %}
 
-  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+  <p class="text-muted">Fill in all required fields marked with <span class="text-danger">*</span></p>
 
   {% if form.non_field_errors %}
   <div class="alert alert-danger">
@@ -96,45 +96,45 @@
   <form method="post" novalidate>
     {% csrf_token %}
     
-    <!-- Informations principales -->
+    <!-- Trainer Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-user-tie"></i>
-        Informations du formateur
+        Trainer Information
       </h3>
       <div class="row">
         <div class="col-md-12 mb-3">
-          <label for="{{ form.formateur.id_for_label }}" class="form-label">Formateur <span class="text-danger">*</span></label>
+          <label for="{{ form.formateur.id_for_label }}" class="form-label">Trainer <span class="text-danger">*</span></label>
           {{ form.formateur }}
           {% if form.formateur.errors %}
           <div class="invalid-feedback d-block">
             {{ form.formateur.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Sélectionnez le formateur à payer</div>
+          <div class="form-text">Select the trainer to pay</div>
         </div>
       </div>
     </div>
     
-    <!-- Période et heures -->
+    <!-- Period and Hours -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-calendar-alt"></i>
-        Période et heures travaillées
+        Period and Hours Worked
       </h3>
       
       {% if not form.instance.paiement_formateur_id and form.formateur.value %}
       <div class="periode-selector">
-        <h4 class="mb-3"><i class="fas fa-clock"></i> Sélection rapide de période</h4>
+        <h4 class="mb-3"><i class="fas fa-clock"></i> Quick Period Selection</h4>
         <div class="d-flex flex-wrap mb-3">
-          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="mois-courant">Mois courant</button>
-          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="mois-precedent">Mois précédent</button>
-          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="semaine-courante">Semaine courante</button>
-          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="semaine-precedente">Semaine précédente</button>
-          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="trimestre-courant">Trimestre courant</button>
+          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="mois-courant">Current Month</button>
+          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="mois-precedent">Previous Month</button>
+          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="semaine-courante">Current Week</button>
+          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="semaine-precedente">Previous Week</button>
+          <button type="button" class="btn btn-outline-primary periode-btn" data-periode="trimestre-courant">Current Quarter</button>
         </div>
         <button type="button" id="calculer-heures" class="btn btn-success">
-          <i class="fas fa-calculator me-1"></i> Calculer les heures travaillées
+          <i class="fas fa-calculator me-1"></i> Calculate Hours Worked
         </button>
         <div id="resultat-calcul" class="mt-3"></div>
       </div>
@@ -142,40 +142,40 @@
       
       <div class="row">
         <div class="col-md-6 mb-3">
-          <label for="{{ form.periode_debut.id_for_label }}" class="form-label">Début de la période <span class="text-danger">*</span></label>
+          <label for="{{ form.periode_debut.id_for_label }}" class="form-label">Period Start <span class="text-danger">*</span></label>
           {{ form.periode_debut }}
           {% if form.periode_debut.errors %}
           <div class="invalid-feedback d-block">
             {{ form.periode_debut.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Date de début de la période de travail concernée</div>
+          <div class="form-text">Start date of the work period</div>
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.periode_fin.id_for_label }}" class="form-label">Fin de la période <span class="text-danger">*</span></label>
+          <label for="{{ form.periode_fin.id_for_label }}" class="form-label">Period End <span class="text-danger">*</span></label>
           {{ form.periode_fin }}
           {% if form.periode_fin.errors %}
           <div class="invalid-feedback d-block">
             {{ form.periode_fin.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Date de fin de la période de travail concernée</div>
+          <div class="form-text">End date of the work period</div>
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.heures_travaillees.id_for_label }}" class="form-label">Heures travaillées <span class="text-danger">*</span></label>
+          <label for="{{ form.heures_travaillees.id_for_label }}" class="form-label">Hours Worked <span class="text-danger">*</span></label>
           {{ form.heures_travaillees }}
           {% if form.heures_travaillees.errors %}
           <div class="invalid-feedback d-block">
             {{ form.heures_travaillees.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Nombre d'heures travaillées pendant cette période</div>
+          <div class="form-text">Number of hours worked during this period</div>
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.taux_horaire.id_for_label }}" class="form-label">Taux horaire (€) <span class="text-danger">*</span></label>
+          <label for="{{ form.taux_horaire.id_for_label }}" class="form-label">Hourly Rate (€) <span class="text-danger">*</span></label>
           {{ form.taux_horaire }}
           {% if form.taux_horaire.errors %}
           <div class="invalid-feedback d-block">
@@ -185,27 +185,27 @@
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.montant.id_for_label }}" class="form-label">Montant total (€) <span class="text-danger">*</span></label>
+          <label for="{{ form.montant.id_for_label }}" class="form-label">Total Amount (€) <span class="text-danger">*</span></label>
           {{ form.montant }}
           {% if form.montant.errors %}
           <div class="invalid-feedback d-block">
             {{ form.montant.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Calculé automatiquement (heures × taux horaire)</div>
+          <div class="form-text">Automatically calculated (hours × hourly rate)</div>
         </div>
       </div>
     </div>
     
-    <!-- Détails du paiement -->
+    <!-- Payment Details -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-money-bill-wave"></i>
-        Détails du paiement
+        Payment Details
       </h3>
       <div class="row">
         <div class="col-md-6 mb-3">
-          <label for="{{ form.statut.id_for_label }}" class="form-label">Statut <span class="text-danger">*</span></label>
+          <label for="{{ form.statut.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
           {{ form.statut }}
           {% if form.statut.errors %}
           <div class="invalid-feedback d-block">
@@ -215,18 +215,18 @@
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.date_paiement.id_for_label }}" class="form-label">Date de paiement</label>
+          <label for="{{ form.date_paiement.id_for_label }}" class="form-label">Payment Date</label>
           {{ form.date_paiement }}
           {% if form.date_paiement.errors %}
           <div class="invalid-feedback d-block">
             {{ form.date_paiement.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Laissez vide si le paiement n'a pas encore été effectué</div>
+          <div class="form-text">Leave blank if payment has not been made yet</div>
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.mode_paiement.id_for_label }}" class="form-label">Mode de paiement <span class="text-danger">*</span></label>
+          <label for="{{ form.mode_paiement.id_for_label }}" class="form-label">Payment Method <span class="text-danger">*</span></label>
           {{ form.mode_paiement }}
           {% if form.mode_paiement.errors %}
           <div class="invalid-feedback d-block">
@@ -236,18 +236,18 @@
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.reference.id_for_label }}" class="form-label">Référence</label>
+          <label for="{{ form.reference.id_for_label }}" class="form-label">Reference</label>
           {{ form.reference }}
           {% if form.reference.errors %}
           <div class="invalid-feedback d-block">
             {{ form.reference.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Numéro de référence du paiement (ex: numéro de virement)</div>
+          <div class="form-text">Payment reference number (e.g., bank transfer number)</div>
         </div>
         
         <div class="col-md-12 mb-3">
-          <label for="{{ form.commentaires.id_for_label }}" class="form-label">Commentaires</label>
+          <label for="{{ form.commentaires.id_for_label }}" class="form-label">Comments</label>
           {{ form.commentaires }}
           {% if form.commentaires.errors %}
           <div class="invalid-feedback d-block">
@@ -260,7 +260,7 @@
     
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save me-1"></i> Enregistrer
+        <i class="fas fa-save me-1"></i> Save
       </button>
     </div>
   </form>
@@ -270,9 +270,9 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('Formulaire de paiement formateur chargé');
+    console.log('Trainer payment form loaded');
     
-    // Appliquer des classes Bootstrap aux champs du formulaire
+    // Apply Bootstrap classes to form fields
     const formControls = document.querySelectorAll('input, select, textarea');
     formControls.forEach(function(element) {
       if (element.tagName === 'SELECT') {
@@ -285,12 +285,12 @@
       }
     });
     
-    // Récupérer les éléments du formulaire
+    // Get form elements
     const heuresInput = document.getElementById('{{ form.heures_travaillees.id_for_label }}');
     const tauxInput = document.getElementById('{{ form.taux_horaire.id_for_label }}');
     const montantInput = document.getElementById('{{ form.montant.id_for_label }}');
     
-    // Fonction pour mettre à jour le montant
+    // Function to update amount
     function updateMontant() {
       const heures = parseFloat(heuresInput.value) || 0;
       const taux = parseFloat(tauxInput.value) || 0;
@@ -298,14 +298,14 @@
       montantInput.value = montant.toFixed(2);
     }
     
-    // Mettre à jour le montant lorsque les valeurs changent
+    // Update amount when values change
     heuresInput.addEventListener('input', updateMontant);
     tauxInput.addEventListener('input', updateMontant);
     
-    // Initialiser le calcul
+    // Initialize calculation
     updateMontant();
     
-    // Gestion des boutons de période
+    // Handle period buttons
     const periodeBtns = document.querySelectorAll('.periode-btn');
     const periodeDebutInput = document.getElementById('{{ form.periode_debut.id_for_label }}');
     const periodeFinInput = document.getElementById('{{ form.periode_fin.id_for_label }}');
@@ -327,18 +327,18 @@
               fin = new Date(today.getFullYear(), today.getMonth(), 0);
               break;
             case 'semaine-courante':
-              const dayOfWeek = today.getDay() || 7; // Transformer 0 (dimanche) en 7
+              const dayOfWeek = today.getDay() || 7; // Transform 0 (Sunday) to 7
               debut = new Date(today);
-              debut.setDate(today.getDate() - dayOfWeek + 1); // Lundi
+              debut.setDate(today.getDate() - dayOfWeek + 1); // Monday
               fin = new Date(today);
-              fin.setDate(today.getDate() + (7 - dayOfWeek)); // Dimanche
+              fin.setDate(today.getDate() + (7 - dayOfWeek)); // Sunday
               break;
             case 'semaine-precedente':
               const lastDayOfWeek = today.getDay() || 7;
               debut = new Date(today);
-              debut.setDate(today.getDate() - lastDayOfWeek - 6); // Lundi précédent
+              debut.setDate(today.getDate() - lastDayOfWeek - 6); // Previous Monday
               fin = new Date(today);
-              fin.setDate(today.getDate() - lastDayOfWeek); // Dimanche précédent
+              fin.setDate(today.getDate() - lastDayOfWeek); // Previous Sunday
               break;
             case 'trimestre-courant':
               const trimestre = Math.floor(today.getMonth() / 3);
@@ -347,22 +347,22 @@
               break;
           }
           
-          // Formater les dates pour les inputs
+          // Format dates for inputs
           periodeDebutInput.value = debut.toISOString().split('T')[0];
           periodeFinInput.value = fin.toISOString().split('T')[0];
           
-          // Réinitialiser les styles des boutons
+          // Reset button styles
           periodeBtns.forEach(b => b.classList.remove('btn-primary', 'text-white'));
           periodeBtns.forEach(b => b.classList.add('btn-outline-primary'));
           
-          // Mettre en évidence le bouton sélectionné
+          // Highlight selected button
           this.classList.remove('btn-outline-primary');
           this.classList.add('btn-primary', 'text-white');
         });
       });
     }
     
-    // Gestion du bouton de calcul des heures
+    // Handle calculate hours button
     const calculerHeuresBtn = document.getElementById('calculer-heures');
     const resultatCalculDiv = document.getElementById('resultat-calcul');
     
@@ -373,23 +373,23 @@
         const fin = periodeFinInput.value;
         
         if (!formateurId || !debut || !fin) {
-          resultatCalculDiv.innerHTML = '<div class="alert alert-warning">Veuillez sélectionner un formateur et définir une période.</div>';
+          resultatCalculDiv.innerHTML = '<div class="alert alert-warning">Please select a trainer and define a period.</div>';
           return;
         }
         
-        resultatCalculDiv.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Calcul en cours...</p></div>';
+        resultatCalculDiv.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Calculating...</p></div>';
         
-        // Simuler un calcul (à remplacer par un appel AJAX réel)
+        // Simulate calculation (to be replaced with a real AJAX call)
         setTimeout(() => {
-          // Ceci est une simulation - dans une implémentation réelle, vous feriez un appel AJAX
-          const heuresCalculees = Math.floor(Math.random() * 40) + 10; // Entre 10 et 50 heures
+          // This is a simulation - in a real implementation, you would make an AJAX call
+          const heuresCalculees = Math.floor(Math.random() * 40) + 10; // Between 10 and 50 hours
           heuresInput.value = heuresCalculees;
           updateMontant();
           
           resultatCalculDiv.innerHTML = `
             <div class="alert alert-success">
               <i class="fas fa-check-circle me-2"></i>
-              <strong>${heuresCalculees} heures</strong> travaillées trouvées pour cette période.
+              <strong>${heuresCalculees} hours</strong> worked found for this period.
             </div>
           `;
         }, 1000);
