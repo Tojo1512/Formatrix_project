@@ -90,6 +90,32 @@
     color: #6c757d;
     font-weight: 500;
   }
+  
+  .forgot-password {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+  }
+  
+  .forgot-password-title {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #6c757d;
+  }
+  
+  .forgot-password-title i {
+    margin-right: 8px;
+    color: #ffc107;
+  }
+  
+  .forgot-password-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 10px;
+  }
 </style>
 {% endblock %}
 
@@ -142,19 +168,29 @@
                   <i class="fas fa-eye"></i>
                 </button>
               </div>
-              <div class="mt-2 text-end">
-                <a href="{% url 'password_reset' %}" class="text-primary fw-bold">Forgot password?</a>
-              </div>
             </div>
 
             <input type="hidden" name="next" value="{{ next }}">
 
-            <div class="form-group mb-4 mt-4">
+            <div class="form-group mb-4">
               <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
                 <i class="fas fa-sign-in-alt me-2"></i>Login
               </button>
             </div>
           </form>
+          
+          <!-- Section de réinitialisation via admin -->
+          <div class="forgot-password" style="background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-top: 20px;">
+            <div style="display: flex; align-items: center; font-weight: 600; margin-bottom: 10px; color: #6c757d;">
+              <i class="fas fa-key me-2" style="color: #ffc107;"></i> Forgot Password?
+            </div>
+            <div style="font-size: 0.9rem; color: #6c757d; margin-bottom: 10px;">
+              Forgot your password? Contact the system administrator to reset your password.
+            </div>
+            <a href="/formatrix/admin/auth/user/" class="btn btn-warning w-100">
+              <i class="fas fa-user-shield me-2"></i>Access User Management
+            </a>
+          </div>
           
           <div class="divider">
             <span>Don't have an account yet?</span>
