@@ -3,7 +3,7 @@
 <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow" aria-labelledby="navbarNotifications">
   <div class="dropdown-header d-flex align-items-center py-3">
     <span class="h6 mb-0 flex-grow-1">Notifications</span>
-    <a href="{% url 'notifications:mark_all_read' %}" class="text-muted me-2 fs-xs" id="mark-all-read">Tout marquer comme lu</a>
+    <a href="{% url 'notifications:mark_all_read' %}" class="text-muted me-2 fs-xs" id="mark-all-read">Mark all as read</a>
   </div>
   
   <div class="dropdown-divider my-0"></div>
@@ -35,7 +35,7 @@
     {% else %}
       <div class="text-center py-4">
         <i class="fas fa-bell-slash fa-2x text-muted mb-2"></i>
-        <p class="text-muted">Aucune notification</p>
+        <p class="text-muted">No notifications</p>
       </div>
     {% endif %}
   </div>
@@ -43,13 +43,13 @@
   <div class="dropdown-divider my-0"></div>
   
   <a href="{% url 'notifications:notification_list' %}" class="dropdown-item text-center py-2">
-    <span class="text-primary">Voir toutes les notifications</span>
+    <span class="text-primary">View all notifications</span>
   </a>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Marquer une notification comme lue au clic
+    // Mark a notification as read on click
     const notificationItems = document.querySelectorAll('.notification-item');
     notificationItems.forEach(item => {
       item.addEventListener('click', function(e) {
@@ -58,7 +58,7 @@
         const notificationType = this.querySelector('.avatar i').classList.contains('fa-book') ? 'new_course' : 'new_trainer';
         const relatedId = this.dataset.relatedId;
         
-        // Marquer comme lu via AJAX
+        // Mark as read via AJAX
         fetch(`{% url 'notifications:mark_notification_read' 0 %}`.replace('0', notificationId), {
           method: 'GET',
           headers: {
@@ -67,14 +67,14 @@
         })
         .then(response => response.json())
         .then(data => {
-          // Enlever la classe unread
+          // Remove unread class
           this.classList.remove('unread');
           this.querySelector('.badge')?.remove();
           
-          // Mettre à jour le compteur
+          // Update counter
           updateNotificationCounter();
           
-          // Rediriger vers la page correspondante
+          // Redirect to corresponding page
           if (notificationType === 'new_course') {
             window.location.href = `/cours/detail/${relatedId}/`;
           } else if (notificationType === 'new_trainer') {
@@ -84,7 +84,7 @@
       });
     });
     
-    // Marquer toutes les notifications comme lues
+    // Mark all notifications as read
     document.getElementById('mark-all-read')?.addEventListener('click', function(e) {
       e.preventDefault();
       
@@ -96,13 +96,13 @@
       })
       .then(response => response.json())
       .then(data => {
-        // Mise à jour visuelle
+        // Visual update
         document.querySelectorAll('.notification-item.unread').forEach(item => {
           item.classList.remove('unread');
           item.querySelector('.badge')?.remove();
         });
         
-        // Mettre à jour le compteur
+        // Update counter
         updateNotificationCounter();
       });
     });

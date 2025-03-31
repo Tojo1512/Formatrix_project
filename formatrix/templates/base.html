@@ -451,13 +451,7 @@
             {% endif %}
             
             <!-- Debug Admin Status -->
-            <li class="nav-item">
-              <div class="p-3 bg-light">
-                <p class="mb-0"><strong>Debug Info:</strong></p>
-                <p class="mb-0">Is Staff: {% if user.is_staff %}Yes - Admin{% else %}No - Regular User{% endif %}</p>
-                <p class="mb-0">Username: {{ user.username }}</p>
-              </div>
-            </li>
+            <!-- Removed debug info section as requested -->
             
             {% if user.is_staff %}
               <li class="nav-item">
