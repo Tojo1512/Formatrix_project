@@ -7,21 +7,21 @@ from decimal import Decimal
 # Create your models here.
 
 class Paiement(models.Model):
-    """Modèle pour suivre tous les paiements reçus et dus."""
+    """Model to track all received and due payments."""
     
-    STATUT_CHOICES = [
-        ('recu', 'Reçu'),
-        ('en_attente', 'En attente'),
-        ('retard', 'En retard'),
-        ('annule', 'Annulé'),
+    STATUS_CHOICES = [
+        ('recu', 'Received'),
+        ('en_attente', 'Pending'),
+        ('retard', 'Late'),
+        ('annule', 'Cancelled'),
     ]
     
-    MODE_PAIEMENT_CHOICES = [
-        ('especes', 'Espèces'),
-        ('cheque', 'Chèque'),
-        ('virement', 'Virement bancaire'),
-        ('carte', 'Carte de crédit/débit'),
-        ('autre', 'Autre'),
+    PAYMENT_METHOD_CHOICES = [
+        ('especes', 'Cash'),
+        ('cheque', 'Check'),
+        ('virement', 'Bank Transfer'),
+        ('carte', 'Credit/Debit Card'),
+        ('autre', 'Other'),
     ]
     
     paiement_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -29,92 +29,92 @@ class Paiement(models.Model):
     montant = models.DecimalField(max_digits=10, decimal_places=2)
     date_paiement = models.DateField(default=timezone.now)
     date_echeance = models.DateField(null=True, blank=True)
-    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='en_attente')
-    mode_paiement = models.CharField(max_length=20, choices=MODE_PAIEMENT_CHOICES, null=True, blank=True)
-    reference = models.CharField(max_length=100, blank=True, null=True, help_text="Numéro de référence du paiement (ex: numéro de chèque)")
+    statut = models.CharField(max_length=20, choices=STATUS_CHOICES, default='en_attente')
+    mode_paiement = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, null=True, blank=True)
+    reference = models.CharField(max_length=100, blank=True, null=True, help_text="Payment reference number (e.g., check number)")
     commentaires = models.TextField(blank=True, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "Paiement"
-        verbose_name_plural = "Paiements"
+        verbose_name = "Payment"
+        verbose_name_plural = "Payments"
         ordering = ['-date_paiement']
     
     def __str__(self):
-        return f"Paiement {self.paiement_id} - {self.montant} €"
+        return f"Payment {self.paiement_id} - {self.montant} €"
     
-    def est_en_retard(self):
-        """Vérifie si le paiement est en retard."""
+    def is_late(self):
+        """Check if the payment is late."""
         if self.statut == 'en_attente' and self.date_echeance:
             return self.date_echeance < timezone.now().date()
         return False
     
-    def jours_de_retard(self):
-        """Retourne le nombre de jours de retard."""
-        if self.est_en_retard():
+    def days_overdue(self):
+        """Return the number of days payment is overdue."""
+        if self.is_late():
             return (timezone.now().date() - self.date_echeance).days
         return 0
 
 
 class PaiementFormateur(models.Model):
-    """Modèle pour gérer les paiements aux formateurs."""
+    """Model to manage trainer payments."""
     
-    STATUT_CHOICES = [
-        ('paye', 'Payé'),
-        ('en_attente', 'En attente'),
-        ('planifie', 'Planifié'),
-        ('annule', 'Annulé'),
+    STATUS_CHOICES = [
+        ('paye', 'Paid'),
+        ('en_attente', 'Pending'),
+        ('planifie', 'Scheduled'),
+        ('annule', 'Cancelled'),
     ]
     
-    MODE_PAIEMENT_CHOICES = [
-        ('virement', 'Virement bancaire'),
-        ('cheque', 'Chèque'),
-        ('especes', 'Espèces'),
-        ('autre', 'Autre'),
+    PAYMENT_METHOD_CHOICES = [
+        ('virement', 'Bank Transfer'),
+        ('cheque', 'Check'),
+        ('especes', 'Cash'),
+        ('autre', 'Other'),
     ]
     
     paiement_formateur_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     formateur = models.ForeignKey('formateurs.Formateur', on_delete=models.CASCADE, related_name='paiements')
     montant = models.DecimalField(max_digits=10, decimal_places=2)
     date_paiement = models.DateField(default=timezone.now)
-    periode_debut = models.DateField(help_text="Début de la période de travail concernée par ce paiement")
-    periode_fin = models.DateField(help_text="Fin de la période de travail concernée par ce paiement")
-    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='en_attente')
-    mode_paiement = models.CharField(max_length=20, choices=MODE_PAIEMENT_CHOICES, default='virement')
-    reference = models.CharField(max_length=100, blank=True, null=True, help_text="Référence du paiement (ex: numéro de transaction)")
-    heures_travaillees = models.DecimalField(max_digits=6, decimal_places=2, help_text="Nombre d'heures travaillées sur la période")
-    taux_horaire = models.DecimalField(max_digits=8, decimal_places=2, help_text="Taux horaire appliqué")
+    periode_debut = models.DateField(help_text="Start of work period covered by this payment")
+    periode_fin = models.DateField(help_text="End of work period covered by this payment")
+    statut = models.CharField(max_length=20, choices=STATUS_CHOICES, default='en_attente')
+    mode_paiement = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='virement')
+    reference = models.CharField(max_length=100, blank=True, null=True, help_text="Payment reference (e.g., transaction number)")
+    heures_travaillees = models.DecimalField(max_digits=6, decimal_places=2, help_text="Number of hours worked during the period")
+    taux_horaire = models.DecimalField(max_digits=8, decimal_places=2, help_text="Hourly rate applied")
     commentaires = models.TextField(blank=True, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "Paiement Formateur"
-        verbose_name_plural = "Paiements Formateurs"
+        verbose_name = "Trainer Payment"
+        verbose_name_plural = "Trainer Payments"
         ordering = ['-date_paiement']
     
     def __str__(self):
-        return f"Paiement à {self.formateur} - {self.montant} €"
+        return f"Payment to {self.formateur} - {self.montant} €"
     
-    def calculer_montant(self):
-        """Calcule le montant du paiement basé sur les heures travaillées et le taux horaire."""
+    def calculate_amount(self):
+        """Calculate payment amount based on hours worked and hourly rate."""
         return self.heures_travaillees * self.taux_horaire
     
     def save(self, *args, **kwargs):
-        # Recalculer le montant si les heures ou le taux ont changé
+        # Recalculate amount if hours or rate have changed
         if self.heures_travaillees and self.taux_horaire:
-            self.montant = self.calculer_montant()
+            self.montant = self.calculate_amount()
         super().save(*args, **kwargs)
 
 
 class PlanPaiement(models.Model):
-    """Modèle pour gérer les plans de paiement échelonnés."""
+    """Model to manage installment payment plans."""
     
-    STATUT_CHOICES = [
-        ('actif', 'Actif'),
-        ('complete', 'Complété'),
-        ('annule', 'Annulé'),
+    STATUS_CHOICES = [
+        ('actif', 'Active'),
+        ('complete', 'Completed'),
+        ('annule', 'Cancelled'),
     ]
     
     plan_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -122,62 +122,62 @@ class PlanPaiement(models.Model):
     montant_total = models.DecimalField(max_digits=10, decimal_places=2)
     nombre_versements = models.PositiveIntegerField(default=1)
     date_debut = models.DateField(default=timezone.now)
-    intervalle_jours = models.PositiveIntegerField(default=30, help_text="Intervalle en jours entre les versements")
-    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='actif')
+    intervalle_jours = models.PositiveIntegerField(default=30, help_text="Interval in days between installments")
+    statut = models.CharField(max_length=20, choices=STATUS_CHOICES, default='actif')
     commentaires = models.TextField(blank=True, null=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "Plan de paiement"
-        verbose_name_plural = "Plans de paiement"
+        verbose_name = "Payment Plan"
+        verbose_name_plural = "Payment Plans"
     
     def __str__(self):
-        return f"Plan de paiement pour {self.inscription}"
+        return f"Payment plan for {self.inscription}"
     
-    def montant_verse(self):
-        """Calcule le montant total déjà versé."""
+    def amount_paid(self):
+        """Calculate the total amount already paid."""
         return self.inscription.paiements.filter(statut='recu').aggregate(total=models.Sum('montant'))['total'] or 0
     
-    def montant_restant(self):
-        """Calcule le montant restant à payer."""
-        return self.montant_total - self.montant_verse()
+    def remaining_amount(self):
+        """Calculate the remaining amount to be paid."""
+        return self.montant_total - self.amount_paid()
     
-    def progression(self):
-        """Calcule le pourcentage de progression du plan de paiement."""
+    def progress(self):
+        """Calculate the percentage progress of the payment plan."""
         if self.montant_total > 0:
-            return (self.montant_verse() / self.montant_total) * 100
+            return (self.amount_paid() / self.montant_total) * 100
         return 0
     
-    def generer_echeancier(self):
-        """Génère l'échéancier des paiements à venir."""
-        echeancier = []
+    def generate_schedule(self):
+        """Generate the schedule of upcoming payments."""
+        schedule = []
         montant_par_versement = self.montant_total / self.nombre_versements
         
         for i in range(self.nombre_versements):
             date_versement = self.date_debut + timezone.timedelta(days=i * self.intervalle_jours)
-            echeancier.append({
+            schedule.append({
                 'numero': i + 1,
                 'date': date_versement,
                 'montant': montant_par_versement,
             })
         
-        return echeancier
+        return schedule
 
 
 class Facture(models.Model):
-    """Modèle pour les factures générées pour les paiements."""
+    """Model for invoices generated for payments."""
     
-    STATUT_CHOICES = [
-        ('brouillon', 'Brouillon'),
-        ('emise', 'Émise'),
-        ('payee', 'Payée'),
-        ('annulee', 'Annulée'),
+    STATUS_CHOICES = [
+        ('brouillon', 'Draft'),
+        ('emise', 'Issued'),
+        ('payee', 'Paid'),
+        ('annulee', 'Cancelled'),
     ]
     
-    TYPE_FACTURE_CHOICES = [
-        ('individuelle', 'Individuelle'),
-        ('entreprise', 'Entreprise'),
+    INVOICE_TYPE_CHOICES = [
+        ('individuelle', 'Individual'),
+        ('entreprise', 'Company'),
         ('sponsor', 'Sponsor'),
     ]
     
@@ -186,166 +186,149 @@ class Facture(models.Model):
     inscription = models.ForeignKey('inscriptions.Inscription', on_delete=models.SET_NULL, null=True, blank=True, related_name='factures')
     paiement = models.ForeignKey('Paiement', on_delete=models.SET_NULL, null=True, blank=True, related_name='factures')
     
-    # Type de facture (individuelle, entreprise, sponsor)
-    type_facture = models.CharField(max_length=20, choices=TYPE_FACTURE_CHOICES, default='individuelle')
+    # Invoice type (individual, company, sponsor)
+    type_facture = models.CharField(max_length=20, choices=INVOICE_TYPE_CHOICES, default='individuelle')
     
-    # Statut de la facture
-    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='brouillon')
+    # Invoice status
+    statut = models.CharField(max_length=20, choices=STATUS_CHOICES, default='brouillon')
     
     # Dates
     date_emission = models.DateField(default=timezone.now)
     date_echeance = models.DateField(null=True, blank=True)
     
-    # Montants
+    # Amounts
     montant_ht = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     taux_tva = models.DecimalField(max_digits=5, decimal_places=2, default=20.0)
     montant_tva = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     montant_ttc = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
-    # Informations du destinataire
+    # Recipient information
     destinataire_nom = models.CharField(max_length=255)
     destinataire_adresse = models.TextField()
     destinataire_email = models.EmailField()
     destinataire_telephone = models.CharField(max_length=20, blank=True, null=True)
     destinataire_siret = models.CharField(max_length=14, blank=True, null=True)
     
-    # Informations complémentaires
+    # Additional information
     conditions_paiement = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
     
-    # Métadonnées
+    # Metadata
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "Facture"
-        verbose_name_plural = "Factures"
+        verbose_name = "Invoice"
+        verbose_name_plural = "Invoices"
         ordering = ['-date_emission']
     
     def __str__(self):
-        return f"Facture {self.numero_facture}"
+        return f"Facture {self.numero_facture} - {self.get_type_facture_display()}"
     
     def save(self, *args, **kwargs):
-        # Générer un numéro de facture unique s'il n'existe pas déjà
+        # Generate invoice number if not already set
         if not self.numero_facture:
-            annee = timezone.now().year
-            # Compter les factures existantes pour cette année
-            count = Facture.objects.filter(
-                numero_facture__startswith=f"F{annee}"
-            ).count()
-            # Générer le numéro de facture (format: F2023-0001)
-            self.numero_facture = f"F{annee}-{count+1:04d}"
-        
-        # Calculer les montants TVA et TTC si le montant HT est défini
-        if self.montant_ht and self.taux_tva:
-            self.montant_tva = self.montant_ht * (self.taux_tva / Decimal('100.0'))
-            self.montant_ttc = self.montant_ht + self.montant_tva
-        
+            today = timezone.now().date()
+            count = Facture.objects.filter(date_emission__year=today.year).count() + 1
+            self.numero_facture = f"F{today.year}{count:04d}"
         super().save(*args, **kwargs)
     
-    def recalculer_montants(self):
-        """Recalcule les montants de la facture en fonction des lignes de facture."""
-        from django.db.models import Sum
+    def recalculate_amounts(self):
+        """Recalculate invoice amounts based on line items."""
+        # Reset amounts
+        self.montant_ht = 0
+        self.montant_tva = 0
+        self.montant_ttc = 0
         
-        # Récupérer les lignes de facture
-        lignes = LigneFacture.objects.filter(facture=self)
-        
-        # Calculer les totaux
-        if lignes.exists():
-            total_ht = lignes.aggregate(total=Sum('montant_ht'))['total'] or 0
-            total_tva = lignes.aggregate(total=Sum('montant_tva'))['total'] or 0
-            total_ttc = lignes.aggregate(total=Sum('montant_ttc'))['total'] or 0
-            
-            self.montant_ht = total_ht
-            self.montant_tva = total_tva
-            self.montant_ttc = total_ttc
-            self.save()
-        
-        return self.montant_ttc
+        # Sum from line items if they exist
+        if hasattr(self, 'lignes'):
+            lines = self.lignes.all()
+            if lines:
+                for line in lines:
+                    self.montant_ht += line.montant_ht
+                    self.montant_tva += line.montant_tva
+                    self.montant_ttc += line.montant_ttc
+            else:
+                # Calculate based on tax rate if there are no line items
+                if self.montant_ht > 0:
+                    self.montant_tva = self.montant_ht * (self.taux_tva / 100)
+                    self.montant_ttc = self.montant_ht + self.montant_tva
     
     @classmethod
     def generer_facture_pour_inscription(cls, inscription_id, statut='brouillon'):
         """
         Génère une facture pour une inscription donnée.
-        Le type de facture est déterminé en fonction du type d'inscription.
+        
+        Args:
+            inscription_id: ID de l'inscription
+            statut: Statut initial de la facture
+            
+        Returns:
+            Facture: L'objet facture créé
         """
         from inscriptions.models import Inscription
+        from decimal import Decimal
         
-        # Récupérer l'inscription
-        inscription = Inscription.objects.get(pk=inscription_id)
-        
-        # Déterminer le type de facture en fonction du type d'inscription
+        try:
+            inscription = Inscription.objects.get(inscription_id=inscription_id)
+        except Inscription.DoesNotExist:
+            raise ValueError("L'inscription spécifiée n'existe pas")
+            
+        # Déterminer le destinataire en fonction du type d'inscription
+        if inscription.type_inscription == 'individuelle':
+            destinataire = inscription.client
+        elif inscription.type_inscription in ['entreprise', 'groupe']:
+            destinataire = inscription.client
+        elif inscription.sponsor:
+            destinataire = inscription.sponsor
+        else:
+            destinataire = inscription.client
+            
+        # Déterminer le type de facture
         if inscription.type_inscription == 'individuelle':
             type_facture = 'individuelle'
-            # Utiliser uniquement le nom complet de l'apprenant pour éviter des erreurs
-            # d'attributs manquants comme 'prenom'
-            destinataire_nom = str(inscription.apprenant)
-            destinataire_adresse = getattr(inscription.apprenant, 'adresse', 'Adresse non spécifiée')
-            destinataire_email = getattr(inscription.apprenant, 'email', '')
-            destinataire_telephone = getattr(inscription.apprenant, 'telephone', '')
-            destinataire_siret = None
         elif inscription.type_inscription in ['entreprise', 'groupe']:
             type_facture = 'entreprise'
-            if inscription.client:
-                destinataire_nom = inscription.client.nom_entite
-                destinataire_adresse = getattr(inscription.client, 'adresse_siege', 'Adresse non spécifiée')
-                destinataire_email = getattr(inscription.client, 'email', '')
-                destinataire_telephone = getattr(inscription.client, 'telephone', '')
-                destinataire_siret = getattr(inscription.client, 'numero_immatriculation', '')
-            else:
-                # Fallback si pas d'entreprise
-                destinataire_nom = str(inscription.apprenant)
-                destinataire_adresse = getattr(inscription.apprenant, 'adresse', 'Adresse non spécifiée')
-                destinataire_email = getattr(inscription.apprenant, 'email', '')
-                destinataire_telephone = getattr(inscription.apprenant, 'telephone', '')
-                destinataire_siret = None
         elif inscription.sponsor:
             type_facture = 'sponsor'
-            destinataire_nom = inscription.sponsor.nom_entite
-            destinataire_adresse = getattr(inscription.sponsor, 'adresse_siege', 'Adresse non spécifiée')
-            destinataire_email = getattr(inscription.sponsor, 'email', '')
-            destinataire_telephone = getattr(inscription.sponsor, 'telephone', '')
-            destinataire_siret = getattr(inscription.sponsor, 'numero_immatriculation', '')
         else:
-            # Par défaut, facturer à l'apprenant
             type_facture = 'individuelle'
-            destinataire_nom = str(inscription.apprenant)
-            destinataire_adresse = getattr(inscription.apprenant, 'adresse', 'Adresse non spécifiée')
-            destinataire_email = getattr(inscription.apprenant, 'email', '')
-            destinataire_telephone = getattr(inscription.apprenant, 'telephone', '')
-            destinataire_siret = None
-        
-        # Déterminer le montant à facturer
+            
+        # Calculer le montant à partir de la séance ou du plan de paiement
         try:
-            if hasattr(inscription, 'plan_paiement') and inscription.plan_paiement:
-                # Si un plan de paiement est défini, utiliser le montant total du plan
-                montant_ht = Decimal(str(inscription.plan_paiement.montant_total))
-            else:
-                # Sinon, utiliser le prix de la séance
-                montant_ht = Decimal(str(inscription.seance.prix))
-        except Exception as e:
-            # En cas d'erreur, utiliser le prix de la séance
-            montant_ht = Decimal(str(inscription.seance.prix))
-        
+            plan_paiement = inscription.plan_paiement
+            montant_ttc = plan_paiement.montant_total
+            montant_ht = montant_ttc / Decimal('1.2')  # Supposant une TVA de 20%
+        except:
+            # Si pas de plan de paiement, utiliser le prix de la séance
+            montant_ttc = inscription.seance.prix
+            montant_ht = montant_ttc / Decimal('1.2')
+            
         # Créer la facture
-        facture = cls.objects.create(
+        facture = cls(
             inscription=inscription,
-            paiement=None,  # Pas de paiement associé initialement
             type_facture=type_facture,
             statut=statut,
             date_emission=timezone.now().date(),
-            date_echeance=timezone.now().date() + timezone.timedelta(days=30),  # Échéance à 30 jours par défaut
+            date_echeance=timezone.now().date() + timezone.timedelta(days=30),
             montant_ht=montant_ht,
-            taux_tva=Decimal('20.0'),  # TVA à 20% par défaut
-            destinataire_nom=destinataire_nom,
-            destinataire_adresse=destinataire_adresse,
-            destinataire_email=destinataire_email,
-            destinataire_telephone=destinataire_telephone,
-            destinataire_siret=destinataire_siret,
-            conditions_paiement="Paiement à réception de facture.\nMerci d'indiquer le numéro de facture dans votre référence de paiement."
+            taux_tva=Decimal('20.0'),
+            montant_tva=montant_ht * Decimal('0.2'),
+            montant_ttc=montant_ttc,
+            destinataire_nom=destinataire.nom_entite,
+            destinataire_adresse=destinataire.adresse_siege or "",
+            destinataire_email=destinataire.email or "",
+            destinataire_telephone=destinataire.telephone or "",
         )
         
+        # Ajouter le SIRET si c'est une entreprise
+        if hasattr(destinataire, 'numero_immatriculation') and destinataire.numero_immatriculation:
+            facture.destinataire_siret = destinataire.numero_immatriculation
+            
+        facture.save()
+        
         # Créer une ligne de facture par défaut
+        from .models import LigneFacture
         LigneFacture.objects.create(
             facture=facture,
             description=f"Formation: {inscription.seance.cours.nom_cours}",
@@ -354,14 +337,14 @@ class Facture(models.Model):
             taux_tva=Decimal('20.0'),
             montant_ht=montant_ht,
             montant_tva=montant_ht * Decimal('0.2'),
-            montant_ttc=montant_ht * Decimal('1.2')
+            montant_ttc=montant_ttc
         )
         
         return facture
 
 
 class LigneFacture(models.Model):
-    """Modèle pour les lignes détaillées d'une facture."""
+    """Model for detailed invoice line items."""
     
     ligne_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     facture = models.ForeignKey('Facture', on_delete=models.CASCADE, related_name='lignes')
@@ -379,16 +362,20 @@ class LigneFacture(models.Model):
     date_modification = models.DateTimeField(auto_now=True)
     
     class Meta:
-        verbose_name = "Ligne de facture"
-        verbose_name_plural = "Lignes de facture"
+        verbose_name = "Invoice Line"
+        verbose_name_plural = "Invoice Lines"
     
     def __str__(self):
-        return f"{self.description} ({self.facture.numero_facture})"
+        return f"{self.description} - {self.montant_ttc}€"
     
     def save(self, *args, **kwargs):
-        # Calculer les montants
+        # Calculate amounts
         self.montant_ht = self.quantite * self.prix_unitaire_ht
-        self.montant_tva = self.montant_ht * (self.taux_tva / Decimal('100.0'))
+        self.montant_tva = self.montant_ht * (self.taux_tva / 100)
         self.montant_ttc = self.montant_ht + self.montant_tva
         
         super().save(*args, **kwargs)
+        
+        # Update the parent invoice
+        self.facture.recalculate_amounts()
+        self.facture.save()

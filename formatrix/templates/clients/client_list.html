@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Liste des clients - Formatrix{% endblock %}
+{% block title %}Client List - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/apprenants/list.css' %}">
@@ -10,48 +10,48 @@
 {% block content %}
 <div class="page-inner">
   <div class="page-header mb-4">
-    <h1 class="page-title">Liste des clients</h1>
+    <h1 class="page-title">Client List</h1>
     <div class="ms-auto">
       <a href="{% url 'clients:client-create' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Créer un client
+        <i class="fas fa-plus me-2"></i>Create a client
       </a>
     </div>
   </div>
 
-  <!-- Filtres -->
+  <!-- Filters -->
   <div class="filter-card">
     <form method="get" class="row g-3">
       <div class="col-md-4">
         <div class="input-group">
           <span class="input-group-text"><i class="fas fa-search"></i></span>
-          <input type="text" name="search" class="form-control" placeholder="Rechercher un client..." value="{{ search_query }}">
+          <input type="text" name="search" class="form-control" placeholder="Search for a client..." value="{{ search_query }}">
         </div>
       </div>
       <div class="col-md-2">
         <select name="type" class="form-select">
-          <option value="">Tous les types</option>
-          <option value="ong" {% if type_filter == 'ong' %}selected{% endif %}>ONG</option>
+          <option value="">All types</option>
+          <option value="ong" {% if type_filter == 'ong' %}selected{% endif %}>NGO</option>
           <option value="sponsor" {% if type_filter == 'sponsor' %}selected{% endif %}>Sponsor</option>
-          <option value="entreprise" {% if type_filter == 'entreprise' %}selected{% endif %}>Entreprise</option>
-          <option value="autre" {% if type_filter == 'autre' %}selected{% endif %}>Autre</option>
+          <option value="entreprise" {% if type_filter == 'entreprise' %}selected{% endif %}>Company</option>
+          <option value="autre" {% if type_filter == 'autre' %}selected{% endif %}>Other</option>
         </select>
       </div>
       <div class="col-md-2">
         <select name="secteur" class="form-select">
-          <option value="">Tous les secteurs</option>
-          <option value="education" {% if secteur_filter == 'education' %}selected{% endif %}>Éducation</option>
-          <option value="sante" {% if secteur_filter == 'sante' %}selected{% endif %}>Santé</option>
+          <option value="">All sectors</option>
+          <option value="education" {% if secteur_filter == 'education' %}selected{% endif %}>Education</option>
+          <option value="sante" {% if secteur_filter == 'sante' %}selected{% endif %}>Health</option>
           <option value="agriculture" {% if secteur_filter == 'agriculture' %}selected{% endif %}>Agriculture</option>
-          <option value="technologie" {% if secteur_filter == 'technologie' %}selected{% endif %}>Technologie</option>
+          <option value="technologie" {% if secteur_filter == 'technologie' %}selected{% endif %}>Technology</option>
           <option value="finance" {% if secteur_filter == 'finance' %}selected{% endif %}>Finance</option>
-          <option value="humanitaire" {% if secteur_filter == 'humanitaire' %}selected{% endif %}>Humanitaire</option>
-          <option value="environnement" {% if secteur_filter == 'environnement' %}selected{% endif %}>Environnement</option>
-          <option value="autre" {% if secteur_filter == 'autre' %}selected{% endif %}>Autre</option>
+          <option value="humanitaire" {% if secteur_filter == 'humanitaire' %}selected{% endif %}>Humanitarian</option>
+          <option value="environnement" {% if secteur_filter == 'environnement' %}selected{% endif %}>Environment</option>
+          <option value="autre" {% if secteur_filter == 'autre' %}selected{% endif %}>Other</option>
         </select>
       </div>
       <div class="col-md-2">
         <select name="ville" class="form-select">
-          <option value="">Toutes les villes</option>
+          <option value="">All cities</option>
           {% for ville in villes %}
           <option value="{{ ville }}" {% if ville_filter == ville %}selected{% endif %}>{{ ville }}</option>
           {% endfor %}
@@ -59,18 +59,18 @@
       </div>
       <div class="col-md-2 d-flex">
         <button type="submit" class="btn btn-primary me-2">
-          <i class="fas fa-filter me-1"></i>Filtrer
+          <i class="fas fa-filter me-1"></i>Filter
         </button>
         {% if has_active_filters %}
         <a href="{{ reset_url }}" class="btn btn-outline-secondary">
-          <i class="fas fa-times me-1"></i>Réinitialiser
+          <i class="fas fa-times me-1"></i>Reset
         </a>
         {% endif %}
       </div>
     </form>
   </div>
 
-  <!-- Tableau des clients -->
+  <!-- Client table -->
   <div class="table-container">
     {% if client_list %}
     <div class="table-responsive">
@@ -79,20 +79,20 @@
           <tr>
             <th>
               <a href="?{% if ordering == 'nom_entite' %}-{% endif %}nom_entite{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Nom de l'entité
+                Entity Name
                 <i class="fas fa-sort{% if ordering == 'nom_entite' %}-up{% elif ordering == '-nom_entite' %}-down{% endif %}"></i>
               </a>
             </th>
             <th>Type</th>
             <th>
               <a href="?{% if ordering == 'secteur_activite' %}-{% endif %}secteur_activite{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Secteur
+                Sector
                 <i class="fas fa-sort{% if ordering == 'secteur_activite' %}-up{% elif ordering == '-secteur_activite' %}-down{% endif %}"></i>
               </a>
             </th>
             <th>
               <a href="?{% if ordering == 'ville' %}-{% endif %}ville{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Ville
+                City
                 <i class="fas fa-sort{% if ordering == 'ville' %}-up{% elif ordering == '-ville' %}-down{% endif %}"></i>
               </a>
             </th>
@@ -121,7 +121,7 @@
                 {{ client.get_secteur_activite_display }}
               </span>
             </td>
-            <td>{{ client.ville|default:"Non spécifié" }}</td>
+            <td>{{ client.ville|default:"Not specified" }}</td>
             <td>
               {% if client.personne_contact %}
               <div>{{ client.personne_contact }}</div>
@@ -138,13 +138,13 @@
               {% endif %}
             </td>
             <td class="text-end">
-              <a href="/clients/{{ client.clientid }}" class="btn btn-sm btn-info" title="Voir">
+              <a href="/clients/{{ client.clientid }}" class="btn btn-sm btn-info" title="View">
                 <i class="fas fa-eye"></i>
               </a>
-              <a href="/clients/{{ client.clientid }}/modifier" class="btn btn-sm btn-warning" title="Modifier">
+              <a href="/clients/{{ client.clientid }}/modifier" class="btn btn-sm btn-warning" title="Edit">
                 <i class="fas fa-edit"></i>
               </a>
-              <a href="/clients/{{ client.clientid }}/supprimer" class="btn btn-sm btn-danger" title="Supprimer">
+              <a href="/clients/{{ client.clientid }}/supprimer" class="btn btn-sm btn-danger" title="Delete">
                 <i class="fas fa-trash"></i>
               </a>
             </td>
@@ -156,11 +156,11 @@
     {% else %}
     <div class="empty-state text-center py-5">
       <i class="fas fa-building-user fa-4x text-muted mb-3"></i>
-      <h4 class="text-muted">Aucun client trouvé</h4>
-      <p class="text-muted">Aucun client ne correspond à vos critères de recherche.</p>
+      <h4 class="text-muted">No clients found</h4>
+      <p class="text-muted">No clients match your search criteria.</p>
       {% if has_active_filters %}
       <a href="{{ reset_url }}" class="btn btn-outline-primary mt-3">
-        <i class="fas fa-sync-alt me-2"></i>Réinitialiser les filtres
+        <i class="fas fa-sync-alt me-2"></i>Reset filters
       </a>
       {% endif %}
     </div>
@@ -169,17 +169,17 @@
     <!-- Pagination -->
     {% if client_list and is_paginated %}
     <div class="d-flex justify-content-between align-items-center p-3">
-      <p class="mb-0">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
-      <nav aria-label="Navigation de pagination">
+      <p class="mb-0">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+      <nav aria-label="Pagination navigation">
         <ul class="pagination mb-0">
           {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Première">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="First">
               <i class="fas fa-angle-double-left"></i>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Précédente">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Previous">
               <i class="fas fa-angle-left"></i>
             </a>
           </li>
@@ -202,12 +202,12 @@
           
           {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Suivante">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Next">
               <i class="fas fa-angle-right"></i>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Dernière">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if secteur_filter %}&secteur={{ secteur_filter }}{% endif %}{% if ville_filter %}&ville={{ ville_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Last">
               <i class="fas fa-angle-double-right"></i>
             </a>
           </li>

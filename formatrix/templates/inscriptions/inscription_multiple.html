@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Inscription Multiple - Formatrix{% endblock %}
+{% block title %}Multiple Registration - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
@@ -51,10 +51,10 @@
   <div class="form-header">
     <h1 class="form-title">
       <i class="fas fa-users"></i>
-      Inscription Multiple d'Apprenants
+      Multiple Learner Registration
     </h1>
     <a href="{% url 'inscriptions:inscription-list' %}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left"></i> Retour
+      <i class="fas fa-arrow-left"></i> Back
     </a>
   </div>
 
@@ -70,68 +70,68 @@
   {% endif %}
 
   <div class="alert alert-info">
-    <i class="fas fa-info-circle"></i> Utilisez ce formulaire pour inscrire plusieurs apprenants à une même séance.
+    <i class="fas fa-info-circle"></i> Use this form to register multiple learners for the same session.
   </div>
 
-  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+  <p class="text-muted">Fill in all required fields marked with a <span class="text-danger">*</span></p>
 
   <form id="inscriptionMultipleForm" method="post">
     {% csrf_token %}
     
-    <!-- Informations sur la séance -->
+    <!-- Session Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-calendar-alt"></i>
-        Informations sur la séance
+        Session Information
       </h3>
       <div class="row">
         <div class="col-md-12">
           <div class="form-group">
-            <label for="seance" class="form-label">Séance <span class="text-danger">*</span></label>
+            <label for="seance" class="form-label">Session <span class="text-danger">*</span></label>
             <select class="form-select" id="seance" name="seance_id" required>
-              <option value="">Sélectionnez une séance</option>
+              <option value="">Select a session</option>
               {% for seance in seances %}
                 <option value="{{ seance.seance_id }}" data-places="{{ seance.places_disponibles }}">
-                  {{ seance.cours.nom_cours }} - {{ seance.date|date:"d/m/Y" }} - {{ seance.places_disponibles }} places disponibles
+                  {{ seance.cours.nom_cours }} - {{ seance.date|date:"d/m/Y" }} - {{ seance.places_disponibles }} available seats
                 </option>
               {% endfor %}
             </select>
-            <small id="placesInfo" class="form-text text-muted">Sélectionnez la séance pour laquelle vous souhaitez inscrire les apprenants.</small>
+            <small id="placesInfo" class="form-text text-muted">Select the session for which you want to register the learners.</small>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Informations sur le client et les apprenants -->
+    <!-- Client and Learner Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-user-graduate"></i>
-        Informations sur le client et les apprenants
+        Client and Learner Information
       </h3>
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
             <label for="client" class="form-label">Client <span class="text-danger">*</span></label>
             <select class="form-select" id="client" name="clientid" required>
-              <option value="">Sélectionnez un client</option>
+              <option value="">Select a client</option>
               {% for client in clients %}
                 <option value="{{ client.clientid }}">{{ client.nom_entite }}</option>
               {% endfor %}
             </select>
-            <small class="form-text text-muted">Sélectionnez le client qui effectue l'inscription.</small>
+            <small class="form-text text-muted">Select the client making the registration.</small>
           </div>
         </div>
         
         <div class="col-md-6">
           <div class="form-group">
-            <label for="sponsor" class="form-label">Sponsor (optionnel)</label>
+            <label for="sponsor" class="form-label">Sponsor (optional)</label>
             <select class="form-select" id="sponsor" name="sponsorid">
-              <option value="">Aucun sponsor</option>
+              <option value="">No sponsor</option>
               {% for client in clients %}
                 <option value="{{ client.clientid }}">{{ client.nom_entite }}</option>
               {% endfor %}
             </select>
-            <small class="form-text text-muted">Sélectionnez un sponsor si applicable.</small>
+            <small class="form-text text-muted">Select a sponsor if applicable.</small>
           </div>
         </div>
       </div>
@@ -139,36 +139,36 @@
       <div class="row">
         <div class="col-md-12">
           <div class="form-group">
-            <label for="apprenants" class="form-label">Apprenants <span class="text-danger">*</span></label>
+            <label for="apprenants" class="form-label">Learners <span class="text-danger">*</span></label>
             <select class="form-select" id="apprenants" name="apprenants_ids" multiple="multiple" required>
               {% for apprenant in apprenants %}
                 <option value="{{ apprenant.apprenant_id }}">{{ apprenant.nom_apprenant }} {{ apprenant.autres_nom }}</option>
               {% endfor %}
             </select>
-            <small id="apprenantsCount" class="form-text text-muted">0 apprenants sélectionnés</small>
+            <small id="apprenantsCount" class="form-text text-muted">0 learners selected</small>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Informations sur l'inscription -->
+    <!-- Registration Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-clipboard-list"></i>
-        Informations sur l'inscription
+        Registration Information
       </h3>
       <div class="row">
         <div class="col-md-12">
           <div class="form-group">
-            <label for="typeInscription" class="form-label">Type d'inscription <span class="text-danger">*</span></label>
+            <label for="typeInscription" class="form-label">Registration Type <span class="text-danger">*</span></label>
             <select class="form-select" id="typeInscription" name="type_inscription">
-              <option value="groupe">Inscription par groupe</option>
-              <option value="individuelle">Inscription individuelle</option>
-              <option value="entreprise">Inscription par entreprise</option>
-              <option value="rse">Inscription via RSE</option>
-              <option value="ong">Inscription via ONG</option>
+              <option value="groupe">Group Registration</option>
+              <option value="individuelle">Individual Registration</option>
+              <option value="entreprise">Company Registration</option>
+              <option value="rse">CSR Registration</option>
+              <option value="ong">NGO Registration</option>
             </select>
-            <small class="form-text text-muted">Sélectionnez le type d'inscription.</small>
+            <small class="form-text text-muted">Select the registration type.</small>
           </div>
         </div>
       </div>
@@ -176,25 +176,25 @@
     
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save"></i> Inscrire les apprenants
+        <i class="fas fa-save"></i> Register Learners
       </button>
       <button type="button" id="previewBtn" class="btn btn-outline-secondary">
-        <i class="fas fa-eye"></i> Aperçu
+        <i class="fas fa-eye"></i> Preview
       </button>
     </div>
   </form>
 </div>
 
-<!-- Carte de résumé pour l'aperçu -->
+<!-- Summary card for preview -->
 <div class="card summary-card" id="summaryCard">
   <div class="card-header">
-    <h3 class="card-title">Résumé de l'inscription</h3>
+    <h3 class="card-title">Registration Summary</h3>
     <button type="button" class="btn btn-sm btn-outline-secondary" id="closeSummary">
       <i class="fas fa-times"></i>
     </button>
   </div>
   <div class="card-body" id="summaryContent">
-    <!-- Le contenu sera rempli dynamiquement -->
+    <!-- Content will be dynamically populated -->
   </div>
 </div>
 

@@ -1,37 +1,37 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Détails du paiement{% endblock %}
+{% block title %}Payment Details{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-        <h1>Détails du paiement</h1>
+        <h1>Payment Details</h1>
         <div>
             <a href="{% url 'paiements:paiement-list' %}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                <i class="fas fa-arrow-left me-1"></i> Back to list
             </a>
             <a href="{% url 'paiements:paiement-update' paiement_id=paiement.paiement_id %}" class="btn btn-warning">
-                <i class="fas fa-edit me-1"></i> Modifier
+                <i class="fas fa-edit me-1"></i> Edit
             </a>
         </div>
     </div>
     
     <div class="row">
-        <!-- Informations principales -->
+        <!-- Main Information -->
         <div class="col-lg-6 mb-4">
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-info-circle me-1"></i>
-                    Informations principales
+                    Main Information
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">ID du paiement:</div>
+                        <div class="col-md-4 fw-bold">Payment ID:</div>
                         <div class="col-md-8">{{ paiement.paiement_id }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Inscription:</div>
+                        <div class="col-md-4 fw-bold">Registration:</div>
                         <div class="col-md-8">
                             <a href="{% url 'inscriptions:inscription-detail' paiement.inscription.inscription_id %}">
                                 {{ paiement.inscription }}
@@ -39,20 +39,20 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Montant:</div>
+                        <div class="col-md-4 fw-bold">Amount:</div>
                         <div class="col-md-8">{{ paiement.montant }} €</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Date de paiement:</div>
+                        <div class="col-md-4 fw-bold">Payment date:</div>
                         <div class="col-md-8">{{ paiement.date_paiement|date:"d/m/Y" }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Date d'échéance:</div>
+                        <div class="col-md-4 fw-bold">Due date:</div>
                         <div class="col-md-8">
                             {% if paiement.date_echeance %}
                                 {{ paiement.date_echeance|date:"d/m/Y" }}
                                 {% if paiement.est_en_retard %}
-                                    <span class="badge bg-danger ms-2">En retard de {{ paiement.jours_de_retard }} jours</span>
+                                    <span class="badge bg-danger ms-2">{{ paiement.jours_de_retard }} days late</span>
                                 {% endif %}
                             {% else %}
                                 -
@@ -60,7 +60,7 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Statut:</div>
+                        <div class="col-md-4 fw-bold">Status:</div>
                         <div class="col-md-8">
                             <span class="badge {% if paiement.statut == 'recu' %}bg-success{% elif paiement.statut == 'en_attente' %}bg-warning{% elif paiement.statut == 'retard' %}bg-danger{% else %}bg-secondary{% endif %} px-3 py-2">
                                 {{ paiement.get_statut_display }}
@@ -68,27 +68,27 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Mode de paiement:</div>
+                        <div class="col-md-4 fw-bold">Payment method:</div>
                         <div class="col-md-8">{{ paiement.get_mode_paiement_display|default:"-" }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Référence:</div>
+                        <div class="col-md-4 fw-bold">Reference:</div>
                         <div class="col-md-8">{{ paiement.reference|default:"-" }}</div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Informations complémentaires -->
+        <!-- Additional Information -->
         <div class="col-lg-6 mb-4">
             <div class="card h-100">
                 <div class="card-header">
                     <i class="fas fa-clipboard-list me-1"></i>
-                    Informations complémentaires
+                    Additional Information
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Apprenant:</div>
+                        <div class="col-md-4 fw-bold">Learner:</div>
                         <div class="col-md-8">
                             {% if paiement.inscription.apprenant %}
                                 <a href="#">{{ paiement.inscription.apprenant.nom_apprenant }}</a>
@@ -108,7 +108,7 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Formation:</div>
+                        <div class="col-md-4 fw-bold">Course:</div>
                         <div class="col-md-8">
                             {% if paiement.inscription.seance and paiement.inscription.seance.cours %}
                                 {{ paiement.inscription.seance.cours.nom_cours }}
@@ -118,15 +118,15 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Date de création:</div>
+                        <div class="col-md-4 fw-bold">Creation date:</div>
                         <div class="col-md-8">{{ paiement.date_creation|date:"d/m/Y H:i" }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Dernière modification:</div>
+                        <div class="col-md-4 fw-bold">Last modified:</div>
                         <div class="col-md-8">{{ paiement.date_modification|date:"d/m/Y H:i" }}</div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-4 fw-bold">Commentaires:</div>
+                        <div class="col-md-4 fw-bold">Comments:</div>
                         <div class="col-md-8">{{ paiement.commentaires|default:"-"|linebreaks }}</div>
                     </div>
                 </div>

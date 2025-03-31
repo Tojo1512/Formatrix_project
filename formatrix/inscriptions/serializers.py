@@ -42,7 +42,7 @@ class InscriptionSerializer(serializers.ModelSerializer):
 
 class InscriptionMultipleSerializer(serializers.Serializer):
     """
-    Sérialiseur pour inscrire plusieurs apprenants à une séance
+    Serializer for registering multiple learners to a session
     """
     clientid = serializers.PrimaryKeyRelatedField(
         queryset=Client.objects.all(),
@@ -55,7 +55,7 @@ class InscriptionMultipleSerializer(serializers.Serializer):
         child=serializers.PrimaryKeyRelatedField(queryset=Apprenant.objects.all())
     )
     type_inscription = serializers.ChoiceField(
-        choices=Inscription.TYPE_INSCRIPTION_CHOICES,
+        choices=Inscription.REGISTRATION_TYPE_CHOICES,
         default='groupe'
     )
     sponsorid = serializers.PrimaryKeyRelatedField(
@@ -73,8 +73,8 @@ class InscriptionMultipleSerializer(serializers.Serializer):
         sponsor_id = validated_data.get('sponsor_id')
         sponsor_id = sponsor_id.clientid if sponsor_id else None
         
-        # Utiliser la méthode de classe pour inscrire les apprenants
-        return Inscription.inscrire_apprenants(
+        # Use the class method to register learners
+        return Inscription.register_learners(
             client_id=client_id,
             seance_id=seance_id,
             apprenants_ids=apprenants_ids,
@@ -84,6 +84,6 @@ class InscriptionMultipleSerializer(serializers.Serializer):
         
     def update(self, instance, validated_data):
         """
-        Cette méthode n'est pas utilisée car nous ne mettons pas à jour des inscriptions multiples
+        This method is not used as we don't update multiple registrations
         """
-        raise NotImplementedError("La mise à jour d'inscriptions multiples n'est pas supportée")
+        raise NotImplementedError("Multiple registrations update is not supported")

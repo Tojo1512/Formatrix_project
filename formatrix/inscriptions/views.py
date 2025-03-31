@@ -12,6 +12,7 @@ from apprenants.models import Apprenant
 from seances.models import Seance
 from clients.models import Client
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 
@@ -40,13 +41,20 @@ class InscriptionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def inscrire_multiple(self, request):
         """Inscrit plusieurs apprenants à une séance"""
+        # Vérifier si l'utilisateur est un administrateur
+        if not request.user.is_staff:
+            return Response(
+                {'error': "You don't have permission to register multiple learners."}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+            
         serializer = InscriptionMultipleSerializer(data=request.data)
         if serializer.is_valid():
             try:
                 inscriptions = serializer.save()
                 return Response(
                     {
-                        'message': f"{len(inscriptions)} apprenants inscrits avec succès",
+                        'message': f"{len(inscriptions)} learners successfully registered",
                         'created': len(inscriptions),
                         'failed': 0,
                         'details': [f"{inscription.apprenant.nom_apprenant} {inscription.apprenant.autres_nom}" for inscription in inscriptions]
@@ -71,6 +79,11 @@ class InscriptionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='formulaire-multiple')
     def formulaire_multiple(self, request):
         """Affiche le formulaire pour inscrire plusieurs apprenants"""
+        # Vérifier si l'utilisateur est un administrateur
+        if not request.user.is_staff:
+            messages.error(request, "You don't have permission to access the multiple registration feature.")
+            return redirect('inscriptions:inscription-list')
+            
         # Récupérer tous les clients et les trier par nom
         clients = Client.objects.all().order_by('nom_entite')
         
@@ -89,7 +102,7 @@ class InscriptionViewSet(viewsets.ModelViewSet):
         return render(request, 'inscriptions/inscription_multiple.html', context)
 
 
-class InscriptionListView(ListView):
+class InscriptionListView(LoginRequiredMixin, ListView):
     model = Inscription
     template_name = 'inscriptions/inscription_list.html'
     context_object_name = 'inscriptions'
@@ -131,8 +144,8 @@ class InscriptionListView(ListView):
         context = super().get_context_data(**kwargs)
         context['seances'] = Seance.objects.all()
         context['clients'] = Client.objects.all().order_by('nom_entite')
-        context['status_choices'] = Inscription.STATUT_CHOICES
-        context['type_choices'] = Inscription.TYPE_INSCRIPTION_CHOICES
+        context['status_choices'] = Inscription.STATUS_CHOICES
+        context['type_choices'] = Inscription.REGISTRATION_TYPE_CHOICES
         
         # Récupération des filtres actifs pour la navigation
         context['seance_filter'] = self.request.GET.get('seance', '')
@@ -155,15 +168,15 @@ class InscriptionListView(ListView):
         return context
 
 
-class InscriptionDetailView(DetailView):
+class InscriptionDetailView(LoginRequiredMixin, DetailView):
     model = Inscription
     template_name = 'inscriptions/inscription_detail.html'
     context_object_name = 'inscription'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['status_choices'] = Inscription.STATUT_CHOICES
-        context['type_choices'] = Inscription.TYPE_INSCRIPTION_CHOICES
+        context['status_choices'] = Inscription.STATUS_CHOICES
+        context['type_choices'] = Inscription.REGISTRATION_TYPE_CHOICES
         return context
         
     def post(self, request, *args, **kwargs):
@@ -171,7 +184,7 @@ class InscriptionDetailView(DetailView):
         inscription = self.get_object()
         status_param = request.POST.get('status')
         
-        if status_param and status_param in dict(Inscription.STATUT_CHOICES):
+        if status_param and status_param in dict(Inscription.STATUS_CHOICES):
             # Mettre à jour le statut
             old_status = inscription.statut_inscription
             inscription.statut_inscription = status_param
@@ -203,17 +216,23 @@ class InscriptionDetailView(DetailView):
         return redirect('inscription-detail', pk=inscription.pk)
 
 
-class InscriptionCreateView(CreateView):
+class InscriptionCreateView(LoginRequiredMixin, CreateView):
     model = Inscription
     template_name = 'inscriptions/inscription_form.html'
     fields = ['client', 'seance', 'apprenant', 'type_inscription', 'statut_inscription', 'sponsor']
     success_url = reverse_lazy('inscriptions:inscription-list')
     
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            messages.error(request, "You don't have permission to create registrations.")
+            return redirect('inscriptions:inscription-list')
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Nouvelle Inscription'
-        context['status_choices'] = Inscription.STATUT_CHOICES
-        context['type_choices'] = Inscription.TYPE_INSCRIPTION_CHOICES
+        context['title'] = 'New Registration'
+        context['status_choices'] = Inscription.STATUS_CHOICES
+        context['type_choices'] = Inscription.REGISTRATION_TYPE_CHOICES
         return context
         
     def form_valid(self, form):
@@ -232,17 +251,23 @@ class InscriptionCreateView(CreateView):
         return super().form_valid(form)
 
 
-class InscriptionUpdateView(UpdateView):
+class InscriptionUpdateView(LoginRequiredMixin, UpdateView):
     model = Inscription
     template_name = 'inscriptions/inscription_form.html'
     fields = ['client', 'seance', 'apprenant', 'type_inscription', 'statut_inscription', 'sponsor']
     success_url = reverse_lazy('inscriptions:inscription-list')
     
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            messages.error(request, "You don't have permission to update registrations.")
+            return redirect('inscriptions:inscription-list')
+        return super().dispatch(request, *args, **kwargs)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Modifier Inscription'
-        context['status_choices'] = Inscription.STATUT_CHOICES
-        context['type_choices'] = Inscription.TYPE_INSCRIPTION_CHOICES
+        context['title'] = 'Edit Registration'
+        context['status_choices'] = Inscription.STATUS_CHOICES
+        context['type_choices'] = Inscription.REGISTRATION_TYPE_CHOICES
         return context
         
     def form_valid(self, form):
@@ -273,10 +298,16 @@ class InscriptionUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class InscriptionDeleteView(DeleteView):
+class InscriptionDeleteView(LoginRequiredMixin, DeleteView):
     model = Inscription
     template_name = 'inscriptions/inscription_confirm_delete.html'
     success_url = reverse_lazy('inscriptions:inscription-list')
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            messages.error(request, "You don't have permission to delete registrations.")
+            return redirect('inscriptions:inscription-list')
+        return super().dispatch(request, *args, **kwargs)
     
     def delete(self, request, *args, **kwargs):
         """Libère une place lorsqu'une inscription est supprimée"""
@@ -287,7 +318,7 @@ class InscriptionDeleteView(DeleteView):
         seance.places_reservees -= 1
         seance.save()
         
-        messages.success(request, "L'inscription a été supprimée avec succès. Une place a été libérée.")
+        messages.success(request, "Registration has been successfully deleted. A seat has been freed.")
         return super().delete(request, *args, **kwargs)
 
 

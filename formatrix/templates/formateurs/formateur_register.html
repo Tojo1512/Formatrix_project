@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Inscription Formateur - Formatrix{% endblock %}
+{% block title %}Trainer Registration - Formatrix{% endblock %}
 
 {% block extra_css %}
 <style>
-  /* Réinitialisation complète des styles de défilement */
+  /* Complete scroll style reset */
   html, body {
     overflow-y: scroll !important;
     height: unset !important;
@@ -495,7 +495,7 @@
     }
   }
   
-  /* Boutons fixes pour défiler */
+  /* Fixed scroll buttons */
   .scroll-buttons {
     position: fixed;
     right: 20px;
@@ -533,14 +533,14 @@
 
 {% block guest_content %}
 <div class="container-fluid registration-container">
-  <!-- Bouton d'urgence pour défiler -->
+  <!-- Emergency scroll button -->
   <div class="text-end mb-3">
     <button type="button" class="btn btn-sm btn-secondary" onclick="window.scrollTo(0, document.body.scrollHeight)">
-      <i class="fas fa-arrow-down me-1"></i>Défiler vers le bas
+      <i class="fas fa-arrow-down me-1"></i>Scroll down
     </button>
   </div>
 
-  <!-- Boutons fixes pour défiler -->
+  <!-- Fixed scroll buttons -->
   <div class="scroll-buttons top-buttons">
     <div class="scroll-btn mb-2" onclick="window.scrollTo(0, document.body.scrollHeight)">
       <i class="fas fa-arrow-down"></i>
@@ -557,13 +557,13 @@
     <div class="registration-header">
       <div class="d-flex justify-content-between align-items-center">
         <h3>
-          <i class="fas fa-chalkboard-teacher me-2"></i>Inscription Formateur
+          <i class="fas fa-chalkboard-teacher me-2"></i>Trainer Registration
         </h3>
         <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light">
-          <i class="fas fa-arrow-left me-1"></i>Retour
+          <i class="fas fa-arrow-left me-1"></i>Back
         </a>
       </div>
-      <p>Créez votre compte formateur Formatrix</p>
+      <p>Create your Formatrix trainer account</p>
     </div>
     
     <div class="registration-body">
@@ -609,35 +609,35 @@
           <div class="step-icon">
             <i class="fas fa-user-lock"></i>
           </div>
-          <div class="step-label">Compte utilisateur</div>
+          <div class="step-label">User Account</div>
         </div>
         
         <div class="progress-step" id="step-2-indicator">
           <div class="step-icon">
             <i class="fas fa-user"></i>
           </div>
-          <div class="step-label">Profil personnel</div>
+          <div class="step-label">Personal Profile</div>
         </div>
         
         <div class="progress-step" id="step-3-indicator">
           <div class="step-icon">
             <i class="fas fa-chalkboard-teacher"></i>
           </div>
-          <div class="step-label">Profil formateur</div>
+          <div class="step-label">Trainer Profile</div>
         </div>
         
         <div class="progress-step" id="step-4-indicator">
           <div class="step-icon">
             <i class="fas fa-check-circle"></i>
           </div>
-          <div class="step-label">Finalisation</div>
+          <div class="step-label">Finalization</div>
         </div>
       </div>
       
       <form method="post" action="{% url 'formateurs:formateur-register' %}" enctype="multipart/form-data" novalidate id="formateur-form">
         {% csrf_token %}
         
-        <!-- Champs cachés pour garantir la transmission des données -->
+        <!-- Hidden fields to ensure data transmission -->
         <input type="hidden" name="nom" id="hidden_nom">
         <input type="hidden" name="prenom" id="hidden_prenom">
         <input type="hidden" name="specialites" id="hidden_specialites">
@@ -645,11 +645,11 @@
         <input type="hidden" name="type_formateur" id="hidden_type_formateur">
         <input type="hidden" name="disponibilite" id="hidden_disponibilite">
         
-        <!-- Étape 1: Création du compte -->
+        <!-- Step 1: Account Creation -->
         <div class="form-step active" id="step-1">
           <div class="form-section">
             <h5 class="section-title">
-              <i class="fas fa-user-lock me-2"></i>Création de votre compte
+              <i class="fas fa-user-lock me-2"></i>Create Your Account
             </h5>
             
             <div class="alert alert-info mb-4">
@@ -658,7 +658,7 @@
                   <i class="fas fa-info-circle fa-lg"></i>
                 </div>
                 <div>
-                  Commencez par créer vos identifiants de connexion. Ces informations vous permettront d'accéder à votre espace formateur.
+                  Start by creating your login credentials. This information will allow you to access your trainer dashboard.
                 </div>
               </div>
             </div>
@@ -666,7 +666,7 @@
             <div class="form-row">
               <div class="form-group {% if form.username.errors %}has-error{% endif %}">
                 <label class="form-label" for="{{ form.username.id_for_label }}">
-                  Nom d'utilisateur <span class="text-danger">*</span>
+                  Username <span class="text-danger">*</span>
                 </label>
                 <div class="input-group">
                   <span class="input-group-text">
@@ -675,7 +675,7 @@
                   {{ form.username }}
                 </div>
                 <small class="text-muted mt-1">
-                  <i class="fas fa-info-circle me-1"></i>Choisissez un nom d'utilisateur unique qui sera utilisé pour vous connecter
+                  <i class="fas fa-info-circle me-1"></i>Choose a unique username that will be used to log in
                 </small>
                 {% if form.username.errors %}
                   {% for error in form.username.errors %}
@@ -690,7 +690,7 @@
             <div class="form-row">
               <div class="form-group {% if form.email.errors %}has-error{% endif %}">
                 <label class="form-label" for="{{ form.email.id_for_label }}">
-                  Adresse email <span class="text-danger">*</span>
+                  Email Address <span class="text-danger">*</span>
                 </label>
                 <div class="input-group">
                   <span class="input-group-text">
@@ -699,7 +699,7 @@
                   {{ form.email }}
                 </div>
                 <small class="text-muted mt-1">
-                  <i class="fas fa-info-circle me-1"></i>Nous utiliserons cette adresse pour les communications importantes
+                  <i class="fas fa-info-circle me-1"></i>We will use this address for important communications
                 </small>
                 {% if form.email.errors %}
                   {% for error in form.email.errors %}
@@ -714,7 +714,7 @@
             <div class="form-row">
               <div class="form-group {% if form.password1.errors %}has-error{% endif %}">
                 <label class="form-label" for="{{ form.password1.id_for_label }}">
-                  Mot de passe <span class="text-danger">*</span>
+                  Password <span class="text-danger">*</span>
                 </label>
                 <div class="input-group position-relative">
                   <span class="input-group-text">
@@ -733,7 +733,7 @@
                   {% endfor %}
                 {% else %}
                   <small class="text-muted mt-1">
-                    <i class="fas fa-info-circle me-1"></i>Le mot de passe doit contenir au moins 8 caractères, incluant lettres et chiffres
+                    <i class="fas fa-info-circle me-1"></i>Password must contain at least 8 characters, including letters and numbers
                   </small>
                 {% endif %}
               </div>
@@ -742,7 +742,7 @@
             <div class="form-row">
               <div class="form-group {% if form.password2.errors %}has-error{% endif %}">
                 <label class="form-label" for="{{ form.password2.id_for_label }}">
-                  Confirmer le mot de passe <span class="text-danger">*</span>
+                  Confirm Password <span class="text-danger">*</span>
                 </label>
                 <div class="input-group position-relative">
                   <span class="input-group-text">
@@ -754,7 +754,7 @@
                   </button>
                 </div>
                 <small class="text-muted mt-1">
-                  <i class="fas fa-info-circle me-1"></i>Saisissez à nouveau votre mot de passe pour confirmation
+                  <i class="fas fa-info-circle me-1"></i>Enter your password again for confirmation
                 </small>
                 {% if form.password2.errors %}
                   {% for error in form.password2.errors %}
@@ -770,16 +770,16 @@
           <div class="form-navigation">
             <div></div>
             <button type="button" class="btn btn-navigation btn-next" onclick="nextStep(1, 2)">
-              Continuer vers Profil personnel <i class="fas fa-arrow-right ms-2"></i>
+              Continue to Personal Profile <i class="fas fa-arrow-right ms-2"></i>
             </button>
           </div>
         </div>
         
-        <!-- Étape 2: Informations personnelles -->
+        <!-- Step 2: Personal Information -->
         <div class="form-step" id="step-2">
           <div class="form-section">
             <h5 class="section-title">
-              <i class="fas fa-user me-2"></i>Vos informations personnelles
+              <i class="fas fa-user me-2"></i>Your Personal Information
             </h5>
             
             <div class="alert alert-info mb-4">
@@ -788,7 +788,7 @@
                   <i class="fas fa-info-circle fa-lg"></i>
                 </div>
                 <div>
-                  Ces informations nous permettront de mieux vous connaître et de personnaliser votre expérience.
+                  This information will help us get to know you better and personalize your experience.
                 </div>
               </div>
             </div>
@@ -796,13 +796,13 @@
             <div class="form-row">
               <div class="form-group {% if form.first_name.errors %}has-error{% endif %}">
                 <label class="form-label" for="{{ form.first_name.id_for_label }}">
-                  Prénom <span class="text-danger">*</span>
+                  First Name <span class="text-danger">*</span>
                 </label>
                 <div class="input-group">
                   <span class="input-group-text">
                     <i class="fas fa-user-tag"></i>
                   </span>
-                  <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder="Entrez votre prénom">
+                  <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder="Enter your first name">
                 </div>
                 {% if form.first_name.errors %}
                   {% for error in form.first_name.errors %}
@@ -815,13 +815,13 @@
 
               <div class="form-group {% if form.last_name.errors %}has-error{% endif %}">
                 <label class="form-label" for="{{ form.last_name.id_for_label }}">
-                  Nom <span class="text-danger">*</span>
+                  Last Name <span class="text-danger">*</span>
                 </label>
                 <div class="input-group">
                   <span class="input-group-text">
                     <i class="fas fa-user-tag"></i>
                   </span>
-                  <input type="text" name="last_name" id="id_last_name" class="form-control" placeholder="Entrez votre nom">
+                  <input type="text" name="last_name" id="id_last_name" class="form-control" placeholder="Enter your last name">
                 </div>
                 {% if form.last_name.errors %}
                   {% for error in form.last_name.errors %}
@@ -836,16 +836,16 @@
             <div class="form-row">
               <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
                 <label class="form-label" for="{{ form.telephone.id_for_label }}">
-                  Téléphone
+                  Phone
                 </label>
                 <div class="input-group">
                   <span class="input-group-text">
                     <i class="fas fa-phone"></i>
                   </span>
-                  <input type="tel" name="telephone" id="id_telephone" class="form-control" placeholder="Entrez votre numéro de téléphone">
+                  <input type="tel" name="telephone" id="id_telephone" class="form-control" placeholder="Enter your phone number">
                 </div>
                 <small class="text-muted mt-1">
-                  <i class="fas fa-info-circle me-1"></i>Format recommandé: +33 6 12 34 56 78
+                  <i class="fas fa-info-circle me-1"></i>Recommended format: +33 6 12 34 56 78
                 </small>
                 {% if form.telephone.errors %}
                   {% for error in form.telephone.errors %}
@@ -858,7 +858,7 @@
 
               <div class="form-group {% if form.date_naissance.errors %}has-error{% endif %}">
                 <label class="form-label" for="{{ form.date_naissance.id_for_label }}">
-                  Date de naissance <span class="text-danger">*</span>
+                  Date of Birth <span class="text-danger">*</span>
                 </label>
                 <div class="input-group">
                   <span class="input-group-text">
@@ -867,7 +867,7 @@
                   <input type="date" name="date_naissance" id="id_date_naissance" class="form-control">
                 </div>
                 <small class="text-muted mt-1">
-                  <i class="fas fa-info-circle me-1"></i>Vous devez avoir au moins 18 ans
+                  <i class="fas fa-info-circle me-1"></i>You must be at least 18 years old
                 </small>
                 {% if form.date_naissance.errors %}
                   {% for error in form.date_naissance.errors %}
@@ -880,18 +880,18 @@
             </div>
             
             <div class="form-section mt-4">
-              <h6 class="mb-3"><i class="fas fa-map-marked-alt me-2"></i>Adresse</h6>
+              <h6 class="mb-3"><i class="fas fa-map-marked-alt me-2"></i>Address</h6>
               
               <div class="form-row">
                 <div class="form-group {% if form.adresse.errors %}has-error{% endif %}">
                   <label class="form-label" for="{{ form.adresse.id_for_label }}">
-                    Adresse complète
+                    Full Address
                   </label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="fas fa-map-marker-alt"></i>
                     </span>
-                    <textarea name="adresse" id="id_adresse" class="form-control" rows="2" placeholder="Numéro, rue, complément d'adresse"></textarea>
+                    <textarea name="adresse" id="id_adresse" class="form-control" rows="2" placeholder="Street number, street name, additional address information"></textarea>
                   </div>
                   {% if form.adresse.errors %}
                     {% for error in form.adresse.errors %}
@@ -906,13 +906,13 @@
               <div class="form-row">
                 <div class="form-group {% if form.ville.errors %}has-error{% endif %}">
                   <label class="form-label" for="{{ form.ville.id_for_label }}">
-                    Ville
+                    City
                   </label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="fas fa-city"></i>
                     </span>
-                    <input type="text" name="ville" id="id_ville" class="form-control" placeholder="Entrez votre ville">
+                    <input type="text" name="ville" id="id_ville" class="form-control" placeholder="Enter your city">
                   </div>
                   {% if form.ville.errors %}
                     {% for error in form.ville.errors %}
@@ -925,13 +925,13 @@
                 
                 <div class="form-group">
                   <label class="form-label" for="id_code_postal">
-                    Code postal
+                    Postal Code
                   </label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="fas fa-map-pin"></i>
                     </span>
-                    <input type="text" name="code_postal" id="id_code_postal" class="form-control" placeholder="Entrez votre code postal">
+                    <input type="text" name="code_postal" id="id_code_postal" class="form-control" placeholder="Enter your postal code">
                   </div>
                 </div>
               </div>
@@ -940,7 +940,7 @@
             <div class="form-row mt-3">
               <div class="form-group">
                 <label class="form-label" for="id_photo">
-                  Photo de profil
+                  Profile Photo
                 </label>
                 <div class="input-group">
                   <span class="input-group-text">
@@ -949,7 +949,7 @@
                   <input type="file" name="photo" id="id_photo" class="form-control" accept="image/*">
                 </div>
                 <small class="text-muted mt-1">
-                  <i class="fas fa-info-circle me-1"></i>Formats acceptés: JPG, PNG. Taille max: 2 MB
+                  <i class="fas fa-info-circle me-1"></i>Accepted formats: JPG, PNG. Max size: 2 MB
                 </small>
               </div>
             </div>
@@ -957,19 +957,19 @@
           
           <div class="form-navigation">
             <button type="button" class="btn btn-navigation btn-prev" onclick="prevStep(2, 1)">
-              <i class="fas fa-arrow-left me-2"></i> Retour
+              <i class="fas fa-arrow-left me-2"></i> Back
             </button>
             <button type="button" class="btn btn-navigation btn-next" onclick="nextStep(2, 3)">
-              Continuer vers Profil formateur <i class="fas fa-arrow-right ms-2"></i>
+              Continue to Trainer Profile <i class="fas fa-arrow-right ms-2"></i>
             </button>
           </div>
         </div>
         
-        <!-- Étape 3: Informations professionnelles -->
+        <!-- Step 3: Professional Information -->
         <div class="form-step" id="step-3">
           <div class="form-section">
             <h5 class="section-title">
-              <i class="fas fa-briefcase me-2"></i>Votre profil de formateur
+              <i class="fas fa-briefcase me-2"></i>Your Trainer Profile
             </h5>
             
             <div class="alert alert-info mb-4">
@@ -978,27 +978,27 @@
                   <i class="fas fa-info-circle fa-lg"></i>
                 </div>
                 <div>
-                  Ces informations nous aideront à vous proposer des missions adaptées à votre profil et à vos compétences.
+                  This information will help us match you with assignments that fit your profile and skills.
                 </div>
               </div>
             </div>
             
             <div class="form-section mt-3">
-              <h6 class="mb-3"><i class="fas fa-graduation-cap me-2"></i>Compétences et expertise</h6>
+              <h6 class="mb-3"><i class="fas fa-graduation-cap me-2"></i>Skills and Expertise</h6>
               
               <div class="form-row">
                 <div class="form-group {% if form.specialites.errors %}has-error{% endif %}">
                   <label class="form-label" for="{{ form.specialites.id_for_label }}">
-                    Domaines de spécialité <span class="text-danger">*</span>
+                    Areas of Specialty <span class="text-danger">*</span>
                   </label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="fas fa-tags"></i>
                     </span>
-                    <textarea name="specialites" id="id_specialites" class="form-control" rows="2" placeholder="Ex: Développement web, Intelligence artificielle, Marketing digital"></textarea>
+                    <textarea name="specialites" id="id_specialites" class="form-control" rows="2" placeholder="Ex: Web Development, Artificial Intelligence, Digital Marketing"></textarea>
                   </div>
                   <small class="text-muted mt-1">
-                    <i class="fas fa-info-circle me-1"></i>Séparez les différentes spécialités par des virgules
+                    <i class="fas fa-info-circle me-1"></i>Separate different specialties with commas
                   </small>
                   {% if form.specialites.errors %}
                     {% for error in form.specialites.errors %}
@@ -1013,17 +1013,17 @@
               <div class="form-row">
                 <div class="form-group {% if form.niveau_expertise.errors %}has-error{% endif %}">
                   <label class="form-label" for="{{ form.niveau_expertise.id_for_label }}">
-                    Niveau d'expertise <span class="text-danger">*</span>
+                    Expertise Level <span class="text-danger">*</span>
                   </label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="fas fa-award"></i>
                     </span>
                     <select name="niveau_expertise" id="id_niveau_expertise" class="form-control">
-                      <option value="">Sélectionnez votre niveau</option>
-                      <option value="debutant">Débutant (1-2 ans d'expérience)</option>
-                      <option value="intermediaire">Intermédiaire (3-5 ans d'expérience)</option>
-                      <option value="expert">Expert (6+ ans d'expérience)</option>
+                      <option value="">Select your level</option>
+                      <option value="debutant">Beginner (1-2 years of experience)</option>
+                      <option value="intermediaire">Intermediate (3-5 years of experience)</option>
+                      <option value="expert">Expert (6+ years of experience)</option>
                     </select>
                   </div>
                   {% if form.niveau_expertise.errors %}
@@ -1037,17 +1037,17 @@
                 
                 <div class="form-group {% if form.type_formateur.errors %}has-error{% endif %}">
                   <label class="form-label" for="{{ form.type_formateur.id_for_label }}">
-                    Type de formateur <span class="text-danger">*</span>
+                    Trainer Type <span class="text-danger">*</span>
                   </label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="fas fa-user-tie"></i>
                     </span>
                     <select name="type_formateur" id="id_type_formateur" class="form-control">
-                      <option value="">Sélectionnez votre type</option>
-                      <option value="interne">Interne (employé permanent)</option>
-                      <option value="externe">Externe (prestataire régulier)</option>
-                      <option value="consultant">Consultant (missions ponctuelles)</option>
+                      <option value="">Select your type</option>
+                      <option value="interne">Internal (permanent employee)</option>
+                      <option value="externe">External (regular contractor)</option>
+                      <option value="consultant">Consultant (occasional assignments)</option>
                     </select>
                   </div>
                   {% if form.type_formateur.errors %}
@@ -1062,12 +1062,12 @@
             </div>
             
             <div class="form-section mt-4">
-              <h6 class="mb-3"><i class="fas fa-business-time me-2"></i>Informations professionnelles</h6>
+              <h6 class="mb-3"><i class="fas fa-business-time me-2"></i>Professional Information</h6>
               
               <div class="form-row">
                 <div class="form-group {% if form.date_embauche.errors %}has-error{% endif %}">
                   <label class="form-label" for="{{ form.date_embauche.id_for_label }}">
-                    Date de début de collaboration
+                    Collaboration Start Date
                   </label>
                   <div class="input-group">
                     <span class="input-group-text">
@@ -1076,7 +1076,7 @@
                     <input type="date" name="date_embauche" id="id_date_embauche" class="form-control">
                   </div>
                   <small class="text-muted mt-1">
-                    <i class="fas fa-info-circle me-1"></i>Date à laquelle vous souhaitez commencer à collaborer avec nous
+                    <i class="fas fa-info-circle me-1"></i>Date when you would like to start collaborating with us
                   </small>
                   {% if form.date_embauche.errors %}
                     {% for error in form.date_embauche.errors %}
@@ -1089,13 +1089,13 @@
                 
                 <div class="form-group {% if form.disponibilite.errors %}has-error{% endif %}">
                   <label class="form-label" for="{{ form.disponibilite.id_for_label }}">
-                    Disponibilité <span class="text-danger">*</span>
+                    Availability <span class="text-danger">*</span>
                   </label>
                   <div class="input-group">
                     <span class="input-group-text">
                       <i class="fas fa-clock"></i>
                     </span>
-                    <textarea name="disponibilite" id="id_disponibilite" class="form-control" rows="2" placeholder="Ex: Lundi-Vendredi 9h-17h, disponible les week-ends"></textarea>
+                    <textarea name="disponibilite" id="id_disponibilite" class="form-control" rows="2" placeholder="Ex: Monday-Friday 9am-5pm, available on weekends"></textarea>
                   </div>
                   {% if form.disponibilite.errors %}
                     {% for error in form.disponibilite.errors %}
@@ -1110,9 +1110,7 @@
             
             <div class="form-row mt-3">
               <div class="form-group {% if form.cv.errors %}has-error{% endif %}">
-                <label class="form-label" for="{{ form.cv.id_for_label }}">
-                  Curriculum Vitae (CV)
-                </label>
+                <label class="form-label" for="{{ form.cv.id_for_label }}">Curriculum Vitae (CV)</label>
                 <div class="input-group">
                   <span class="input-group-text">
                     <i class="fas fa-file-pdf"></i>
@@ -1120,7 +1118,7 @@
                   <input type="file" name="cv" id="id_cv" class="form-control" accept=".pdf,.doc,.docx">
                 </div>
                 <small class="text-muted mt-1">
-                  <i class="fas fa-info-circle me-1"></i>Formats acceptés: PDF, DOC, DOCX. Taille max: 5 MB
+                  <i class="fas fa-info-circle me-1"></i>Accepted formats: PDF, DOC, DOCX. Max size: 5 MB
                 </small>
                 {% if form.cv.errors %}
                   {% for error in form.cv.errors %}
@@ -1135,13 +1133,13 @@
             <div class="form-row">
               <div class="form-group {% if form.notes.errors %}has-error{% endif %}">
                 <label class="form-label" for="{{ form.notes.id_for_label }}">
-                  Informations complémentaires
+                  Additional Information
                 </label>
                 <div class="input-group">
                   <span class="input-group-text">
                     <i class="fas fa-sticky-note"></i>
                   </span>
-                  <textarea name="notes" id="id_notes" class="form-control" rows="2" placeholder="Toute information supplémentaire que vous souhaitez partager"></textarea>
+                  <textarea name="notes" id="id_notes" class="form-control" rows="2" placeholder="Any additional information you would like to share"></textarea>
                 </div>
                 {% if form.notes.errors %}
                   {% for error in form.notes.errors %}
@@ -1156,19 +1154,19 @@
           
           <div class="form-navigation">
             <button type="button" class="btn btn-navigation btn-prev" onclick="prevStep(3, 2)">
-              <i class="fas fa-arrow-left me-2"></i> Retour
+              <i class="fas fa-arrow-left me-2"></i> Back
             </button>
             <button type="button" class="btn btn-navigation btn-next" onclick="nextStep(3, 4)">
-              Finaliser l'inscription <i class="fas fa-arrow-right ms-2"></i>
+              Finalize Registration <i class="fas fa-arrow-right ms-2"></i>
             </button>
           </div>
         </div>
         
-        <!-- Étape 4: Finalisation -->
+        <!-- Step 4: Finalization -->
         <div class="form-step" id="step-4">
           <div class="form-section">
             <h5 class="section-title">
-              <i class="fas fa-check-circle me-2"></i>Finalisation de votre inscription
+              <i class="fas fa-check-circle me-2"></i>Finalize Your Registration
             </h5>
             
             <div class="alert alert-success mb-4">
@@ -1177,31 +1175,31 @@
                   <i class="fas fa-check-circle fa-lg"></i>
                 </div>
                 <div>
-                  <strong>Vous y êtes presque !</strong> Veuillez vérifier les informations saisies et accepter les conditions générales pour finaliser votre inscription.
+                  <strong>You're almost there!</strong> Please verify the information you've entered and accept the terms and conditions to complete your registration.
                 </div>
               </div>
             </div>
             
             <div class="card mb-4">
               <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Récapitulatif de votre inscription</h6>
+                <h6 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Registration Summary</h6>
               </div>
               <div class="card-body">
                 <div class="row mb-3">
                   <div class="col-md-6">
-                    <p class="mb-1"><strong>Nom d'utilisateur:</strong> <span id="recap-username"></span></p>
+                    <p class="mb-1"><strong>Username:</strong> <span id="recap-username"></span></p>
                     <p class="mb-1"><strong>Email:</strong> <span id="recap-email"></span></p>
-                    <p class="mb-1"><strong>Nom complet:</strong> <span id="recap-fullname"></span></p>
-                    <p class="mb-1"><strong>Téléphone:</strong> <span id="recap-telephone"></span></p>
+                    <p class="mb-1"><strong>Full Name:</strong> <span id="recap-fullname"></span></p>
+                    <p class="mb-1"><strong>Phone:</strong> <span id="recap-telephone"></span></p>
                   </div>
                   <div class="col-md-6">
-                    <p class="mb-1"><strong>Type de formateur:</strong> <span id="recap-type"></span></p>
-                    <p class="mb-1"><strong>Niveau d'expertise:</strong> <span id="recap-niveau"></span></p>
-                    <p class="mb-1"><strong>Spécialités:</strong> <span id="recap-specialites"></span></p>
-                    <p class="mb-1"><strong>Disponibilité:</strong> <span id="recap-disponibilite"></span></p>
+                    <p class="mb-1"><strong>Trainer Type:</strong> <span id="recap-type"></span></p>
+                    <p class="mb-1"><strong>Expertise Level:</strong> <span id="recap-niveau"></span></p>
+                    <p class="mb-1"><strong>Specialties:</strong> <span id="recap-specialites"></span></p>
+                    <p class="mb-1"><strong>Availability:</strong> <span id="recap-disponibilite"></span></p>
                   </div>
                 </div>
-                <p class="text-muted small">Vous pourrez modifier ces informations ultérieurement dans votre espace formateur.</p>
+                <p class="text-muted small">You can edit this information later in your trainer dashboard.</p>
               </div>
             </div>
             
@@ -1210,7 +1208,7 @@
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="terms_conditions" required>
                   <label class="form-check-label" for="terms_conditions">
-                    J'accepte les <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">conditions générales</a> et la <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">politique de confidentialité</a> <span class="text-danger">*</span>
+                    I accept the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">terms and conditions</a> and the <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">privacy policy</a> <span class="text-danger">*</span>
                   </label>
                 </div>
               </div>
@@ -1221,7 +1219,7 @@
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="newsletter_consent">
                   <label class="form-check-label" for="newsletter_consent">
-                    Je souhaite recevoir la newsletter et les offres de formation
+                    I would like to receive the newsletter and training offers
                   </label>
                 </div>
               </div>
@@ -1230,10 +1228,10 @@
           
           <div class="form-navigation">
             <button type="button" class="btn btn-navigation btn-prev" onclick="prevStep(4, 3)">
-              <i class="fas fa-arrow-left me-2"></i> Retour
+              <i class="fas fa-arrow-left me-2"></i> Back
             </button>
             <button type="submit" class="btn btn-navigation btn-submit">
-              <i class="fas fa-check me-2"></i> Valider mon inscription
+              <i class="fas fa-check me-2"></i> Confirm My Registration
             </button>
           </div>
         </div>
@@ -1241,7 +1239,7 @@
     </div>
     
     <div class="registration-footer">
-      <p class="mb-0">Vous avez déjà un compte ? <a href="{% url 'login' %}">Connectez-vous</a></p>
+      <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
     </div>
   </div>
 </div>
@@ -1250,14 +1248,14 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Script d'initialisation immédiate pour débloquer le défilement
+    // Immediate initialization script to unlock scrolling
     setTimeout(function() {
       document.documentElement.style.overflow = 'scroll';
       document.body.style.overflow = 'scroll';
       document.body.style.height = 'auto';
       document.body.style.position = 'relative';
       
-      // Débloquer tous les conteneurs
+      // Unlock all containers
       const containers = document.querySelectorAll('.container, .container-fluid, .registration-container, .registration-body, .registration-card');
       containers.forEach(container => {
         container.style.overflow = 'visible';
@@ -1266,30 +1264,30 @@
       });
     }, 100);
     
-    // Ajouter la classe form-control aux champs de formulaire générés par Django
+    // Add form-control class to form fields generated by Django
     const formFields = document.querySelectorAll('input, select, textarea');
     formFields.forEach(field => {
       if (!field.classList.contains('btn') && !field.classList.contains('toggle-password')) {
         field.classList.add('form-control');
         
-        // Ajouter des placeholders
+        // Add placeholders
         if (field.id.includes('username')) {
-          field.setAttribute('placeholder', 'Choisissez un nom d\'utilisateur');
+          field.setAttribute('placeholder', 'Choose a username');
         } else if (field.id.includes('email')) {
-          field.setAttribute('placeholder', 'Entrez votre adresse email');
+          field.setAttribute('placeholder', 'Enter your email address');
         } else if (field.id.includes('password1')) {
-          field.setAttribute('placeholder', 'Créez un mot de passe sécurisé');
+          field.setAttribute('placeholder', 'Create a secure password');
         } else if (field.id.includes('password2')) {
-          field.setAttribute('placeholder', 'Confirmez votre mot de passe');
+          field.setAttribute('placeholder', 'Confirm your password');
         } else if (field.id.includes('first_name')) {
-          field.setAttribute('placeholder', 'Entrez votre prénom');
+          field.setAttribute('placeholder', 'Enter your first name');
         } else if (field.id.includes('last_name')) {
-          field.setAttribute('placeholder', 'Entrez votre nom');
+          field.setAttribute('placeholder', 'Enter your last name');
         }
       }
     });
     
-    // Gestion des boutons de visibilité du mot de passe
+    // Password visibility toggle buttons
     const toggleButtons = document.querySelectorAll('.toggle-password');
     toggleButtons.forEach(button => {
       button.addEventListener('click', function() {
@@ -1306,23 +1304,23 @@
       });
     });
     
-    // Initialiser la barre de progression
+    // Initialize progress bar
     updateProgressBar(1);
     
-    // Assurer que le formulaire est visible et défilable
+    // Ensure form is visible and scrollable
     document.body.style.overflow = 'auto';
     document.body.style.height = 'auto';
     
-    // Ajuster la hauteur pour les appareils mobiles
+    // Adjust height for mobile devices
     adjustMobileHeight();
     
-    // Réajuster la hauteur lors du redimensionnement de la fenêtre
+    // Readjust height on window resize
     window.addEventListener('resize', adjustMobileHeight);
   });
   
-  // Fonction pour ajuster la hauteur sur mobile
+  // Function to adjust height on mobile
   function adjustMobileHeight() {
-    // Force le défilement sur tous les éléments clés
+    // Force scrolling on all key elements
     document.documentElement.style.overflow = 'scroll';
     document.documentElement.style.height = '100%';
     
@@ -1345,7 +1343,7 @@
       registrationBody.style.height = 'auto';
     }
     
-    // Débloquer les conteneurs parents potentiels
+    // Unlock potential parent containers
     const mainContainers = document.querySelectorAll('.container, .container-fluid');
     mainContainers.forEach(container => {
       container.style.overflow = 'visible';
@@ -1353,29 +1351,29 @@
     });
   }
   
-  // Fonction pour passer à l'étape suivante
+  // Function to proceed to next step
   function nextStep(currentStep, nextStep) {
-    // Valider l'étape actuelle (vous pouvez ajouter votre propre logique de validation ici)
+    // Validate current step (you can add your own validation logic here)
     if (validateStep(currentStep)) {
-      // Masquer l'étape actuelle
+      // Hide current step
       document.getElementById(`step-${currentStep}`).classList.remove('active');
-      // Afficher l'étape suivante
+      // Show next step
       document.getElementById(`step-${nextStep}`).classList.add('active');
       
-      // Mettre à jour les indicateurs d'étape
+      // Update step indicators
       document.getElementById(`step-${currentStep}-indicator`).classList.remove('active');
       document.getElementById(`step-${currentStep}-indicator`).classList.add('completed');
       document.getElementById(`step-${nextStep}-indicator`).classList.add('active');
       
-      // Mettre à jour la barre de progression
+      // Update progress bar
       updateProgressBar(nextStep);
       
-      // Si nous passons à l'étape de récapitulatif, mettre à jour les informations
+      // If we're moving to the summary step, update the information
       if (nextStep === 4) {
         updateRecapInfo();
       }
       
-      // Faire défiler vers le haut
+      // Scroll to top
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
@@ -1383,268 +1381,13 @@
     }
   }
   
-  // Fonction pour revenir à l'étape précédente
+  // Function to go back to previous step
   function prevStep(currentStep, prevStep) {
-    // Masquer l'étape actuelle
+    // Hide current step
     document.getElementById(`step-${currentStep}`).classList.remove('active');
-    // Afficher l'étape précédente
+    // Show previous step
     document.getElementById(`step-${prevStep}`).classList.add('active');
     
-    // Mettre à jour les indicateurs d'étape
+    // Update step indicators
     document.getElementById(`step-${currentStep}-indicator`).classList.remove('active');
-    document.getElementById(`step-${prevStep}-indicator`).classList.remove('completed');
-    document.getElementById(`step-${prevStep}-indicator`).classList.add('active');
-    
-    // Mettre à jour la barre de progression
-    updateProgressBar(prevStep);
-    
-    // Faire défiler vers le haut
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }
-  
-  // Fonction pour valider une étape
-  function validateStep(step) {
-    let isValid = true;
-    let requiredFields = [];
-    
-    // Définir les champs requis pour chaque étape
-    if (step === 1) {
-      requiredFields = ['id_username', 'id_email', 'id_password1', 'id_password2'];
-    } else if (step === 2) {
-      requiredFields = ['id_first_name', 'id_last_name', 'id_date_naissance'];
-    } else if (step === 3) {
-      requiredFields = ['id_specialites', 'id_niveau_expertise', 'id_type_formateur', 'id_disponibilite'];
-    } else if (step === 4) {
-      // Vérifier que les termes et conditions sont acceptés
-      const termsConditions = document.getElementById('terms_conditions');
-      if (termsConditions && !termsConditions.checked) {
-        isValid = false;
-        
-        // Afficher un message d'erreur
-        const stepElement = document.getElementById(`step-${step}`);
-        let alertElement = stepElement.querySelector('.alert-danger');
-        
-        if (!alertElement) {
-          alertElement = document.createElement('div');
-          alertElement.className = 'alert alert-danger mb-4';
-          alertElement.innerHTML = `
-            <div class="d-flex align-items-center">
-              <div class="alert-icon me-3">
-                <i class="fas fa-exclamation-circle fa-lg"></i>
-              </div>
-              <div>
-                Veuillez accepter les conditions générales et la politique de confidentialité.
-              </div>
-            </div>
-          `;
-          stepElement.insertBefore(alertElement, stepElement.firstChild);
-        }
-        
-        return false;
-      }
-      
-      return true;
-    }
-    
-    // Vérifier chaque champ requis
-    requiredFields.forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field && !field.value.trim()) {
-        isValid = false;
-        field.classList.add('is-invalid');
-        
-        // Créer un message d'erreur s'il n'existe pas déjà
-        const errorDiv = field.parentNode.querySelector('.error-feedback');
-        if (!errorDiv) {
-          const newErrorDiv = document.createElement('div');
-          newErrorDiv.className = 'error-feedback';
-          newErrorDiv.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Ce champ est requis';
-          field.parentNode.appendChild(newErrorDiv);
-        }
-      } else if (field) {
-        field.classList.remove('is-invalid');
-        const errorDiv = field.parentNode.querySelector('.error-feedback');
-        if (errorDiv) {
-          errorDiv.remove();
-        }
-      }
-    });
-    
-    // Validation spécifique pour l'étape 1
-    if (step === 1 && isValid) {
-      const password1 = document.getElementById('id_password1').value;
-      const password2 = document.getElementById('id_password2').value;
-      
-      if (password1 !== password2) {
-        isValid = false;
-        const field = document.getElementById('id_password2');
-        field.classList.add('is-invalid');
-        
-        // Créer un message d'erreur pour la confirmation du mot de passe
-        const errorDiv = field.parentNode.querySelector('.error-feedback');
-        if (!errorDiv) {
-          const newErrorDiv = document.createElement('div');
-          newErrorDiv.className = 'error-feedback';
-          newErrorDiv.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Les mots de passe ne correspondent pas';
-          field.parentNode.appendChild(newErrorDiv);
-        }
-      }
-    }
-    
-    // Si le formulaire n'est pas valide, afficher un message général
-    if (!isValid) {
-      const stepElement = document.getElementById(`step-${step}`);
-      let alertElement = stepElement.querySelector('.alert-danger');
-      
-      if (!alertElement) {
-        alertElement = document.createElement('div');
-        alertElement.className = 'alert alert-danger mb-4';
-        alertElement.innerHTML = `
-          <div class="d-flex align-items-center">
-            <div class="alert-icon me-3">
-              <i class="fas fa-exclamation-circle fa-lg"></i>
-            </div>
-            <div>
-              Veuillez remplir tous les champs obligatoires marqués d'un <span class="text-danger">*</span>
-            </div>
-          </div>
-        `;
-        stepElement.insertBefore(alertElement, stepElement.firstChild);
-      }
-    } else {
-      const stepElement = document.getElementById(`step-${step}`);
-      const alertElement = stepElement.querySelector('.alert-danger');
-      if (alertElement) {
-        alertElement.remove();
-      }
-    }
-    
-    return isValid;
-  }
-  
-  // Fonction pour mettre à jour la barre de progression
-  function updateProgressBar(step) {
-    const progressBar = document.getElementById('progress-bar');
-    const width = (step - 1) * 33.33; // 4 étapes, donc chaque étape représente 33.33% (sauf la dernière)
-    progressBar.style.width = `${width}%`;
-  }
-  
-  // Fonction pour mettre à jour les informations de récapitulatif
-  function updateRecapInfo() {
-    // Récupérer les valeurs des champs
-    const username = document.getElementById('id_username').value;
-    const email = document.getElementById('id_email').value;
-    const firstName = document.getElementById('id_first_name').value;
-    const lastName = document.getElementById('id_last_name').value;
-    const telephone = document.getElementById('id_telephone').value || 'Non renseigné';
-    const typeFormateur = document.getElementById('id_type_formateur');
-    const typeFormateurText = typeFormateur.options[typeFormateur.selectedIndex].text;
-    const niveauExpertise = document.getElementById('id_niveau_expertise');
-    const niveauExpertiseText = niveauExpertise.options[niveauExpertise.selectedIndex].text;
-    const specialites = document.getElementById('id_specialites').value;
-    const disponibilite = document.getElementById('id_disponibilite').value;
-    
-    // Mettre à jour les éléments de récapitulatif
-    document.getElementById('recap-username').textContent = username;
-    document.getElementById('recap-email').textContent = email;
-    document.getElementById('recap-fullname').textContent = `${firstName} ${lastName}`;
-    document.getElementById('recap-telephone').textContent = telephone;
-    document.getElementById('recap-type').textContent = typeFormateurText;
-    document.getElementById('recap-niveau').textContent = niveauExpertiseText;
-    document.getElementById('recap-specialites').textContent = specialites;
-    document.getElementById('recap-disponibilite').textContent = disponibilite;
-  }
-  
-  // Fonction pour mettre à jour les champs cachés
-  function updateHiddenFields() {
-    // Récupérer les valeurs des champs visibles
-    const nom = document.getElementById('id_last_name').value;
-    const prenom = document.getElementById('id_first_name').value;
-    const specialites = document.getElementById('id_specialites').value;
-    const niveau_expertise = document.getElementById('id_niveau_expertise').value;
-    const type_formateur = document.getElementById('id_type_formateur').value;
-    const disponibilite = document.getElementById('id_disponibilite').value;
-    
-    // Mettre à jour les champs cachés
-    document.getElementById('hidden_nom').value = nom;
-    document.getElementById('hidden_prenom').value = prenom;
-    document.getElementById('hidden_specialites').value = specialites;
-    document.getElementById('hidden_niveau_expertise').value = niveau_expertise;
-    document.getElementById('hidden_type_formateur').value = type_formateur;
-    document.getElementById('hidden_disponibilite').value = disponibilite;
-  }
-  
-  // Script pour forcer le défilement à fonctionner
-  window.addEventListener('load', function() {
-    // Force le défilement
-    enableScroll();
-    
-    // Ajouter des écouteurs pour les boutons de navigation
-    document.querySelectorAll('.btn-next, .btn-prev').forEach(button => {
-      button.addEventListener('click', function() {
-        enableScroll();
-      });
-    });
-    
-    // Ajouter écouteur pour le bouton de soumission
-    document.querySelector('.btn-submit').addEventListener('click', function(e) {
-      e.preventDefault(); // Empêcher la soumission immédiate
-      
-      // Mettre à jour les champs cachés
-      updateHiddenFields();
-      
-      // Valider l'étape finale
-      if (validateStep(4)) {
-        // Si la validation réussit, soumettre le formulaire
-        document.getElementById('formateur-form').submit();
-      }
-    });
-    
-    // Répéter régulièrement pour s'assurer que le défilement fonctionne
-    setInterval(enableScroll, 1000);
-  });
-  
-  // Fonction pour activer le défilement
-  function enableScroll() {
-    document.documentElement.style.overflow = 'auto';
-    document.documentElement.style.height = 'auto';
-    document.body.style.overflow = 'auto';
-    document.body.style.height = 'auto';
-    document.body.style.position = 'relative';
-    
-    // Activer le défilement pour tous les conteneurs
-    document.querySelectorAll('.container, .container-fluid, .card, .registration-container, .registration-body, .registration-card').forEach(el => {
-      el.style.overflow = 'visible';
-      el.style.height = 'auto';
-      el.style.maxHeight = 'none';
-    });
-  }
-  
-  // Script pour vérifier si les boutons sont visibles
-  function checkButtonsVisibility() {
-    const buttons = document.querySelectorAll('.btn-next, .btn-prev, .btn-submit');
-    let allVisible = true;
-    
-    buttons.forEach(button => {
-      const rect = button.getBoundingClientRect();
-      if (rect.top < 0 || rect.bottom > window.innerHeight) {
-        allVisible = false;
-      }
-    });
-    
-    // Si les boutons ne sont pas visibles, afficher une alerte
-    if (!allVisible && !window.hasShownButtonAlert) {
-      window.hasShownButtonAlert = true;
-      alert('Certains boutons ne sont pas visibles. Utilisez les boutons de défilement sur les côtés pour naviguer.');
-    }
-  }
-  
-  // Vérifier après le chargement complet
-  window.addEventListener('load', function() {
-    setTimeout(checkButtonsVisibility, 1000);
-  });
-</script>
-{% endblock %}
+    document.getElementById(`

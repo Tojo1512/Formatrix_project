@@ -1,30 +1,30 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Plans de paiement{% endblock %}
+{% block title %}Payment Plans{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-        <h1>Plans de paiement</h1>
+        <h1>Payment Plans</h1>
         <div>
             <a href="{% url 'paiements:tableau-bord' %}" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-tachometer-alt me-1"></i> Tableau de bord
+                <i class="fas fa-tachometer-alt me-1"></i> Dashboard
             </a>
             <a href="{% url 'paiements:plan-create' %}" class="btn btn-primary">
-                <i class="fas fa-plus me-1"></i> Nouveau plan
+                <i class="fas fa-plus me-1"></i> New Plan
             </a>
         </div>
     </div>
     
-    <!-- Statistiques -->
+    <!-- Statistics -->
     <div class="row mb-4">
         <div class="col-xl-4 col-md-6 mb-3">
             <div class="card bg-primary text-white h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="me-3">
-                            <div class="text-white-75">Total des plans</div>
+                            <div class="text-white-75">Total Plans</div>
                             <div class="text-lg fw-bold">{{ total_plans }}</div>
                         </div>
                         <i class="fas fa-calendar-alt fa-2x text-white-50"></i>
@@ -38,7 +38,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="me-3">
-                            <div class="text-white-75">Plans actifs</div>
+                            <div class="text-white-75">Active Plans</div>
                             <div class="text-lg fw-bold">{{ plans_actifs }}</div>
                         </div>
                         <i class="fas fa-play-circle fa-2x text-white-50"></i>
@@ -52,7 +52,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="me-3">
-                            <div class="text-white-75">Plans complétés</div>
+                            <div class="text-white-75">Completed Plans</div>
                             <div class="text-lg fw-bold">{{ plans_completes }}</div>
                         </div>
                         <i class="fas fa-check-circle fa-2x text-white-50"></i>
@@ -62,45 +62,45 @@
         </div>
     </div>
     
-    <!-- Filtres -->
+    <!-- Filters -->
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-filter me-1"></i>
-            Filtres
+            Filters
         </div>
         <div class="card-body">
             <form method="get" class="row g-3">
                 <div class="col-md-4">
-                    <label for="statut" class="form-label">Statut</label>
+                    <label for="statut" class="form-label">Status</label>
                     <select name="statut" id="statut" class="form-select">
-                        <option value="">Tous les statuts</option>
-                        <option value="actif" {% if request.GET.statut == 'actif' %}selected{% endif %}>Actif</option>
-                        <option value="complete" {% if request.GET.statut == 'complete' %}selected{% endif %}>Complété</option>
-                        <option value="annule" {% if request.GET.statut == 'annule' %}selected{% endif %}>Annulé</option>
+                        <option value="">All statuses</option>
+                        <option value="actif" {% if request.GET.statut == 'actif' %}selected{% endif %}>Active</option>
+                        <option value="complete" {% if request.GET.statut == 'complete' %}selected{% endif %}>Completed</option>
+                        <option value="annule" {% if request.GET.statut == 'annule' %}selected{% endif %}>Cancelled</option>
                     </select>
                 </div>
                 
                 <div class="col-12 d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary me-2">
-                        <i class="fas fa-search me-1"></i> Filtrer
+                        <i class="fas fa-search me-1"></i> Filter
                     </button>
                     <a href="{% url 'paiements:plan-list' %}" class="btn btn-secondary">
-                        <i class="fas fa-undo me-1"></i> Réinitialiser
+                        <i class="fas fa-undo me-1"></i> Reset
                     </a>
                 </div>
             </form>
         </div>
     </div>
     
-    <!-- Liste des plans de paiement -->
+    <!-- Payment Plan List -->
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
                 <i class="fas fa-list me-1"></i>
-                Liste des plans de paiement
+                Payment Plan List
             </div>
             <a href="{% url 'paiements:plan-create' %}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus me-1"></i> Nouveau plan
+                <i class="fas fa-plus me-1"></i> New Plan
             </a>
         </div>
         <div class="card-body p-0">
@@ -109,12 +109,12 @@
                     <thead class="table-light">
                         <tr>
                             <th>ID</th>
-                            <th>Inscription</th>
-                            <th>Montant total</th>
-                            <th>Versements</th>
-                            <th>Date début</th>
-                            <th>Statut</th>
-                            <th>Progression</th>
+                            <th>Registration</th>
+                            <th>Total Amount</th>
+                            <th>Installments</th>
+                            <th>Start Date</th>
+                            <th>Status</th>
+                            <th>Progress</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -154,7 +154,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="8" class="text-center py-3">Aucun plan de paiement trouvé</td>
+                            <td colspan="8" class="text-center py-3">No payment plans found</td>
                         </tr>
                         {% endfor %}
                     </tbody>

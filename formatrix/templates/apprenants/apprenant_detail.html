@@ -14,28 +14,28 @@
     <div class="ms-auto">
       <div class="btn-group">
         <a href="{% url 'apprenants:apprenant-update' apprenant.apprenant_id %}" class="btn btn-warning">
-          <i class="fas fa-edit me-2"></i>Modifier
+          <i class="fas fa-edit me-2"></i>Edit
         </a>
         <a href="{% url 'apprenants:apprenant-list' %}" class="btn btn-secondary">
-          <i class="fas fa-arrow-left me-2"></i>Retour
+          <i class="fas fa-arrow-left me-2"></i>Back
         </a>
       </div>
     </div>
   </div>
 
   <div class="row">
-    <!-- Colonne de gauche -->
+    <!-- Left column -->
     <div class="col-md-6">
-      <!-- Informations personnelles -->
+      <!-- Personal Information -->
       <div class="info-card">
         <div class="info-card-header">
-          <i class="fas fa-user me-2"></i>Informations personnelles
+          <i class="fas fa-user me-2"></i>Personal Information
         </div>
         <div class="info-card-body">
           <div class="row">
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Nom complet</div>
+                <div class="info-label">Full Name</div>
                 <div class="info-value">{{ apprenant.nom_apprenant }}</div>
               </div>
             </div>
@@ -43,7 +43,7 @@
             {% if apprenant.autres_nom %}
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Autres noms</div>
+                <div class="info-label">Other Names</div>
                 <div class="info-value">{{ apprenant.autres_nom }}</div>
               </div>
             </div>
@@ -51,21 +51,21 @@
             
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Numéro CIN</div>
+                <div class="info-label">ID Number</div>
                 <div class="info-value">{{ apprenant.cin }}</div>
               </div>
             </div>
             
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Date de naissance</div>
+                <div class="info-label">Date of Birth</div>
                 <div class="info-value">{{ apprenant.date_naissance|date:"d F Y" }}</div>
               </div>
             </div>
             
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Genre</div>
+                <div class="info-label">Gender</div>
                 <div class="info-value">
                   <span class="badge {% if apprenant.sexe == 'M' %}bg-primary{% elif apprenant.sexe == 'F' %}bg-info{% else %}bg-secondary{% endif %}">
                     {% for code, label in sexe_choices %}
@@ -78,7 +78,7 @@
             
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Catégorie d'âge</div>
+                <div class="info-label">Age Category</div>
                 <div class="info-value">
                   <span class="badge bg-secondary">
                     {% for code, label in age_choices %}
@@ -92,30 +92,30 @@
         </div>
       </div>
 
-      <!-- Adresse -->
+      <!-- Address -->
       <div class="info-card">
         <div class="info-card-header">
-          <i class="fas fa-map-marker-alt me-2"></i>Adresse
+          <i class="fas fa-map-marker-alt me-2"></i>Address
         </div>
         <div class="info-card-body">
           <div class="row">
             <div class="col-md-12">
               <div class="info-item">
-                <div class="info-label">Rue</div>
+                <div class="info-label">Street</div>
                 <div class="info-value">{{ apprenant.adresse_rue }}</div>
               </div>
             </div>
             
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Localité</div>
+                <div class="info-label">Location</div>
                 <div class="info-value">{{ apprenant.localite }}</div>
               </div>
             </div>
             
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Ville</div>
+                <div class="info-label">City</div>
                 <div class="info-value">{{ apprenant.ville }}</div>
               </div>
             </div>
@@ -124,18 +124,18 @@
       </div>
     </div>
     
-    <!-- Colonne de droite -->
+    <!-- Right column -->
     <div class="col-md-6">
-      <!-- Informations académiques -->
+      <!-- Academic Information -->
       <div class="info-card">
         <div class="info-card-header">
-          <i class="fas fa-graduation-cap me-2"></i>Informations académiques
+          <i class="fas fa-graduation-cap me-2"></i>Academic Information
         </div>
         <div class="info-card-body">
           <div class="row">
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Niveau académique</div>
+                <div class="info-label">Academic Level</div>
                 <div class="info-value">
                   <span class="badge bg-success">
                     {% for code, label in niveau_choices %}
@@ -149,7 +149,7 @@
             {% if apprenant.type_apprenant %}
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Type d'apprenant</div>
+                <div class="info-label">Learner Type</div>
                 <div class="info-value">{{ apprenant.type_apprenant }}</div>
               </div>
             </div>
@@ -158,7 +158,7 @@
             {% if apprenant.besoins_speciaux %}
             <div class="col-md-12">
               <div class="info-item">
-                <div class="info-label">Besoins spéciaux</div>
+                <div class="info-label">Special Needs</div>
                 <div class="info-value">{{ apprenant.besoins_speciaux }}</div>
               </div>
             </div>
@@ -167,23 +167,23 @@
         </div>
       </div>
 
-      <!-- Contact d'urgence -->
+      <!-- Contact -->
       <div class="info-card">
         <div class="info-card-header">
-          <i class="fas fa-phone-alt me-2"></i>Contact d'urgence
+          <i class="fas fa-phone-alt me-2"></i>Contact
         </div>
         <div class="info-card-body">
           <div class="row">
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Personne à contacter</div>
+                <div class="info-label">Contact Person</div>
                 <div class="info-value">{{ apprenant.contact_urgence }}</div>
               </div>
             </div>
             
             <div class="col-md-6">
               <div class="info-item">
-                <div class="info-label">Téléphone d'urgence</div>
+                <div class="info-label">Contact Phone</div>
                 <div class="info-value">{{ apprenant.telephone_urgence }}</div>
               </div>
             </div>
@@ -195,14 +195,14 @@
   
   <div class="d-flex justify-content-between mt-3">
     <a href="{% url 'apprenants:apprenant-list' %}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+      <i class="fas fa-arrow-left me-2"></i>Back to List
     </a>
     <div>
       <a href="{% url 'apprenants:apprenant-update' apprenant.apprenant_id %}" class="btn btn-warning btn-action">
-        <i class="fas fa-edit me-2"></i>Modifier
+        <i class="fas fa-edit me-2"></i>Edit
       </a>
       <a href="{% url 'apprenants:apprenant-delete' apprenant.apprenant_id %}" class="btn btn-danger btn-action">
-        <i class="fas fa-trash me-2"></i>Supprimer
+        <i class="fas fa-trash me-2"></i>Delete
       </a>
     </div>
   </div>

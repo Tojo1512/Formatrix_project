@@ -486,13 +486,13 @@ class GenerationFactureForm(forms.Form):
     )
     
     type_facture = forms.ChoiceField(
-        choices=Facture.TYPE_FACTURE_CHOICES,
+        choices=Facture.INVOICE_TYPE_CHOICES,
         label="Type de facture",
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     
     statut_initial = forms.ChoiceField(
-        choices=Facture.STATUT_CHOICES,
+        choices=Facture.STATUS_CHOICES,
         label="Statut initial",
         initial='brouillon',
         widget=forms.Select(attrs={'class': 'form-control'})

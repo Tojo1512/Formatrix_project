@@ -67,7 +67,7 @@ class SeanceListView(LoginRequiredMixin, ListView):
         context['ordering'] = self.request.GET.get('ordering', '-date')
         context['show_create_button'] = True
         context['create_url'] = reverse_lazy('seances:seance-create')
-        context['create_button_text'] = 'Créer une séance'
+        context['create_button_text'] = 'Create a session'
         context['reset_url'] = reverse_lazy('seances:seance-list')
         context['has_active_filters'] = bool(context['search_query'] or context['statut_filter'] or context['horaire_filter'])
         context['STATUS_CHOICES'] = Seance.STATUS_CHOICES
@@ -75,9 +75,9 @@ class SeanceListView(LoginRequiredMixin, ListView):
         # Passer l'information si nous sommes en mode filtrage des absences
         context['filtre_absences'] = self.request.GET.get('filtre', '') == 'absences'
         if context['filtre_absences']:
-            context['page_title'] = 'Séances avec absences à gérer'
+            context['page_title'] = 'Sessions with absences to manage'
         else:
-            context['page_title'] = 'Liste des séances'
+            context['page_title'] = 'Sessions List'
             
         return context
 
@@ -226,9 +226,9 @@ class SeanceDeleteView(LoginRequiredMixin, DeleteView):
 def annuler_seance(request, pk):
     seance = get_object_or_404(Seance, pk=pk)
     if request.method == 'POST':
-        seance.statut = 'annule_sans_paiement'
+        seance.statut = 'annule'
         seance.save()
-        messages.success(request, 'La séance a été annulée avec succès.')
+        messages.success(request, 'The session has been cancelled successfully.')
         return redirect('seances:seance-detail', pk=seance.pk)
     return redirect('seances:seance-detail', pk=seance.pk)
 
@@ -237,12 +237,12 @@ def annuler_seance(request, pk):
 def start_session(request, pk):
     seance = get_object_or_404(Seance, pk=pk)
     if seance.start_session():
-        messages.success(request, 'La séance a été démarrée avec succès!')
+        messages.success(request, 'The session has been started successfully!')
         return JsonResponse({
             'status': 'success',
             'new_status': dict(Seance.STATUS_CHOICES)[seance.statut]
         }, json_dumps_params={'ensure_ascii': False})
-    messages.error(request, 'Impossible de démarrer la séance. Vérifiez son statut.')
+    messages.error(request, 'Unable to start the session. Please check its status.')
     return JsonResponse({'status': 'error'}, status=400)
 
 @login_required
@@ -250,12 +250,12 @@ def start_session(request, pk):
 def complete_session(request, pk):
     seance = get_object_or_404(Seance, pk=pk)
     if seance.complete_session():
-        messages.success(request, 'La séance a été terminée avec succès!')
+        messages.success(request, 'The session has been completed successfully!')
         return JsonResponse({
             'status': 'success',
             'new_status': dict(Seance.STATUS_CHOICES)[seance.statut]
         }, json_dumps_params={'ensure_ascii': False})
-    messages.error(request, 'Impossible de terminer la séance. Vérifiez si elle est en cours.')
+    messages.error(request, 'Unable to complete the session. Please check if it is in progress.')
     return JsonResponse({'status': 'error'}, status=400)
 
 @login_required
@@ -263,12 +263,12 @@ def complete_session(request, pk):
 def cancel_session(request, pk):
     seance = get_object_or_404(Seance, pk=pk)
     if seance.cancel_session():
-        messages.success(request, 'La séance a été annulée avec succès!')
+        messages.success(request, 'The session has been cancelled successfully!')
         return JsonResponse({
             'status': 'success',
             'new_status': dict(Seance.STATUS_CHOICES)[seance.statut]
         }, json_dumps_params={'ensure_ascii': False})
-    messages.error(request, 'Impossible d\'annuler la séance. Vérifiez son statut.')
+    messages.error(request, 'Unable to cancel the session. Please check its status.')
     return JsonResponse({'status': 'error'}, status=400)
 
 # Vues pour la gestion des absences
@@ -297,9 +297,9 @@ def absence_create(request, seance_id):
             
             # Message de succès différent selon qu'un remplaçant a été désigné ou non
             if absence.formateur_remplacant:
-                messages.success(request, f"L'absence de {absence.formateur_absent.get_full_name()} a été enregistrée avec {absence.formateur_remplacant.get_full_name()} comme remplaçant.")
+                messages.success(request, f"The absence of {absence.formateur_absent.get_full_name()} has been recorded with {absence.formateur_remplacant.get_full_name()} as a replacement.")
             else:
-                messages.success(request, f"L'absence de {absence.formateur_absent.get_full_name()} a été enregistrée. Veuillez désigner un remplaçant dès que possible.")
+                messages.success(request, f"The absence of {absence.formateur_absent.get_full_name()} has been recorded. Please designate a replacement as soon as possible.")
             
             return redirect('seances:absence_list', seance_id=seance.seance_id)
     else:
@@ -323,9 +323,9 @@ def absence_update(request, absence_id):
             form.save()
             
             if absence.formateur_remplacant:
-                messages.success(request, f"L'absence a été mise à jour avec {absence.formateur_remplacant.get_full_name()} comme remplaçant.")
+                messages.success(request, f"The absence has been updated with {absence.formateur_remplacant.get_full_name()} as a replacement.")
             else:
-                messages.success(request, "L'absence a été mise à jour.")
+                messages.success(request, "The absence has been updated.")
             
             return redirect('seances:absence_list', seance_id=seance.seance_id)
     else:
@@ -347,7 +347,7 @@ def absence_delete(request, absence_id):
     if request.method == 'POST':
         formateur_name = absence.formateur_absent.get_full_name()
         absence.delete()
-        messages.success(request, f"L'absence de {formateur_name} a été supprimée.")
+        messages.success(request, f"The absence of {formateur_name} has been deleted.")
         return redirect('seances:absence_list', seance_id=seance.seance_id)
     
     context = {

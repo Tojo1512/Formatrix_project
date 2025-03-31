@@ -1,131 +1,83 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Confirmer la suppression de l'absence - Formatrix{% endblock %}
+{% block title %}Delete Absence Record - Formatrix{% endblock %}
 
 {% block extra_css %}
-<style>
-  .card-container {
-    max-width: 700px;
-    margin: 30px auto;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-  }
-  
-  .confirm-header {
-    margin-bottom: 30px;
-    text-align: center;
-    color: #e74c3c;
-  }
-  
-  .confirm-header i {
-    font-size: 48px;
-    margin-bottom: 20px;
-    display: block;
-  }
-  
-  .confirm-content {
-    margin-bottom: 30px;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border-left: 4px solid #e74c3c;
-  }
-  
-  .absence-details {
-    margin-top: 20px;
-    margin-bottom: 30px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-  }
-  
-  .detail-item {
-    margin-bottom: 10px;
-    display: flex;
-  }
-  
-  .detail-label {
-    font-weight: 600;
-    min-width: 150px;
-    color: #495057;
-  }
-  
-  .detail-value {
-    color: #212529;
-  }
-  
-  .confirm-actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-  }
-  
-  .btn-danger {
-    background-color: #e74c3c;
-    border-color: #e74c3c;
-    color: white;
-  }
-  
-  .btn-danger:hover {
-    background-color: #c0392b;
-    border-color: #c0392b;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/delete.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="card-container">
-  <div class="confirm-header">
-    <i class="fas fa-exclamation-triangle"></i>
-    <h2>Confirmer la suppression</h2>
-  </div>
-  
-  <div class="confirm-content">
-    <p>Êtes-vous sûr de vouloir supprimer l'enregistrement d'absence pour <strong>{{ absence.formateur_absent.nom }} {{ absence.formateur_absent.prenom }}</strong> à la date du <strong>{{ absence.date_absence|date:"d/m/Y" }}</strong> ?</p>
-    <p><strong>Cette action est irréversible.</strong></p>
-  </div>
-  
-  <div class="absence-details">
-    <h3 class="mb-3">Détails de l'absence</h3>
-    <div class="detail-item">
-      <span class="detail-label">Séance:</span>
-      <span class="detail-value">{{ absence.seance.cours.nom_cours }} ({{ absence.seance.date|date:"d/m/Y" }})</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Formateur absent:</span>
-      <span class="detail-value">{{ absence.formateur_absent.nom }} {{ absence.formateur_absent.prenom }}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Date d'absence:</span>
-      <span class="detail-value">{{ absence.date_absence|date:"d/m/Y" }}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Raison:</span>
-      <span class="detail-value">{{ absence.raison }}</span>
-    </div>
-    {% if absence.formateur_remplacant %}
-    <div class="detail-item">
-      <span class="detail-label">Remplacé par:</span>
-      <span class="detail-value">{{ absence.formateur_remplacant.nom }} {{ absence.formateur_remplacant.prenom }}</span>
-    </div>
-    {% endif %}
-  </div>
-  
-  <form method="post">
-    {% csrf_token %}
-    <div class="confirm-actions">
-      <a href="{% url 'seances:absence_list' absence.seance.seance_id %}" class="btn btn-outline">
-        <i class="fas fa-times"></i>
-        Annuler
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">Delete Confirmation</h1>
+    <div class="ms-auto">
+      <a href="{% url 'seances:absence_list' absence.seance.seance_id %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back
       </a>
-      <button type="submit" class="btn btn-danger">
-        <i class="fas fa-trash-alt"></i>
-        Confirmer la suppression
-      </button>
     </div>
-  </form>
+  </div>
+
+  <div class="delete-card">
+    <div class="p-4">
+      <div class="alert-warning-custom d-flex">
+        <div class="me-3">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <div>
+          <h4 class="mb-2">Warning!</h4>
+          <p class="mb-0">Are you sure you want to delete the absence record for <strong>{{ absence.formateur_absent.get_full_name }}</strong> on <strong>{{ absence.date_absence|date:"d/m/Y" }}</strong>? This action cannot be undone.</p>
+        </div>
+      </div>
+      
+      <h5 class="mb-3">Absence Details</h5>
+      <table class="info-table mb-4">
+        <tbody>
+          <tr>
+            <th>Session:</th>
+            <td>{{ absence.seance.cours.nom_cours }} ({{ absence.seance.date|date:"d/m/Y" }})</td>
+          </tr>
+          <tr>
+            <th>Absent Trainer:</th>
+            <td>{{ absence.formateur_absent.get_full_name }}</td>
+          </tr>
+          <tr>
+            <th>Absence Date:</th>
+            <td>{{ absence.date_absence|date:"d/m/Y" }}</td>
+          </tr>
+          <tr>
+            <th>Reason:</th>
+            <td>{{ absence.get_raison_display }}</td>
+          </tr>
+          {% if absence.formateur_remplacant %}
+          <tr>
+            <th>Replacement:</th>
+            <td>{{ absence.formateur_remplacant.get_full_name }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <th>Status:</th>
+            <td>
+              <span class="badge {% if absence.est_remplace %}bg-success{% else %}bg-danger{% endif %}">
+                {% if absence.est_remplace %}Replaced{% else %}Not replaced{% endif %}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <form method="post" action="{% url 'seances:absence_delete' absence.absence_id %}">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'seances:absence_list' absence.seance.seance_id %}" class="btn btn-secondary">
+            <i class="fas fa-times me-2"></i>Cancel
+          </a>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash me-2"></i>Confirm Deletion
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %} 

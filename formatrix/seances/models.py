@@ -10,10 +10,10 @@ from django.core.exceptions import ValidationError
 
 class Seance(models.Model):
     STATUS_CHOICES = [
-        ('pas_commence', 'Pas encore commencé'),
-        ('en_cours', 'En cours'),
-        ('termine', 'Terminé'),
-        ('annule', 'Annulé')
+        ('pas_commence', 'Not started'),
+        ('en_cours', 'In progress'),
+        ('termine', 'Completed'),
+        ('annule', 'Cancelled')
     ]
 
     seance_id = models.AutoField(primary_key=True)
@@ -26,11 +26,11 @@ class Seance(models.Model):
         null=True,  # Permettre temporairement null
         default=None  # Valeur par défaut None
     )
-    duree = models.IntegerField(default=1, verbose_name="Durée (mois)", help_text="Durée de la séance en mois")
+    duree = models.IntegerField(default=1, verbose_name="Duration (months)", help_text="Duration of the session in months")
     formateurs = models.ManyToManyField(
         Formateur,
         related_name='seances_assignees',
-        verbose_name="Formateurs assignés"
+        verbose_name="Assigned trainers"
     )
     nombre_places = models.IntegerField(default=10)
     places_reservees = models.IntegerField(default=0)
@@ -105,17 +105,17 @@ class Seance(models.Model):
 
     @property
     def duree_totale(self):
-        """Retourne la durée totale en jours"""
+        """Returns the total duration in days"""
         if self.date_fin:
             return (self.date_fin - self.date_debut).days + 1
         return None
 
 class Absence(models.Model):
     RAISON_CHOICES = [
-        ('maladie', 'Maladie'),
-        ('conge', 'Congé'),
-        ('formation', 'Formation'),
-        ('autre', 'Autre raison')
+        ('maladie', 'Illness'),
+        ('conge', 'Leave'),
+        ('formation', 'Training'),
+        ('autre', 'Other reason')
     ]
     
     absence_id = models.AutoField(primary_key=True)
@@ -124,20 +124,20 @@ class Absence(models.Model):
         Formateur, 
         on_delete=models.CASCADE, 
         related_name='absences',
-        verbose_name="Formateur absent"
+        verbose_name="Absent trainer"
     )
     formateur_remplacant = models.ForeignKey(
         Formateur, 
         on_delete=models.CASCADE, 
         related_name='remplacements',
-        verbose_name="Formateur remplaçant",
+        verbose_name="Replacement trainer",
         null=True,
         blank=True
     )
-    date_absence = models.DateField(verbose_name="Date de l'absence")
+    date_absence = models.DateField(verbose_name="Absence date")
     raison = models.CharField(max_length=50, choices=RAISON_CHOICES, default='autre')
-    details = models.TextField(verbose_name="Détails de l'absence", blank=True, null=True)
-    est_remplace = models.BooleanField(default=False, verbose_name="Est remplacé")
+    details = models.TextField(verbose_name="Absence details", blank=True, null=True)
+    est_remplace = models.BooleanField(default=False, verbose_name="Is replaced")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -153,15 +153,15 @@ class Absence(models.Model):
     def clean(self):
         # Vérifier que le formateur absent est bien assigné à la séance
         if not self.seance.formateurs.filter(formateurid=self.formateur_absent.formateurid).exists():
-            raise ValidationError("Le formateur n'est pas assigné à cette séance.")
+            raise ValidationError("The trainer is not assigned to this session.")
             
         # Vérifier que le remplaçant n'est pas le formateur absent
         if self.formateur_remplacant and self.formateur_remplacant.formateurid == self.formateur_absent.formateurid:
-            raise ValidationError("Le formateur remplaçant ne peut pas être le même que le formateur absent.")
+            raise ValidationError("The replacement trainer cannot be the same as the absent trainer.")
             
         # Vérifier que le remplaçant n'est pas déjà assigné à la séance
         if self.formateur_remplacant and self.seance.formateurs.filter(formateurid=self.formateur_remplacant.formateurid).exists():
-            raise ValidationError("Le formateur remplaçant est déjà assigné à cette séance.")
+            raise ValidationError("The replacement trainer is already assigned to this session.")
     
     def save(self, *args, **kwargs):
         # Mettre à jour l'état du remplacement

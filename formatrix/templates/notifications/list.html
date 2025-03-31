@@ -12,10 +12,10 @@
       <div class="card">
         <div class="card-header">
           <div class="d-flex align-items-center">
-            <h4 class="card-title">Historique des notifications</h4>
+            <h4 class="card-title">Notification History</h4>
             {% if notifications %}
             <a href="{% url 'notifications:mark_all_read' %}" class="btn btn-primary btn-sm ml-auto">
-              <i class="fas fa-check-double"></i> Marquer tout comme lu
+              <i class="fas fa-check-double"></i> Mark all as read
             </a>
             {% endif %}
           </div>
@@ -29,7 +29,7 @@
                     <th>Type</th>
                     <th>Message</th>
                     <th>Date</th>
-                    <th>Statut</th>
+                    <th>Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -38,33 +38,33 @@
                   <tr class="{% if not notification.is_read %}fw-bold bg-light{% endif %}">
                     <td>
                       {% if notification.notification_type == 'new_course' %}
-                        <span class="badge bg-success"><i class="fas fa-book"></i> Cours</span>
+                        <span class="badge bg-success"><i class="fas fa-book"></i> Course</span>
                       {% elif notification.notification_type == 'new_trainer' %}
-                        <span class="badge bg-info"><i class="fas fa-chalkboard-teacher"></i> Formateur</span>
+                        <span class="badge bg-info"><i class="fas fa-chalkboard-teacher"></i> Trainer</span>
                       {% endif %}
                     </td>
                     <td>{{ notification.message }}</td>
                     <td>{{ notification.created_at|date:"d/m/Y H:i" }}</td>
                     <td>
                       {% if notification.is_read %}
-                        <span class="badge bg-secondary">Lu</span>
+                        <span class="badge bg-secondary">Read</span>
                       {% else %}
-                        <span class="badge bg-warning">Non lu</span>
+                        <span class="badge bg-warning">Unread</span>
                       {% endif %}
                     </td>
                     <td>
                       {% if not notification.is_read %}
                       <a href="{% url 'notifications:mark_notification_read' notification.id %}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-check"></i> Marquer comme lu
+                        <i class="fas fa-check"></i> Mark as read
                       </a>
                       {% endif %}
                       {% if notification.notification_type == 'new_course' %}
                         <a href="{% url 'cours:cours-detail' notification.related_id %}" class="btn btn-sm btn-info">
-                          <i class="fas fa-eye"></i> Voir
+                          <i class="fas fa-eye"></i> View
                         </a>
                       {% elif notification.notification_type == 'new_trainer' %}
                         <a href="{% url 'formateurs:formateur-detail' notification.related_id %}" class="btn btn-sm btn-info">
-                          <i class="fas fa-eye"></i> Voir
+                          <i class="fas fa-eye"></i> View
                         </a>
                       {% endif %}
                     </td>
@@ -76,7 +76,7 @@
           {% else %}
             <div class="text-center py-5">
               <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
-              <h4 class="text-muted">Vous n'avez aucune notification</h4>
+              <h4 class="text-muted">You don't have any notifications</h4>
             </div>
           {% endif %}
         </div>
@@ -88,7 +88,7 @@
 
 {% block extra_js %}
 <script>
-  // Mettre à jour le compteur de notifications après les actions
+  // Update notification counter after actions
   function updateNotificationCounter() {
     fetch('{% url "notifications:get_unread_count" %}')
       .then(response => response.json())
@@ -105,7 +105,7 @@
       });
   }
 
-  // Mise à jour lorsque la page se charge
+  // Update when page loads
   document.addEventListener('DOMContentLoaded', function() {
     updateNotificationCounter();
   });

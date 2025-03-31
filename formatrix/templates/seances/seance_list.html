@@ -25,7 +25,7 @@ function getCookie(name) {
 }
 
 function updateSeanceStatus(seanceId, action) {
-    if (!confirm(`Êtes-vous sûr de vouloir ${action === 'start' ? 'commencer' : action === 'complete' ? 'terminer' : 'annuler'} cette séance ?`)) {
+    if (!confirm(`Are you sure you want to ${action === 'start' ? 'start' : action === 'complete' ? 'complete' : 'cancel'} this session?`)) {
         return;
     }
 
@@ -40,91 +40,86 @@ function updateSeanceStatus(seanceId, action) {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Erreur lors de la mise à jour du statut');
+            throw new Error('Error updating status');
         }
         return response.json();
     })
     .then(data => {
-        if (data.success) {
-            // Mettre à jour l'affichage du statut
+        if (data.status === 'success') {
+            // Update status display
             const statusCell = document.querySelector(`tr[data-seance-id="${seanceId}"] .status-cell`);
             if (statusCell) {
-                // Supprimer les anciennes classes
+                // Remove old classes
                 statusCell.querySelector('.badge').classList.remove('bg-warning', 'bg-success', 'bg-primary', 'bg-danger');
                 
-                // Ajouter la nouvelle classe
+                // Add new class
                 let newClass = '';
-                let newText = '';
                 
                 switch (data.new_status) {
                     case 'pas_commence':
                         newClass = 'bg-warning';
-                        newText = 'Pas encore commencé';
                         break;
                     case 'en_cours':
                         newClass = 'bg-success';
-                        newText = 'En cours';
                         break;
                     case 'termine':
                         newClass = 'bg-primary';
-                        newText = 'Terminé';
                         break;
                     case 'annule':
                         newClass = 'bg-danger';
-                        newText = 'Annulé';
                         break;
                 }
                 
                 statusCell.querySelector('.badge').classList.add(newClass);
-                statusCell.querySelector('.badge').textContent = newText;
+                statusCell.querySelector('.badge').textContent = data.new_status;
                 
-                // Mettre à jour les boutons d'action
+                // Update action buttons
                 const actionsCell = document.querySelector(`tr[data-seance-id="${seanceId}"] .actions-cell`);
                 if (actionsCell) {
-                    // Mettre à jour les boutons en fonction du nouveau statut
+                    // Update buttons based on new status
                     updateActionButtons(actionsCell, data.new_status);
                 }
             }
             
-            // Afficher un message de succès
-            alert('Statut mis à jour avec succès !');
+            // Show success message
+            alert('Status updated successfully!');
         } else {
-            alert('Erreur: ' + data.error);
+            alert('Error: ' + data.error);
         }
     })
     .catch(error => {
-        console.error('Erreur:', error);
-        alert('Une erreur est survenue lors de la mise à jour du statut.');
+        console.error('Error:', error);
+        alert('An error occurred while updating the status.');
     });
 }
 
 function updateActionButtons(actionsCell, status) {
-    // Supprimer tous les boutons d'action existants
+    // Remove all existing action buttons
     const actionButtons = actionsCell.querySelectorAll('.status-action');
     actionButtons.forEach(button => button.remove());
     
-    // Ajouter les nouveaux boutons en fonction du statut
+    // Add new buttons based on status
     const buttonContainer = actionsCell.querySelector('.btn-group');
     
     if (status === 'pas_commence') {
         const startButton = document.createElement('button');
         startButton.className = 'btn btn-sm btn-success status-action';
         startButton.innerHTML = '<i class="fas fa-play"></i>';
-        startButton.title = 'Commencer la séance';
+        startButton.title = 'Start session';
         startButton.onclick = function() { updateSeanceStatus(this.closest('tr').dataset.seanceId, 'start'); };
         buttonContainer.appendChild(startButton);
         
         const cancelButton = document.createElement('button');
         cancelButton.className = 'btn btn-sm btn-danger status-action';
         cancelButton.innerHTML = '<i class="fas fa-times"></i>';
-        cancelButton.title = 'Annuler la séance';
+        cancelButton.title = 'Cancel session';
         cancelButton.onclick = function() { updateSeanceStatus(this.closest('tr').dataset.seanceId, 'cancel'); };
         buttonContainer.appendChild(cancelButton);
     } else if (status === 'en_cours') {
         const completeButton = document.createElement('button');
         completeButton.className = 'btn btn-sm btn-primary status-action';
         completeButton.innerHTML = '<i class="fas fa-check"></i>';
-        completeButton.title = 'Terminer la séance';
+        completeButton.title = 'Complete session';
         completeButton.onclick = function() { updateSeanceStatus(this.closest('tr').dataset.seanceId, 'complete'); };
         buttonContainer.appendChild(completeButton);
     }
@@ -137,81 +132,78 @@ function updateActionButtons(actionsCell, status) {
   <div class="page-header mb-4">
     <h1 class="page-title">{{ page_title }}</h1>
     <div class="ms-auto">
-      <a href="{% url 'seances:seance-create' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Ajouter une séance
+      {% if show_create_button %}
+      <a href="{{ create_url }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>{{ create_button_text }}
       </a>
+      {% endif %}
     </div>
   </div>
 
-  <!-- Filtres -->
+  <!-- Filters -->
   <div class="filter-card">
     <form method="get" class="row g-3">
       <div class="col-md-4">
         <div class="input-group">
           <span class="input-group-text"><i class="fas fa-search"></i></span>
-          <input type="text" name="search" class="form-control" placeholder="Rechercher une séance..." value="{{ search_query }}">
+          <input type="text" name="search" class="form-control" placeholder="Search for a session..." value="{{ search_query }}">
         </div>
       </div>
       <div class="col-md-3">
         <select name="statut" class="form-select">
-          <option value="">Tous les statuts</option>
+          <option value="">All statuses</option>
           {% for code, label in STATUS_CHOICES %}
           <option value="{{ code }}" {% if statut_filter == code %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="col-md-3 d-flex">
-        <button type="submit" class="btn btn-primary me-2">
-          <i class="fas fa-filter me-1"></i>Filtrer
-        </button>
-        {% if has_active_filters %}
-        <a href="{{ reset_url }}" class="btn btn-outline-secondary">
-          <i class="fas fa-times me-1"></i>Réinitialiser
-        </a>
-        {% endif %}
+      <div class="col-md-3">
+        <select name="ordering" class="form-select">
+          <option value="-date" {% if ordering == '-date' %}selected{% endif %}>Most recent</option>
+          <option value="date" {% if ordering == 'date' %}selected{% endif %}>Oldest</option>
+          <option value="cours__nom_cours" {% if ordering == 'cours__nom_cours' %}selected{% endif %}>Course (A-Z)</option>
+          <option value="-cours__nom_cours" {% if ordering == '-cours__nom_cours' %}selected{% endif %}>Course (Z-A)</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter me-2"></i>Filter
+          </button>
+        </div>
       </div>
     </form>
   </div>
 
-  <!-- Tableau des séances -->
+  <!-- Sessions table -->
   <div class="table-container">
     {% if seance_list %}
     <div class="table-responsive">
       <table class="table table-hover">
         <thead>
           <tr>
-            <th>
-              <a href="?{% if ordering == 'cours__nom_cours' %}-{% endif %}cours__nom_cours{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Cours
-                <i class="fas fa-sort{% if ordering == 'cours__nom_cours' %}-up{% elif ordering == '-cours__nom_cours' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th>
-              <a href="?{% if ordering == 'lieu__lieu' %}-{% endif %}lieu__lieu{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Lieu
-                <i class="fas fa-sort{% if ordering == 'lieu__lieu' %}-up{% elif ordering == '-lieu__lieu' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th>
-              <a href="?{% if ordering == 'date' %}-{% endif %}date{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Date
-                <i class="fas fa-sort{% if ordering == 'date' %}-up{% elif ordering == '-date' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th>Places</th>
-            <th>
-              <a href="?{% if ordering == 'statut' %}-{% endif %}statut{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Statut
-                <i class="fas fa-sort{% if ordering == 'statut' %}-up{% elif ordering == '-statut' %}-down{% endif %}"></i>
-              </a>
-            </th>
+            <th>Course</th>
+            <th>Location</th>
+            <th>Date</th>
+            <th>Spots</th>
+            <th>Status</th>
             <th class="text-end">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for seance in seance_list %}
           <tr data-seance-id="{{ seance.seance_id }}">
-            <td>{{ seance.cours.nom_cours }}</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm bg-primary-light rounded me-2">
+                  <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div>
+                  <div class="fw-bold">{{ seance.cours.nom_cours }}</div>
+                  <small class="text-muted">{{ seance.duree }} month{{ seance.duree|pluralize }}</small>
+                </div>
+              </div>
+            </td>
             <td>{{ seance.lieu.lieu }}</td>
             <td>{{ seance.date|date:"d/m/Y" }}</td>
             <td>{{ seance.places_reservees }} / {{ seance.nombre_places }}</td>
@@ -224,25 +216,25 @@ function updateActionButtons(actionsCell, status) {
             </td>
             <td class="text-end actions-cell">
               <div class="btn-group">
-                <a href="{% url 'seances:seance-detail' seance.seance_id %}" class="btn btn-sm btn-info btn-action" title="Voir">
+                <a href="{% url 'seances:seance-detail' seance.seance_id %}" class="btn btn-sm btn-info btn-action" title="View">
                   <i class="fas fa-eye"></i>
                 </a>
-                <a href="{% url 'seances:seance-update' seance.seance_id %}" class="btn btn-sm btn-warning btn-action" title="Modifier">
+                <a href="{% url 'seances:seance-update' seance.seance_id %}" class="btn btn-sm btn-warning btn-action" title="Edit">
                   <i class="fas fa-edit"></i>
                 </a>
-                <a href="{% url 'seances:seance-delete' seance.seance_id %}" class="btn btn-sm btn-danger btn-action" title="Supprimer">
+                <a href="{% url 'seances:seance-delete' seance.seance_id %}" class="btn btn-sm btn-danger btn-action" title="Delete">
                   <i class="fas fa-trash"></i>
                 </a>
                 
                 {% if seance.statut == 'pas_commence' %}
-                <button type="button" class="btn btn-sm btn-success status-action" onclick="updateSeanceStatus('{{ seance.seance_id }}', 'start')" title="Commencer la séance">
+                <button type="button" class="btn btn-sm btn-success status-action" onclick="updateSeanceStatus('{{ seance.seance_id }}', 'start')" title="Start session">
                   <i class="fas fa-play"></i>
                 </button>
-                <button type="button" class="btn btn-sm btn-danger status-action" onclick="updateSeanceStatus('{{ seance.seance_id }}', 'cancel')" title="Annuler la séance">
+                <button type="button" class="btn btn-sm btn-danger status-action" onclick="updateSeanceStatus('{{ seance.seance_id }}', 'cancel')" title="Cancel session">
                   <i class="fas fa-times"></i>
                 </button>
                 {% elif seance.statut == 'en_cours' %}
-                <button type="button" class="btn btn-sm btn-primary status-action" onclick="updateSeanceStatus('{{ seance.seance_id }}', 'complete')" title="Terminer la séance">
+                <button type="button" class="btn btn-sm btn-primary status-action" onclick="updateSeanceStatus('{{ seance.seance_id }}', 'complete')" title="Complete session">
                   <i class="fas fa-check"></i>
                 </button>
                 {% endif %}
@@ -254,74 +246,81 @@ function updateActionButtons(actionsCell, status) {
       </table>
     </div>
     
-    {% if is_paginated %}
+    <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center p-3">
-      <p class="mb-0">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
-      <nav aria-label="Navigation de pagination">
+      <p class="mb-0">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+      <nav aria-label="Pagination navigation">
         <ul class="pagination mb-0">
           {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Première">
+            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="First">
               <span aria-hidden="true">&laquo;&laquo;</span>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Précédente">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
           {% else %}
           <li class="page-item disabled">
-            <span class="page-link">&laquo;&laquo;</span>
+            <a class="page-link" href="#" aria-label="First">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
           </li>
           <li class="page-item disabled">
-            <span class="page-link">&laquo;</span>
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
           </li>
           {% endif %}
           
-          {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}">{{ num }}</a>
-              </li>
+          {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+              <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+            {% elif i > page_obj.number|add:"-3" and i < page_obj.number|add:"3" %}
+              <li class="page-item"><a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}">{{ i }}</a></li>
             {% endif %}
           {% endfor %}
           
           {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Suivante">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Dernière">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Last">
               <span aria-hidden="true">&raquo;&raquo;</span>
             </a>
           </li>
           {% else %}
           <li class="page-item disabled">
-            <span class="page-link">&raquo;</span>
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
           </li>
           <li class="page-item disabled">
-            <span class="page-link">&raquo;&raquo;</span>
+            <a class="page-link" href="#" aria-label="Last">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
           </li>
           {% endif %}
         </ul>
       </nav>
     </div>
-    {% endif %}
     {% else %}
     <div class="empty-state">
-      <div class="empty-icon">
-        <i class="fas fa-calendar-alt"></i>
+      <div class="empty-state-icon">
+        <i class="fas fa-calendar-alt fa-3x"></i>
       </div>
-      <h3>Aucune séance trouvée</h3>
-      <p>Il n'y a pas de séances correspondant à vos critères de recherche.</p>
-      <a href="{% url 'seances:seance-create' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Ajouter une séance
+      <h3>No sessions found</h3>
+      <p>There are no sessions matching your search criteria.</p>
+      {% if show_create_button %}
+      <a href="{{ create_url }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>{{ create_button_text }}
       </a>
+      {% endif %}
     </div>
     {% endif %}
   </div>

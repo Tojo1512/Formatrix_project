@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Refuser le cours - Formatrix{% endblock %}
+{% block title %}Reject Course - Formatrix{% endblock %}
 
 {% block content %}
 <div class="card">
-  <h2 class="mb-4">Refuser le cours</h2>
+  <h2 class="mb-4">Reject Course</h2>
   
   <div class="alert alert-warning">
     <i class="fas fa-exclamation-circle"></i>
-    Vous êtes sur le point de refuser le cours "{{ object.nom_cours }}".
+    You are about to reject the course "{{ object.nom_cours }}".
   </div>
   
   <div class="course-info mb-4">
     <div class="info-row">
-      <div class="info-label">Nom du cours :</div>
+      <div class="info-label">Course Name:</div>
       <div class="info-value">{{ object.nom_cours }}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Type de cours :</div>
+      <div class="info-label">Course Type:</div>
       <div class="info-value">{{ object.get_type_cours_display }}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Durée :</div>
-      <div class="info-value">{{ object.duree_heures }} heures</div>
+      <div class="info-label">Duration:</div>
+      <div class="info-value">{{ object.duree_heures }} hours</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Statut actuel :</div>
+      <div class="info-label">Current Status:</div>
       <div class="info-value">
         <span class="badge {% if object.statut_approbation == 'approuve' %}badge-success{% elif object.statut_approbation == 'en_attente' %}badge-warning{% elif object.statut_approbation == 'refuse' %}badge-danger{% else %}badge-secondary{% endif %}">
           {{ object.get_statut_approbation_display }}
@@ -38,19 +38,19 @@
   <form method="post">
     {% csrf_token %}
     <div class="form-group mb-4">
-      <label for="commentaire" class="form-label">Motif du refus :</label>
-      <textarea id="commentaire" name="commentaire" class="form-control" rows="3" placeholder="Veuillez indiquer le motif du refus..." required></textarea>
-      <div class="form-text">Un motif est requis pour expliquer la raison du refus.</div>
+      <label for="commentaire" class="form-label">Reason for rejection:</label>
+      <textarea id="commentaire" name="commentaire" class="form-control" rows="3" placeholder="Please indicate the reason for rejection..." required></textarea>
+      <div class="form-text">A reason is required to explain why the course is being rejected.</div>
     </div>
     
     <div class="form-actions">
       <a href="{% url 'cours:cours-list' %}" class="btn btn-outline">
         <i class="fas fa-arrow-left"></i>
-        Annuler
+        Cancel
       </a>
       <button type="submit" class="btn btn-danger">
         <i class="fas fa-times"></i>
-        Confirmer le refus
+        Confirm Rejection
       </button>
     </div>
   </form>

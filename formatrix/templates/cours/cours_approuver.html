@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Approuver le cours - Formatrix{% endblock %}
+{% block title %}Approve Course - Formatrix{% endblock %}
 
 {% block content %}
 <div class="card">
-  <h2 class="mb-4">Approuver le cours</h2>
+  <h2 class="mb-4">Approve Course</h2>
   
   <div class="alert alert-info">
     <i class="fas fa-info-circle"></i>
-    Vous êtes sur le point d'approuver le cours "{{ object.nom_cours }}".
+    You are about to approve the course "{{ object.nom_cours }}".
   </div>
   
   <div class="course-info mb-4">
     <div class="info-row">
-      <div class="info-label">Nom du cours :</div>
+      <div class="info-label">Course Name:</div>
       <div class="info-value">{{ object.nom_cours }}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Type de cours :</div>
+      <div class="info-label">Course Type:</div>
       <div class="info-value">{{ object.get_type_cours_display }}</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Durée :</div>
-      <div class="info-value">{{ object.duree_heures }} heures</div>
+      <div class="info-label">Duration:</div>
+      <div class="info-value">{{ object.duree_heures }} hours</div>
     </div>
     <div class="info-row">
-      <div class="info-label">Statut actuel :</div>
+      <div class="info-label">Current Status:</div>
       <div class="info-value">
         <span class="badge {% if object.statut_approbation == 'approuve' %}badge-success{% elif object.statut_approbation == 'en_attente' %}badge-warning{% elif object.statut_approbation == 'refuse' %}badge-danger{% else %}badge-secondary{% endif %}">
           {{ object.get_statut_approbation_display }}
@@ -38,18 +38,18 @@
   <form method="post">
     {% csrf_token %}
     <div class="form-group mb-4">
-      <label for="commentaire" class="form-label">Commentaire (optionnel) :</label>
-      <textarea id="commentaire" name="commentaire" class="form-control" rows="3" placeholder="Ajouter un commentaire concernant l'approbation..."></textarea>
+      <label for="commentaire" class="form-label">Comment (optional):</label>
+      <textarea id="commentaire" name="commentaire" class="form-control" rows="3" placeholder="Add a comment about the approval..."></textarea>
     </div>
     
     <div class="form-actions">
       <a href="{% url 'cours:cours-list' %}" class="btn btn-outline">
         <i class="fas fa-arrow-left"></i>
-        Annuler
+        Cancel
       </a>
       <button type="submit" class="btn btn-success">
         <i class="fas fa-check"></i>
-        Confirmer l'approbation
+        Confirm Approval
       </button>
     </div>
   </form>

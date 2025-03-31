@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Liste des Apprenants - Formatrix{% endblock %}
+{% block title %}Learner List - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/apprenants/list.css' %}">
@@ -10,26 +10,26 @@
 {% block content %}
 <div class="page-inner">
   <div class="page-header mb-4">
-    <h1 class="page-title">Liste des Apprenants</h1>
+    <h1 class="page-title">Learner List</h1>
     <div class="ms-auto">
       <a href="{% url 'apprenants:apprenant-create' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Ajouter un apprenant
+        <i class="fas fa-plus me-2"></i>Add a Learner
       </a>
     </div>
   </div>
 
-  <!-- Filtres -->
+  <!-- Filters -->
   <div class="filter-card">
     <form method="get" class="row g-3">
       <div class="col-md-4">
         <div class="input-group">
           <span class="input-group-text"><i class="fas fa-search"></i></span>
-          <input type="text" name="search" class="form-control" placeholder="Rechercher un apprenant..." value="{{ search_query }}">
+          <input type="text" name="search" class="form-control" placeholder="Search for a learner..." value="{{ search_query }}">
         </div>
       </div>
       <div class="col-md-2">
         <select name="sexe" class="form-select">
-          <option value="">Tous genres</option>
+          <option value="">All genders</option>
           {% for code, label in sexe_choices %}
           <option value="{{ code }}" {% if sexe_filter == code %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
@@ -37,7 +37,7 @@
       </div>
       <div class="col-md-2">
         <select name="niveau_academique" class="form-select">
-          <option value="">Tous niveaux</option>
+          <option value="">All levels</option>
           {% for code, label in niveau_choices %}
           <option value="{{ code }}" {% if niveau_filter == code %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
@@ -45,7 +45,7 @@
       </div>
       <div class="col-md-2">
         <select name="categorie_age" class="form-select">
-          <option value="">Tous âges</option>
+          <option value="">All ages</option>
           {% for code, label in age_choices %}
           <option value="{{ code }}" {% if age_filter == code %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
@@ -53,18 +53,18 @@
       </div>
       <div class="col-md-2 d-flex">
         <button type="submit" class="btn btn-primary me-2">
-          <i class="fas fa-filter me-1"></i>Filtrer
+          <i class="fas fa-filter me-1"></i>Filter
         </button>
         {% if has_active_filters %}
         <a href="{{ reset_url }}" class="btn btn-outline-secondary">
-          <i class="fas fa-times me-1"></i>Réinitialiser
+          <i class="fas fa-times me-1"></i>Reset
         </a>
         {% endif %}
       </div>
     </form>
   </div>
 
-  <!-- Tableau des apprenants -->
+  <!-- Learner table -->
   <div class="table-container">
     {% if apprenants_list %}
     <div class="table-responsive">
@@ -73,26 +73,26 @@
           <tr>
             <th>
               <a href="?{% if ordering == 'nom_apprenant' %}-{% endif %}nom_apprenant{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau_academique={{ niveau_filter }}{% endif %}{% if age_filter %}&categorie_age={{ age_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Nom
+                Name
                 <i class="fas fa-sort{% if ordering == 'nom_apprenant' %}-up{% elif ordering == '-nom_apprenant' %}-down{% endif %}"></i>
               </a>
             </th>
-            <th>CIN</th>
+            <th>ID</th>
             <th>
               <a href="?{% if ordering == 'ville' %}-{% endif %}ville{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau_academique={{ niveau_filter }}{% endif %}{% if age_filter %}&categorie_age={{ age_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Ville
+                City
                 <i class="fas fa-sort{% if ordering == 'ville' %}-up{% elif ordering == '-ville' %}-down{% endif %}"></i>
               </a>
             </th>
             <th>
               <a href="?{% if ordering == 'sexe' %}-{% endif %}sexe{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau_academique={{ niveau_filter }}{% endif %}{% if age_filter %}&categorie_age={{ age_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Genre
+                Gender
                 <i class="fas fa-sort{% if ordering == 'sexe' %}-up{% elif ordering == '-sexe' %}-down{% endif %}"></i>
               </a>
             </th>
             <th>
               <a href="?{% if ordering == 'categorie_age' %}-{% endif %}categorie_age{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau_academique={{ niveau_filter }}{% endif %}{% if age_filter %}&categorie_age={{ age_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Âge
+                Age
                 <i class="fas fa-sort{% if ordering == 'categorie_age' %}-up{% elif ordering == '-categorie_age' %}-down{% endif %}"></i>
               </a>
             </th>
@@ -121,13 +121,13 @@
             </td>
             <td class="text-end">
               <div class="btn-group">
-                <a href="{% url 'apprenants:apprenant-detail' apprenant.apprenant_id %}" class="btn btn-sm btn-info btn-action" title="Voir">
+                <a href="{% url 'apprenants:apprenant-detail' apprenant.apprenant_id %}" class="btn btn-sm btn-info btn-action" title="View">
                   <i class="fas fa-eye"></i>
                 </a>
-                <a href="{% url 'apprenants:apprenant-update' apprenant.apprenant_id %}" class="btn btn-sm btn-warning btn-action" title="Modifier">
+                <a href="{% url 'apprenants:apprenant-update' apprenant.apprenant_id %}" class="btn btn-sm btn-warning btn-action" title="Edit">
                   <i class="fas fa-edit"></i>
                 </a>
-                <a href="{% url 'apprenants:apprenant-delete' apprenant.apprenant_id %}" class="btn btn-sm btn-danger btn-action" title="Supprimer">
+                <a href="{% url 'apprenants:apprenant-delete' apprenant.apprenant_id %}" class="btn btn-sm btn-danger btn-action" title="Delete">
                   <i class="fas fa-trash"></i>
                 </a>
               </div>
@@ -140,12 +140,12 @@
     
     {% if is_paginated %}
     <div class="d-flex justify-content-between align-items-center p-3">
-      <p class="mb-0">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
-      <nav aria-label="Navigation de pagination">
+      <p class="mb-0">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+      <nav aria-label="Pagination navigation">
         <ul class="pagination mb-0">
           {% if page_obj.has_previous %}
             <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau_academique={{ niveau_filter }}{% endif %}{% if age_filter %}&categorie_age={{ age_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Précédent">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau_academique={{ niveau_filter }}{% endif %}{% if age_filter %}&categorie_age={{ age_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
@@ -155,7 +155,7 @@
           
           {% if page_obj.has_next %}
             <li class="page-item">
-              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau_academique={{ niveau_filter }}{% endif %}{% if age_filter %}&categorie_age={{ age_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Suivant">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if sexe_filter %}&sexe={{ sexe_filter }}{% endif %}{% if niveau_filter %}&niveau_academique={{ niveau_filter }}{% endif %}{% if age_filter %}&categorie_age={{ age_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
               </a>
             </li>
@@ -168,9 +168,9 @@
     {% else %}
     <div class="empty-state">
       <i class="fas fa-user-graduate"></i>
-      <h4 class="mb-3">Aucun apprenant trouvé</h4>
+      <h4 class="mb-3">No learners found</h4>
       {% if has_active_filters %}
-      <a href="{{ reset_url }}" class="btn btn-secondary">Réinitialiser les filtres</a>
+      <a href="{{ reset_url }}" class="btn btn-secondary">Reset filters</a>
       {% else %}
       <a href="{{ create_url }}" class="btn btn-primary">{{ create_button_text }}</a>
       {% endif %}

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Facture {{ facture.numero_facture }} - Formatrix{% endblock %}
+{% block title %}Invoice {{ facture.numero_facture }} - Formatrix{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -92,43 +92,35 @@
 
 {% block content %}
 <div class="container-fluid px-4">
-  <!-- En-tête avec boutons d'action -->
+  <!-- Header with action buttons -->
   <div class="d-flex justify-content-between align-items-center mt-4 mb-4 no-print">
-    <h1>Facture {{ facture.numero_facture }}</h1>
+    <h1>Invoice {{ facture.numero_facture }}</h1>
     <div class="action-buttons">
       <a href="{% url 'paiements:facture-list' %}" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+        <i class="fas fa-arrow-left me-1"></i> Back to list
       </a>
       <a href="{% url 'paiements:facture-recreer' facture_id=facture.facture_id %}" class="btn btn-outline-primary">
-        <i class="fas fa-edit me-1"></i> Modifier
+        <i class="fas fa-edit me-1"></i> Edit
       </a>
-      <a href="{% url 'paiements:telecharger-facture' facture_id=facture.facture_id %}" class="btn btn-outline-info">
-        <i class="fas fa-download me-1"></i> Télécharger PDF
-      </a>
-      <a href="{% url 'paiements:envoyer-facture' facture_id=facture.facture_id %}" class="btn btn-outline-success">
-        <i class="fas fa-envelope me-1"></i> Envoyer par email
+      <a href="{% url 'paiements:facture-pdf' facture_id=facture.facture_id %}" class="btn btn-outline-info">
+        <i class="fas fa-download me-1"></i> Download PDF
       </a>
       {% if facture.statut == 'emise' %}
-      <a href="{% url 'paiements:envoyer-rappel-facture' facture_id=facture.facture_id %}" class="btn btn-outline-warning">
-        <i class="fas fa-bell me-1"></i> Envoyer un rappel
-      </a>
+      <!-- Reminder button removed -->
       {% endif %}
-      <button onclick="window.print();" class="btn btn-outline-dark">
-        <i class="fas fa-print me-1"></i> Imprimer
-      </button>
     </div>
   </div>
   
-  <!-- Statut de la facture -->
+  <!-- Invoice status -->
   <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
       <div>
         <i class="fas fa-info-circle me-1"></i>
-        Statut de la facture
+        Invoice status
       </div>
       <div>
         <span class="badge badge-statut-{{ facture.statut }} fs-6">
-          {% for value, label in facture.STATUT_CHOICES %}
+          {% for value, label in facture.STATUS_CHOICES %}
             {% if value == facture.statut %}{{ label }}{% endif %}
           {% endfor %}
         </span>
@@ -137,37 +129,37 @@
     <div class="card-body">
       <div class="row">
         <div class="col-md-6">
-          <p><strong>Type de facture:</strong> 
+          <p><strong>Invoice type:</strong> 
             <span class="badge badge-type-{{ facture.type_facture }}">
-              {% for value, label in facture.TYPE_FACTURE_CHOICES %}
+              {% for value, label in facture.INVOICE_TYPE_CHOICES %}
                 {% if value == facture.type_facture %}{{ label }}{% endif %}
               {% endfor %}
             </span>
           </p>
-          <p><strong>Date d'émission:</strong> {{ facture.date_emission|date:"d/m/Y" }}</p>
-          <p><strong>Date d'échéance:</strong> {{ facture.date_echeance|date:"d/m/Y" }}</p>
+          <p><strong>Issue date:</strong> {{ facture.date_emission|date:"d/m/Y" }}</p>
+          <p><strong>Due date:</strong> {{ facture.date_echeance|date:"d/m/Y" }}</p>
         </div>
         <div class="col-md-6">
-          <p><strong>Montant HT:</strong> {{ facture.montant_ht|floatformat:2 }} €</p>
-          <p><strong>TVA ({{ facture.taux_tva }}%):</strong> {{ facture.montant_tva|floatformat:2 }} €</p>
-          <p><strong>Montant TTC:</strong> <span class="fw-bold fs-5">{{ facture.montant_ttc|floatformat:2 }} €</span></p>
+          <p><strong>Amount (excl. VAT):</strong> {{ facture.montant_ht|floatformat:2 }} €</p>
+          <p><strong>VAT ({{ facture.taux_tva }}%):</strong> {{ facture.montant_tva|floatformat:2 }} €</p>
+          <p><strong>Total amount:</strong> <span class="fw-bold fs-5">{{ facture.montant_ttc|floatformat:2 }} €</span></p>
         </div>
       </div>
       
-      <!-- Formulaire de changement de statut -->
+      <!-- Status change form -->
       <div class="mt-3 no-print">
         <form method="post" action="{% url 'paiements:changer-statut-facture' facture_id=facture.facture_id %}" class="row g-3">
           {% csrf_token %}
           <div class="col-md-4">
             <select name="statut" class="form-select">
-              {% for value, label in facture.STATUT_CHOICES %}
+              {% for value, label in facture.STATUS_CHOICES %}
                 <option value="{{ value }}" {% if value == facture.statut %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
           </div>
           <div class="col-md-8">
             <button type="submit" class="btn btn-primary">
-              <i class="fas fa-check-circle me-1"></i> Changer le statut
+              <i class="fas fa-check-circle me-1"></i> Change status
             </button>
           </div>
         </form>
@@ -175,14 +167,14 @@
     </div>
   </div>
   
-  <!-- Contenu de la facture -->
+  <!-- Invoice content -->
   <div class="row">
-    <!-- Informations client -->
+    <!-- Client information -->
     <div class="col-md-6">
       <div class="card mb-4">
         <div class="card-header">
           <i class="fas fa-user me-1"></i>
-          Informations du destinataire
+          Recipient information
         </div>
         <div class="card-body">
           <h5>{{ facture.destinataire_nom }}</h5>
@@ -198,42 +190,43 @@
       </div>
     </div>
     
-    <!-- Informations inscription -->
+    <!-- Registration information -->
     <div class="col-md-6">
       <div class="card mb-4">
         <div class="card-header">
           <i class="fas fa-clipboard-list me-1"></i>
-          Informations de l'inscription
+          Registration information
         </div>
         <div class="card-body">
-          {% if inscription %}
-          <p><strong>Apprenant:</strong> {{ inscription.apprenant }}</p>
-          <p><strong>Formation:</strong> {{ inscription.seance.cours.nom_cours }}</p>
-          <p><strong>Date d'inscription:</strong> {{ inscription.date_inscription|date:"d/m/Y" }}</p>
-          <p><strong>Type d'inscription:</strong> 
-            {% for value, label in inscription.TYPE_INSCRIPTION_CHOICES %}
-              {% if value == inscription.type_inscription %}{{ label }}{% endif %}
-            {% endfor %}
-          </p>
-          {% if inscription.sponsor %}
-          <p><strong>Sponsor:</strong> {{ inscription.sponsor.nom_client }}</p>
-          {% endif %}
+          {% if facture.inscription %}
+          <p><strong>Registration:</strong> #{{ facture.inscription.id }}</p>
+          <p><strong>Learner:</strong> {{ facture.inscription.apprenant }}</p>
+          <p><strong>Course:</strong> {{ facture.inscription.seance.cours.nom_cours }}</p>
+          <p><strong>Date:</strong> {{ facture.inscription.seance.date_debut|date:"d/m/Y" }} - {{ facture.inscription.seance.date_fin|date:"d/m/Y" }}</p>
+          {% elif facture.paiement %}
+          <p><strong>Payment ID:</strong> {{ facture.paiement.paiement_id }}</p>
+          <p><strong>Payment date:</strong> {{ facture.paiement.date_paiement|date:"d/m/Y" }}</p>
+          <p><strong>Payment method:</strong> {{ facture.paiement.get_mode_paiement_display }}</p>
           {% else %}
-          <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            Aucune inscription associée à cette facture.
-          </div>
+          <p class="text-muted">No associated registration or payment</p>
           {% endif %}
         </div>
       </div>
     </div>
   </div>
   
-  <!-- Détails de la facture -->
+  <!-- Invoice lines -->
   <div class="card mb-4">
-    <div class="card-header">
-      <i class="fas fa-list me-1"></i>
-      Détails de la facture
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div>
+        <i class="fas fa-list me-1"></i>
+        Invoice lines
+      </div>
+      {% if facture.statut == 'brouillon' %}
+      <a href="{% url 'paiements:ajouter-ligne-facture' facture_id=facture.facture_id %}" class="btn btn-sm btn-primary no-print">
+        <i class="fas fa-plus-circle me-1"></i> Add line
+      </a>
+      {% endif %}
     </div>
     <div class="card-body">
       <div class="table-responsive">
@@ -241,37 +234,53 @@
           <thead>
             <tr>
               <th>Description</th>
-              <th class="text-center">Quantité</th>
-              <th class="text-end">Prix unitaire HT</th>
-              <th class="text-end">Montant HT</th>
-              <th class="text-center">TVA</th>
-              <th class="text-end">Montant TTC</th>
+              <th class="text-center">Quantity</th>
+              <th class="text-end">Unit price</th>
+              <th class="text-end">Amount (excl. VAT)</th>
+              <th class="text-center">VAT rate</th>
+              <th class="text-end">VAT amount</th>
+              <th class="text-end">Total amount</th>
+              {% if facture.statut == 'brouillon' %}
+              <th class="text-center no-print">Actions</th>
+              {% endif %}
             </tr>
           </thead>
           <tbody>
-            {% if lignes %}
-              {% for ligne in lignes %}
-              <tr>
-                <td>{{ ligne.description }}</td>
-                <td class="text-center">{{ ligne.quantite }}</td>
-                <td class="text-end">{{ ligne.prix_unitaire_ht|floatformat:2 }} €</td>
-                <td class="text-end">{{ ligne.montant_ht|floatformat:2 }} €</td>
-                <td class="text-center">{{ ligne.taux_tva }}%</td>
-                <td class="text-end">{{ ligne.montant_ttc|floatformat:2 }} €</td>
-              </tr>
-              {% endfor %}
-            {% else %}
-              <tr>
-                <td colspan="6" class="text-center">Aucune ligne de facture.</td>
-              </tr>
-            {% endif %}
+            {% for ligne in facture.lignes.all %}
+            <tr>
+              <td>{{ ligne.description }}</td>
+              <td class="text-center">{{ ligne.quantite }}</td>
+              <td class="text-end">{{ ligne.prix_unitaire_ht|floatformat:2 }} €</td>
+              <td class="text-end">{{ ligne.montant_ht|floatformat:2 }} €</td>
+              <td class="text-center">{{ ligne.taux_tva }}%</td>
+              <td class="text-end">{{ ligne.montant_tva|floatformat:2 }} €</td>
+              <td class="text-end">{{ ligne.montant_ttc|floatformat:2 }} €</td>
+              {% if facture.statut == 'brouillon' %}
+              <td class="text-center no-print">
+                <a href="{% url 'paiements:supprimer-ligne-facture' ligne_id=ligne.ligne_id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this line?');">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+              {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="{% if facture.statut == 'brouillon' %}8{% else %}7{% endif %}" class="text-center">
+                <p class="text-muted">No lines added to this invoice</p>
+              </td>
+            </tr>
+            {% endfor %}
           </tbody>
           <tfoot>
-            <tr class="table-secondary">
-              <th colspan="3" class="text-end">Total:</th>
+            <tr class="table-light">
+              <th colspan="3" class="text-end">Total</th>
               <th class="text-end">{{ facture.montant_ht|floatformat:2 }} €</th>
-              <th class="text-center">TVA</th>
+              <th></th>
+              <th class="text-end">{{ facture.montant_tva|floatformat:2 }} €</th>
               <th class="text-end">{{ facture.montant_ttc|floatformat:2 }} €</th>
+              {% if facture.statut == 'brouillon' %}
+              <th></th>
+              {% endif %}
             </tr>
           </tfoot>
         </table>
@@ -279,23 +288,20 @@
     </div>
   </div>
   
-  <!-- Informations supplémentaires -->
+  <!-- Additional information -->
   <div class="row">
     <div class="col-md-6">
       <div class="card mb-4">
         <div class="card-header">
-          <i class="fas fa-file-alt me-1"></i>
-          Conditions de paiement
+          <i class="fas fa-money-bill me-1"></i>
+          Payment terms
         </div>
         <div class="card-body">
-          {% if facture.conditions_paiement %}
-            {{ facture.conditions_paiement|linebreaks }}
-          {% else %}
-            <p>Aucune condition de paiement spécifiée.</p>
-          {% endif %}
+          <p>{{ facture.conditions_paiement|default:"No specific payment terms"|linebreaks }}</p>
         </div>
       </div>
     </div>
+    
     <div class="col-md-6">
       <div class="card mb-4">
         <div class="card-header">
@@ -303,60 +309,8 @@
           Notes
         </div>
         <div class="card-body">
-          {% if facture.notes %}
-            {{ facture.notes|linebreaks }}
-          {% else %}
-            <p>Aucune note.</p>
-          {% endif %}
+          <p>{{ facture.notes|default:"No notes"|linebreaks }}</p>
         </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Paiement associé -->
-  {% if facture.paiement %}
-  <div class="card mb-4 no-print">
-    <div class="card-header">
-      <i class="fas fa-money-bill-wave me-1"></i>
-      Paiement associé
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-6">
-          <p><strong>Référence:</strong> {{ facture.paiement.reference|default:"Non spécifié" }}</p>
-          <p><strong>Date de paiement:</strong> {{ facture.paiement.date_paiement|date:"d/m/Y" }}</p>
-          <p><strong>Statut:</strong> 
-            {% for value, label in facture.paiement.STATUT_CHOICES %}
-              {% if value == facture.paiement.statut %}{{ label }}{% endif %}
-            {% endfor %}
-          </p>
-        </div>
-        <div class="col-md-6">
-          <p><strong>Mode de paiement:</strong> 
-            {% for value, label in facture.paiement.MODE_PAIEMENT_CHOICES %}
-              {% if value == facture.paiement.mode_paiement %}{{ label }}{% endif %}
-            {% endfor %}
-          </p>
-          <p><strong>Montant:</strong> {{ facture.paiement.montant|floatformat:2 }} €</p>
-          <p>
-            <a href="{% url 'paiements:paiement-detail' paiement_id=facture.paiement.paiement_id %}" class="btn btn-sm btn-outline-primary">
-              <i class="fas fa-eye me-1"></i> Voir le paiement
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-  
-  <!-- Pied de page pour impression -->
-  <div class="d-none d-print-block mt-5">
-    <div class="row">
-      <div class="col-12 text-center">
-        <p>Formatrix - Centre de formation professionnelle</p>
-        <p>123 Avenue de la Formation, 75000 Paris - Tél: 01 23 45 67 89</p>
-        <p>SIRET: 123 456 789 00012 - N° TVA: FR12 123 456 789</p>
-        <p>contact@formatrix.fr - www.formatrix.fr</p>
       </div>
     </div>
   </div>
@@ -366,7 +320,7 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Activer les tooltips Bootstrap
+    // Enable Bootstrap tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl);

@@ -6,21 +6,21 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class Formateur(models.Model):
-    STATUT_CHOICES = [
-        ('actif', 'Actif'),
-        ('inactif', 'Inactif'),
-        ('en_conge', 'En congé')
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('on_leave', 'On Leave')
     ]
 
-    NIVEAU_CHOICES = [
-        ('debutant', 'Débutant'),
-        ('intermediaire', 'Intermédiaire'),
+    LEVEL_CHOICES = [
+        ('beginner', 'Beginner'),
+        ('intermediate', 'Intermediate'),
         ('expert', 'Expert')
     ]
 
     TYPE_CHOICES = [
-        ('interne', 'Interne'),
-        ('externe', 'Externe'),
+        ('internal', 'Internal'),
+        ('external', 'External'),
         ('consultant', 'Consultant')
     ]
 
@@ -36,14 +36,14 @@ class Formateur(models.Model):
     specialites = models.TextField(verbose_name="Spécialités", null=True, blank=True)
     niveau_expertise = models.CharField(
         max_length=20, 
-        choices=NIVEAU_CHOICES,
-        default='intermediaire',
+        choices=LEVEL_CHOICES,
+        default='intermediate',
         verbose_name="Niveau d'expertise"
     )
     type_formateur = models.CharField(
         max_length=20,
         choices=TYPE_CHOICES,
-        default='interne',
+        default='internal',
         verbose_name="Type de formateur"
     )
     cv = models.FileField(
@@ -61,8 +61,8 @@ class Formateur(models.Model):
     date_embauche = models.DateField(verbose_name="Date d'embauche", null=True, blank=True)
     statut = models.CharField(
         max_length=20,
-        choices=STATUT_CHOICES,
-        default='actif',
+        choices=STATUS_CHOICES,
+        default='active',
         verbose_name="Statut"
     )
     disponibilite = models.TextField(
@@ -94,12 +94,12 @@ class Formateur(models.Model):
     def get_full_name(self):
         return f"{self.prenom} {self.nom}"
 
-    def get_cours_actifs(self):
+    def get_active_courses(self):
         from cours.models import Cours
-        return Cours.objects.filter(formateurs=self, statut_approbation='approuve')
+        return Cours.objects.filter(formateurs=self, statut_approbation='approved')
 
-    def est_disponible(self):
-        return self.statut == 'actif'
+    def is_available(self):
+        return self.statut == 'active'
 
 @receiver(post_save, sender=Formateur)
 def create_formateur_notification(sender, instance, created, **kwargs):

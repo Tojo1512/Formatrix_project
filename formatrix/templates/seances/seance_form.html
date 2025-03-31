@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if form.instance.pk %}Modifier{% else %}Créer{% endif %} une Séance - Formatrix{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Session - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
@@ -12,10 +12,10 @@
   <div class="form-header">
     <h1 class="form-title">
       <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
-      {% if form.instance.pk %}Modifier{% else %}Créer{% endif %} une Séance
+      {% if form.instance.pk %}Edit{% else %}Create{% endif %} Session
     </h1>
     <a href="{% url 'seances:seance-list' %}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left"></i> Retour
+      <i class="fas fa-arrow-left"></i> Back
     </a>
   </div>
 
@@ -30,7 +30,7 @@
   </div>
   {% endif %}
 
-  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+  <p class="text-muted">Fill in all required fields marked with <span class="text-danger">*</span></p>
 
   {% if form.non_field_errors %}
   <div class="alert alert-danger">
@@ -43,18 +43,18 @@
   <form method="post" novalidate>
     {% csrf_token %}
     
-    <!-- Informations générales -->
+    <!-- General Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-info-circle"></i>
-        Informations générales
+        General Information
       </h3>
       
       <div class="row">
         <div class="col-md-6">
           <div class="form-group {% if form.cours.errors %}has-error{% endif %}">
             <label for="{{ form.cours.id_for_label }}">
-              Cours <span class="text-danger">*</span>
+              Course <span class="text-danger">*</span>
             </label>
             {{ form.cours }}
             {% if form.cours.errors %}
@@ -73,13 +73,13 @@
         <div class="col-md-6">
           <div class="form-group {% if form.lieu.errors %}has-error{% endif %}">
             <label for="{{ form.lieu.id_for_label }}">
-              Lieu <span class="text-danger">*</span>
+              Location <span class="text-danger">*</span>
             </label>
             <div class="input-group">
               {{ form.lieu }}
               <div class="input-group-append">
                 <a href="{% url 'lieux:lieu-create' %}?next={{ request.path }}" class="btn btn-primary">
-                  <i class="fas fa-plus"></i> Ajouter
+                  <i class="fas fa-plus"></i> Add
                 </a>
               </div>
             </div>
@@ -120,7 +120,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.statut.errors %}has-error{% endif %}">
             <label for="{{ form.statut.id_for_label }}">
-              Statut <span class="text-danger">*</span>
+              Status <span class="text-danger">*</span>
             </label>
             {{ form.statut }}
             {% if form.statut.errors %}
@@ -138,18 +138,18 @@
       </div>
     </div>
     
-    <!-- Capacité et Prix -->
+    <!-- Capacity and Price -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-users"></i>
-        Capacité et Prix
+        Capacity and Price
       </h3>
       
       <div class="row">
         <div class="col-md-4">
           <div class="form-group {% if form.nombre_places.errors %}has-error{% endif %}">
             <label for="{{ form.nombre_places.id_for_label }}">
-              Nombre de places <span class="text-danger">*</span>
+              Number of spots <span class="text-danger">*</span>
             </label>
             {{ form.nombre_places }}
             {% if form.nombre_places.errors %}
@@ -168,9 +168,9 @@
         <div class="col-md-4">
           <div class="form-group {% if form.duree.errors %}has-error{% endif %}">
             <label for="{{ form.duree.id_for_label }}">
-              Durée (mois) <span class="text-danger">*</span>
+              Duration (months) <span class="text-danger">*</span>
             </label>
-            <input type="number" name="duree" min="1" class="form-control" id="{{ form.duree.id_for_label }}" placeholder="Durée en mois" value="{{ form.duree.value|default:'1' }}" required>
+            <input type="number" name="duree" min="1" class="form-control" id="{{ form.duree.id_for_label }}" placeholder="Duration in months" value="{{ form.duree.value|default:'1' }}" required>
             {% if form.duree.errors %}
             <div class="error-message">
               {% for error in form.duree.errors %}
@@ -187,7 +187,7 @@
         <div class="col-md-4">
           <div class="form-group {% if form.prix.errors %}has-error{% endif %}">
             <label for="{{ form.prix.id_for_label }}">
-              Prix (€) <span class="text-danger">*</span>
+              Price (€) <span class="text-danger">*</span>
             </label>
             {{ form.prix }}
             {% if form.prix.errors %}
@@ -205,18 +205,18 @@
       </div>
     </div>
     
-    <!-- Formateurs -->
+    <!-- Trainers -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-chalkboard-teacher"></i>
-        Formateurs
+        Trainers
       </h3>
       
       <div class="row">
         <div class="col-md-12">
           <div class="form-group">
             <label for="id_formateurs">
-              Formateurs assignés <span class="text-danger">*</span>
+              Assigned trainers <span class="text-danger">*</span>
             </label>
             <select name="formateurs" id="id_formateurs" class="form-control" multiple size="5" required>
               {% for formateur in formateurs_actifs %}
@@ -225,21 +225,21 @@
                 </option>
               {% endfor %}
             </select>
-            <small class="form-text text-muted">Sélectionnez les formateurs qui animeront cette séance.</small>
+            <small class="form-text text-muted">Select the trainers who will lead this session.</small>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Boutons de soumission -->
+    <!-- Submission buttons -->
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">
         <i class="fas fa-save"></i>
-        {% if form.instance.pk %}Mettre à jour{% else %}Créer{% endif %}
+        {% if form.instance.pk %}Update{% else %}Create{% endif %}
       </button>
       <a href="{% url 'seances:seance-list' %}" class="btn btn-secondary">
         <i class="fas fa-times"></i>
-        Annuler
+        Cancel
       </a>
     </div>
   </form>
@@ -250,29 +250,29 @@
 {% block extra_js %}
 <script>
   $(document).ready(function() {
-    // Initialiser les sélecteurs avec Select2
+    // Initialize selectors with Select2
     $('#id_cours').select2({
-      placeholder: "Sélectionnez un cours",
+      placeholder: "Select a course",
       allowClear: true
     });
     
     $('#id_lieu').select2({
-      placeholder: "Sélectionnez un lieu",
+      placeholder: "Select a location",
       allowClear: true
     });
     
     $('#id_formateurs').select2({
-      placeholder: "Sélectionnez au moins deux formateurs",
+      placeholder: "Select at least two trainers",
       allowClear: true
     });
     
-    // Initialiser le datepicker
+    // Initialize datepicker
     $('#id_date').datepicker({
       format: 'yyyy-mm-dd',
       autoclose: true,
       todayBtn: 'linked',
       todayHighlight: true,
-      language: 'fr'
+      language: 'en'
     });
   });
 </script>

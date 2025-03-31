@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-  {% if form.instance.pk %}Modifier le lieu{% else %}Créer un lieu{% endif %} - Formatrix
+  {% if form.instance.pk %}Edit location{% else %}Create location{% endif %} - Formatrix
 {% endblock %}
 
 {% block extra_css %}
@@ -14,10 +14,10 @@
   <div class="form-header">
     <h1 class="form-title">
       <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
-      {% if form.instance.pk %}Modifier{% else %}Créer{% endif %} un lieu
+      {% if form.instance.pk %}Edit{% else %}Create{% endif %} location
     </h1>
     <a href="{{ request.GET.next|default:'/' }}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left"></i> Retour
+      <i class="fas fa-arrow-left"></i> Back
     </a>
   </div>
 
@@ -32,7 +32,7 @@
   </div>
   {% endif %}
 
-  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+  <p class="text-muted">Fill in all required fields marked with a <span class="text-danger">*</span></p>
 
   {% if form.non_field_errors %}
   <div class="alert alert-danger">
@@ -45,18 +45,18 @@
   <form method="post" novalidate>
     {% csrf_token %}
     
-    <!-- Informations du lieu -->
+    <!-- Location Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-map-marker-alt"></i>
-        Informations du lieu
+        Location Information
       </h3>
       
       <div class="row">
         <div class="col-md-6">
           <div class="form-group {% if form.lieu.errors %}has-error{% endif %}">
             <label for="{{ form.lieu.id_for_label }}">
-              Nom du lieu <span class="text-danger">*</span>
+              Location Name <span class="text-danger">*</span>
             </label>
             {{ form.lieu }}
             {% if form.lieu.errors %}
@@ -75,7 +75,7 @@
         <div class="col-md-6">
           <div class="form-group {% if form.adresse.errors %}has-error{% endif %}">
             <label for="{{ form.adresse.id_for_label }}">
-              Adresse complète <span class="text-danger">*</span>
+              Complete Address <span class="text-danger">*</span>
             </label>
             {{ form.adresse }}
             {% if form.adresse.errors %}
@@ -97,14 +97,14 @@
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-phone"></i>
-        Coordonnées de contact
+        Contact Information
       </h3>
       
       <div class="row">
         <div class="col-md-4">
           <div class="form-group {% if form.personne_contact.errors %}has-error{% endif %}">
             <label for="{{ form.personne_contact.id_for_label }}">
-              Personne de contact
+              Contact Person
             </label>
             {{ form.personne_contact }}
             {% if form.personne_contact.errors %}
@@ -123,7 +123,7 @@
         <div class="col-md-4">
           <div class="form-group {% if form.telephone.errors %}has-error{% endif %}">
             <label for="{{ form.telephone.id_for_label }}">
-              Téléphone
+              Phone
             </label>
             {{ form.telephone }}
             {% if form.telephone.errors %}
@@ -160,15 +160,15 @@
       </div>
     </div>
     
-    <!-- Boutons de soumission -->
+    <!-- Submit Buttons -->
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">
         <i class="fas fa-save"></i>
-        {% if form.instance.pk %}Mettre à jour{% else %}Créer{% endif %}
+        {% if form.instance.pk %}Update{% else %}Create{% endif %}
       </button>
       <a href="{{ request.GET.next|default:'/' }}" class="btn btn-secondary">
         <i class="fas fa-times"></i>
-        Annuler
+        Cancel
       </a>
     </div>
   </form>
@@ -178,7 +178,7 @@
 {% block extra_js %}
 <script>
   $(document).ready(function() {
-    // Initialisation des éventuels widgets si nécessaire
+    // Initialize widgets if needed
   });
 </script>
 {% endblock %} 

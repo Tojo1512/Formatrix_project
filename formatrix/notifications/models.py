@@ -3,17 +3,17 @@ from django.contrib.auth.models import User
 
 class Notification(models.Model):
     TYPES = [
-        ('new_course', 'Nouveau cours'),
-        ('new_trainer', 'Nouveau formateur'),
+        ('new_course', 'New course'),
+        ('new_trainer', 'New trainer'),
     ]
     
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications', 
-                                   verbose_name="Destinataire")
+                                   verbose_name="Recipient")
     message = models.TextField(verbose_name="Message")
-    notification_type = models.CharField(max_length=20, choices=TYPES, verbose_name="Type de notification")
-    related_id = models.IntegerField(verbose_name="ID associé", help_text="ID du cours ou du formateur concerné")
-    is_read = models.BooleanField(default=False, verbose_name="Lue")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    notification_type = models.CharField(max_length=20, choices=TYPES, verbose_name="Notification type")
+    related_id = models.IntegerField(verbose_name="Related ID", help_text="ID of the course or trainer concerned")
+    is_read = models.BooleanField(default=False, verbose_name="Read")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creation date")
     
     class Meta:
         ordering = ['-created_at']

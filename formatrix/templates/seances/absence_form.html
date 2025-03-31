@@ -3,196 +3,262 @@
 
 {% block title %}
   {% if absence %}
-    Modifier l'absence - Séance du {{ seance.date|date:"d/m/Y" }}
+    Edit Absence - Session on {{ seance.date|date:"d/m/Y" }}
   {% else %}
-    Signaler une absence - Séance du {{ seance.date|date:"d/m/Y" }}
+    Report Absence - Session on {{ seance.date|date:"d/m/Y" }}
   {% endif %}
   - Formatrix
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/forms.css' %}">
-<style>
-  .card-container {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  
-  .form-header {
-    margin-bottom: 30px;
-  }
-  
-  .form-section {
-    margin-bottom: 30px;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #f8f9fa;
-  }
-  
-  .section-title {
-    margin-bottom: 20px;
-    color: #495057;
-    font-weight: 600;
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 10px;
-  }
-  
-  .notes {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border-left: 4px solid #3498db;
-  }
-  
-  .notes-title {
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #3498db;
-  }
-  
-  .notes-content {
-    color: #6c757d;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/form.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="card-container">
+<div class="form-container">
   <div class="form-header">
-    <h2>
+    <h1 class="form-title">
       <i class="fas {% if absence %}fa-edit{% else %}fa-user-clock{% endif %}"></i>
       {% if absence %}
-        Modifier l'absence
+        Edit Absence
       {% else %}
-        Signaler une absence
+        Report Absence
       {% endif %}
-    </h2>
-    <a href="{% url 'seances:absence_list' seance.seance_id %}" class="btn btn-outline">
-      <i class="fas fa-arrow-left"></i>
-      Retour à la liste des absences
+    </h1>
+    <a href="{% url 'seances:absence_list' seance.seance_id %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Back
     </a>
   </div>
 
   {% if messages %}
+  <div>
     {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
-        {{ message }}
-      </div>
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %}"></i>
+      {{ message }}
+    </div>
     {% endfor %}
+  </div>
   {% endif %}
 
+  <p class="text-muted">Fill in all required fields marked with <span class="text-danger">*</span></p>
+
   {% if form.non_field_errors %}
-    <div class="alert alert-danger">
-      {% for error in form.non_field_errors %}
-        {{ error }}
-      {% endfor %}
-    </div>
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+    {{ error }}
+    {% endfor %}
+  </div>
   {% endif %}
 
   <form method="post" novalidate>
     {% csrf_token %}
     
+    <!-- Session Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-info-circle"></i>
-        Informations sur la séance
+        Session Information
       </h3>
       
-      <div class="info-item">
-        <span class="info-label">Cours:</span>
-        <span class="info-value">{{ seance.cours.nom_cours }}</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Date:</span>
-        <span class="info-value">{{ seance.date|date:"d/m/Y" }}</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Lieu:</span>
-        <span class="info-value">{{ seance.lieu.lieu }}</span>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="info-item">
+            <span class="info-label">Course</span>
+            <span class="info-value">{{ seance.cours.nom_cours }}</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="info-item">
+            <span class="info-label">Date</span>
+            <span class="info-value">{{ seance.date|date:"d/m/Y" }}</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="info-item">
+            <span class="info-label">Location</span>
+            <span class="info-value">{{ seance.lieu.lieu }}</span>
+          </div>
+        </div>
       </div>
     </div>
     
+    <!-- Absence Details -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-user-times"></i>
-        Détails de l'absence
+        Absence Details
       </h3>
       
-      <div class="form-group {% if form.formateur_absent.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.formateur_absent.id_for_label }}">
-          <i class="fas fa-user"></i>
-          Formateur absent <span class="text-danger">*</span>
-        </label>
-        {{ form.formateur_absent }}
-        {% include "includes/field_errors.html" with field=form.formateur_absent %}
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group {% if form.formateur_absent.errors %}has-error{% endif %}">
+            <label for="{{ form.formateur_absent.id_for_label }}">
+              Absent Trainer <span class="text-danger">*</span>
+            </label>
+            {{ form.formateur_absent }}
+            {% if form.formateur_absent.errors %}
+            <div class="error-message">
+              {% for error in form.formateur_absent.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.formateur_absent.help_text %}
+            <small class="form-text text-muted">{{ form.formateur_absent.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group {% if form.date_absence.errors %}has-error{% endif %}">
+            <label for="{{ form.date_absence.id_for_label }}">
+              Absence Date <span class="text-danger">*</span>
+            </label>
+            {{ form.date_absence }}
+            {% if form.date_absence.errors %}
+            <div class="error-message">
+              {% for error in form.date_absence.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.date_absence.help_text %}
+            <small class="form-text text-muted">{{ form.date_absence.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
       </div>
       
-      <div class="form-group {% if form.date_absence.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.date_absence.id_for_label }}">
-          <i class="fas fa-calendar"></i>
-          Date d'absence <span class="text-danger">*</span>
-        </label>
-        {{ form.date_absence }}
-        {% include "includes/field_errors.html" with field=form.date_absence %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group {% if form.raison.errors %}has-error{% endif %}">
+            <label for="{{ form.raison.id_for_label }}">
+              Reason <span class="text-danger">*</span>
+            </label>
+            {{ form.raison }}
+            {% if form.raison.errors %}
+            <div class="error-message">
+              {% for error in form.raison.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.raison.help_text %}
+            <small class="form-text text-muted">{{ form.raison.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
       </div>
       
-      <div class="form-group {% if form.raison.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.raison.id_for_label }}">
-          <i class="fas fa-clipboard-list"></i>
-          Raison <span class="text-danger">*</span>
-        </label>
-        {{ form.raison }}
-        {% include "includes/field_errors.html" with field=form.raison %}
-      </div>
-      
-      <div class="form-group {% if form.details.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.details.id_for_label }}">
-          <i class="fas fa-clipboard"></i>
-          Détails
-        </label>
-        {{ form.details }}
-        {% include "includes/field_errors.html" with field=form.details %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group {% if form.details.errors %}has-error{% endif %}">
+            <label for="{{ form.details.id_for_label }}">
+              Details
+            </label>
+            {{ form.details }}
+            {% if form.details.errors %}
+            <div class="error-message">
+              {% for error in form.details.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.details.help_text %}
+            <small class="form-text text-muted">{{ form.details.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
     
+    <!-- Replacement Trainer -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-user-plus"></i>
-        Formateur remplaçant
+        Replacement Trainer
       </h3>
       
-      <div class="form-group {% if form.formateur_remplacant.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.formateur_remplacant.id_for_label }}">
-          <i class="fas fa-user-check"></i>
-          Remplaçant
-        </label>
-        {{ form.formateur_remplacant }}
-        {% include "includes/field_errors.html" with field=form.formateur_remplacant %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group {% if form.formateur_remplacant.errors %}has-error{% endif %}">
+            <label for="{{ form.formateur_remplacant.id_for_label }}">
+              Replacement Trainer
+            </label>
+            {{ form.formateur_remplacant }}
+            {% if form.formateur_remplacant.errors %}
+            <div class="error-message">
+              {% for error in form.formateur_remplacant.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.formateur_remplacant.help_text %}
+            <small class="form-text text-muted">{{ form.formateur_remplacant.help_text }}</small>
+            {% endif %}
+          </div>
+        </div>
       </div>
       
-      <div class="notes">
-        <div class="notes-title">
-          <i class="fas fa-info-circle"></i> Note importante
-        </div>
-        <div class="notes-content">
-          <p>Un remplacement est nécessaire si l'absence a lieu pendant la session. Si aucun formateur n'est disponible pour remplacer, veuillez contacter l'administration dans les plus brefs délais.</p>
-          <p>Le remplaçant doit avoir les compétences appropriées pour assurer la continuité de la formation.</p>
+      <div class="alert alert-info mt-3">
+        <div class="d-flex">
+          <div class="me-3">
+            <i class="fas fa-info-circle"></i>
+          </div>
+          <div>
+            <h5 class="alert-heading">Important Note</h5>
+            <p>A replacement is necessary if the absence occurs during the session. If no trainer is available for replacement, please contact the administration as soon as possible.</p>
+            <p class="mb-0">The replacement must have the appropriate skills to ensure the continuity of the training.</p>
+          </div>
         </div>
       </div>
     </div>
     
+    <!-- Submission buttons -->
     <div class="form-actions">
-      <a href="{% url 'seances:absence_list' seance.seance_id %}" class="btn btn-outline">
-        <i class="fas fa-times"></i>
-        Annuler
-      </a>
       <button type="submit" class="btn btn-primary">
         <i class="fas {% if absence %}fa-save{% else %}fa-plus{% endif %}"></i>
-        {% if absence %}Enregistrer les modifications{% else %}Signaler l'absence{% endif %}
+        {% if absence %}Update{% else %}Report{% endif %}
       </button>
+      <a href="{% url 'seances:absence_list' seance.seance_id %}" class="btn btn-secondary">
+        <i class="fas fa-times"></i>
+        Cancel
+      </a>
     </div>
   </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function() {
+    // Initialize Select2 for dropdowns
+    if ($.fn.select2) {
+      $('#id_formateur_absent').select2({
+        placeholder: "Select the absent trainer",
+        allowClear: true
+      });
+      
+      $('#id_formateur_remplacant').select2({
+        placeholder: "Select a replacement trainer",
+        allowClear: true
+      });
+      
+      $('#id_raison').select2({
+        placeholder: "Select a reason",
+        allowClear: true
+      });
+    }
+    
+    // Initialize datepicker if available
+    if ($.fn.datepicker) {
+      $('#id_date_absence').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        todayHighlight: true
+      });
+    }
+  });
+</script>
 {% endblock %} 

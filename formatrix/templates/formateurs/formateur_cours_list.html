@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} - Formatrix{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cours/list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h1 class="page-title">{{ page_title }}</h1>
+    <div class="ms-auto">
+      <a href="{% if formateur %}{% url 'formateurs:formateur-detail' formateur.formateurid %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card">
+    <div class="card-header">
+      <h4 class="card-title">Filters</h4>
+    </div>
+    <div class="card-body">
+      <form method="get" class="filter-form">
+        <div class="row">
+          <div class="col-md-5">
+            <div class="form-group">
+              <label for="search">Search</label>
+              <input type="text" class="form-control" id="search" name="search" placeholder="Search for a course..." value="{{ search_query }}">
+            </div>
+          </div>
+          <div class="col-md-5">
+            <div class="form-group">
+              <label for="status">Status</label>
+              <select class="form-control" id="status" name="status">
+                <option value="">All statuses</option>
+                <option value="en_attente" {% if status_filter == 'en_attente' %}selected{% endif %}>Pending</option>
+                <option value="approuve" {% if status_filter == 'approuve' %}selected{% endif %}>Approved</option>
+                <option value="refuse" {% if status_filter == 'refuse' %}selected{% endif %}>Rejected</option>
+                <option value="expire" {% if status_filter == 'expire' %}selected{% endif %}>Expired</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="fas fa-filter me-2"></i>Filter
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Course List -->
+  <div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="card-title mb-0">Course List</h4>
+    </div>
+    <div class="card-body">
+      {% if cours_list %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Course Name</th>
+                <th>Type</th>
+                <th>Level</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cours in cours_list %}
+                <tr>
+                  <td>{{ cours.nom_cours }}</td>
+                  <td>
+                    <span class="badge bg-info">{{ cours.get_type_cours_display }}</span>
+                  </td>
+                  <td>{{ cours.niveau }}</td>
+                  <td>{{ cours.duree_heures }} hours</td>
+                  <td>
+                    <span class="badge {% if cours.statut_approbation == 'approuve' %}bg-success
+                      {% elif cours.statut_approbation == 'en_attente' %}bg-warning
+                      {% elif cours.statut_approbation == 'refuse' %}bg-danger
+                      {% else %}bg-secondary{% endif %}">
+                      {{ cours.get_statut_approbation_display }}
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <a href="{% url 'cours:cours-detail' cours.cours_id %}" class="btn btn-sm btn-info">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+              
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+              
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        {% endif %}
+      {% else %}
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>No courses found.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %} 

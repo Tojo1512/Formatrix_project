@@ -1,238 +1,180 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Absences - Séance du {{ seance.date|date:"d/m/Y" }} - Formatrix{% endblock %}
+{% block title %}Absences - Session on {{ seance.date|date:"d/m/Y" }} - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/table.css' %}">
-<style>
-  .absence-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-  
-  .absence-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-  }
-  
-  .absence-body {
-    padding: 15px;
-  }
-  
-  .absence-content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  
-  .absence-section {
-    flex: 1;
-    min-width: 250px;
-  }
-  
-  .absence-status {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 0.85rem;
-  }
-  
-  .status-remplace {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .status-non-remplace {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .absence-formateur {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .formateur-avatar-sm {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 12px;
-    object-fit: cover;
-    border: 2px solid #3498db;
-  }
-  
-  .formateur-initials-sm {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 12px;
-    background-color: #3498db;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 1rem;
-  }
-  
-  .absence-actions {
-    margin-top: 15px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  
-  .empty-state {
-    text-align: center;
-    padding: 50px 20px;
-  }
-  
-  .empty-state i {
-    font-size: 3rem;
-    color: #adb5bd;
-    margin-bottom: 20px;
-  }
-  
-  .empty-state p {
-    font-size: 1.2rem;
-    color: #6c757d;
-    margin-bottom: 20px;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/apprenants/list.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="page-header">
-    <h2>
-      <i class="fas fa-user-clock"></i> 
-      Gestion des absences - Séance du {{ seance.date|date:"d/m/Y" }}
-    </h2>
-    <div class="header-actions">
-      <a href="{% url 'seances:seance-detail' seance.seance_id %}" class="btn btn-outline">
-        <i class="fas fa-arrow-left"></i> 
-        Retour au détail de la séance
-      </a>
-      <a href="{% url 'seances:absence_create' seance.seance_id %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> 
-        Signaler une absence
-      </a>
+<div class="page-inner">
+  <div class="page-header mb-4">
+    <h1 class="page-title">
+      <i class="fas fa-user-clock me-2"></i> 
+      Absence Management - Session on {{ seance.date|date:"d/m/Y" }}
+    </h1>
+    <div class="ms-auto">
+      <div class="btn-group">
+        <a href="{% url 'seances:seance-detail' seance.seance_id %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left me-2"></i>Back to session
+        </a>
+        <a href="{% url 'seances:absence_create' seance.seance_id %}" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Report an absence
+        </a>
+      </div>
     </div>
   </div>
   
   {% if messages %}
+  <div class="mb-4">
     {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
-        {{ message }}
-      </div>
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'info' %}fa-info-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% endif %} me-2"></i>
+      {{ message }}
+    </div>
     {% endfor %}
+  </div>
   {% endif %}
   
-  <div class="section-info mb-4">
-    <div class="info-box">
-      <div class="info-icon">
-        <i class="fas fa-info-circle"></i>
-      </div>
-      <div class="info-content">
-        <h4>Informations sur la séance</h4>
-        <div class="info-details">
-          <span><strong>Cours:</strong> {{ seance.cours.nom_cours }}</span>
-          <span><strong>Lieu:</strong> {{ seance.lieu.lieu }}</span>
-          <span><strong>Nombre de formateurs assignés:</strong> {{ seance.formateurs.count }}</span>
+  <!-- Session Information Card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="card-title mb-0">
+        <i class="fas fa-info-circle me-2"></i>Session Information
+      </h3>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="info-item">
+            <div class="info-label">Course</div>
+            <div class="info-value">{{ seance.cours.nom_cours }}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="info-item">
+            <div class="info-label">Location</div>
+            <div class="info-value">{{ seance.lieu.lieu }}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="info-item">
+            <div class="info-label">Number of trainers</div>
+            <div class="info-value">{{ seance.formateurs.count }}</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
   
   {% if absences %}
-    <div class="absence-list">
-      {% for absence in absences %}
-        <div class="absence-card">
-          <div class="absence-header">
-            <h3>Absence du {{ absence.date_absence|date:"d/m/Y" }}</h3>
-            <span class="absence-status {% if absence.est_remplace %}status-remplace{% else %}status-non-remplace{% endif %}">
-              {% if absence.est_remplace %}Remplacé{% else %}Non remplacé{% endif %}
-            </span>
-          </div>
-          <div class="absence-body">
-            <div class="absence-content">
-              <div class="absence-section">
-                <h4>Formateur absent</h4>
-                <div class="absence-formateur">
-                  {% if absence.formateur_absent.photo %}
-                    <img src="{{ absence.formateur_absent.photo.url }}" alt="{{ absence.formateur_absent.get_full_name }}" class="formateur-avatar-sm">
-                  {% else %}
-                    <div class="formateur-initials-sm">
-                      {{ absence.formateur_absent.prenom.0 }}{{ absence.formateur_absent.nom.0 }}
+  <!-- List of absences -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title mb-0">
+        <i class="fas fa-user-times me-2"></i>Reported Absences
+      </h3>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Absent Trainer</th>
+              <th>Date</th>
+              <th>Reason</th>
+              <th>Replacement</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for absence in absences %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm bg-primary-light rounded me-2">
+                      {% if absence.formateur_absent.photo %}
+                        <img src="{{ absence.formateur_absent.photo.url }}" alt="{{ absence.formateur_absent.get_full_name }}" class="img-fluid">
+                      {% else %}
+                        <div class="avatar-text">
+                          {{ absence.formateur_absent.prenom.0 }}{{ absence.formateur_absent.nom.0 }}
+                        </div>
+                      {% endif %}
                     </div>
-                  {% endif %}
-                  <div>
-                    <strong>{{ absence.formateur_absent.get_full_name }}</strong>
-                    <div class="formateur-type">{{ absence.formateur_absent.get_type_formateur_display }}</div>
-                  </div>
-                </div>
-                <p>
-                  <strong>Raison:</strong> {{ absence.get_raison_display }}
-                </p>
-                {% if absence.details %}
-                  <p>
-                    <strong>Détails:</strong> {{ absence.details }}
-                  </p>
-                {% endif %}
-              </div>
-              <div class="absence-section">
-                <h4>Formateur remplaçant</h4>
-                {% if absence.formateur_remplacant %}
-                  <div class="absence-formateur">
-                    {% if absence.formateur_remplacant.photo %}
-                      <img src="{{ absence.formateur_remplacant.photo.url }}" alt="{{ absence.formateur_remplacant.get_full_name }}" class="formateur-avatar-sm">
-                    {% else %}
-                      <div class="formateur-initials-sm">
-                        {{ absence.formateur_remplacant.prenom.0 }}{{ absence.formateur_remplacant.nom.0 }}
-                      </div>
-                    {% endif %}
                     <div>
-                      <strong>{{ absence.formateur_remplacant.get_full_name }}</strong>
-                      <div class="formateur-type">{{ absence.formateur_remplacant.get_type_formateur_display }}</div>
+                      <div class="fw-bold">{{ absence.formateur_absent.get_full_name }}</div>
+                      <small class="text-muted">{{ absence.formateur_absent.get_type_formateur_display }}</small>
                     </div>
                   </div>
-                {% else %}
-                  <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i> 
-                    Aucun remplaçant n'a été désigné
+                </td>
+                <td>{{ absence.date_absence|date:"d/m/Y" }}</td>
+                <td>{{ absence.get_raison_display }}</td>
+                <td>
+                  {% if absence.formateur_remplacant %}
+                    <div class="d-flex align-items-center">
+                      <div class="avatar avatar-sm bg-success-light rounded me-2">
+                        {% if absence.formateur_remplacant.photo %}
+                          <img src="{{ absence.formateur_remplacant.photo.url }}" alt="{{ absence.formateur_remplacant.get_full_name }}" class="img-fluid">
+                        {% else %}
+                          <div class="avatar-text">
+                            {{ absence.formateur_remplacant.prenom.0 }}{{ absence.formateur_remplacant.nom.0 }}
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div>{{ absence.formateur_remplacant.get_full_name }}</div>
+                    </div>
+                  {% else %}
+                    <span class="text-danger"><i class="fas fa-times-circle me-1"></i>Not assigned</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge {% if absence.est_remplace %}bg-success{% else %}bg-danger{% endif %}">
+                    {% if absence.est_remplace %}Replaced{% else %}Not replaced{% endif %}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <div class="btn-group">
+                    <a href="{% url 'seances:absence_update' absence.absence_id %}" class="btn btn-sm btn-warning" title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'seances:absence_delete' absence.absence_id %}" class="btn btn-sm btn-danger" title="Delete">
+                      <i class="fas fa-trash"></i>
+                    </a>
                   </div>
-                {% endif %}
-              </div>
-            </div>
-            <div class="absence-actions">
-              <a href="{% url 'seances:absence_update' absence.absence_id %}" class="btn btn-warning">
-                <i class="fas fa-edit"></i> Modifier
-              </a>
-              <a href="{% url 'seances:absence_delete' absence.absence_id %}" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Supprimer
-              </a>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
   {% else %}
-    <div class="empty-state">
-      <i class="fas fa-calendar-check"></i>
-      <p>Aucune absence n'a été signalée pour cette séance.</p>
-      <a href="{% url 'seances:absence_create' seance.seance_id %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Signaler une absence
-      </a>
+  <div class="card mb-4">
+    <div class="card-body text-center py-5">
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i class="fas fa-calendar-check fa-4x text-muted mb-3"></i>
+        </div>
+        <h3>No absences reported</h3>
+        <p class="text-muted mb-4">No absences have been reported for this session yet.</p>
+        <a href="{% url 'seances:absence_create' seance.seance_id %}" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Report an absence
+        </a>
+      </div>
     </div>
+  </div>
   {% endif %}
+  
+  <div class="d-flex justify-content-between mt-4">
+    <a href="{% url 'seances:seance-detail' seance.seance_id %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to session
+    </a>
+    <a href="{% url 'seances:absence_create' seance.seance_id %}" class="btn btn-primary">
+      <i class="fas fa-plus me-2"></i>Report an absence
+    </a>
+  </div>
 </div>
 {% endblock %} 

@@ -6,16 +6,16 @@ class ClientForm(forms.ModelForm):
     email = forms.CharField(
         max_length=100, 
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'exemple@email.com'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'example@email.com'})
     )
     
     # Remplacer le ModelChoiceField par un ChoiceField avec des options fixes
     TYPE_CHOICES = [
-        ('', 'Sélectionnez un type (optionnel)'),
-        ('1', 'Entreprise'),
-        ('2', 'ONG'),
+        ('', 'Select a type (optional)'),
+        ('1', 'Company'),
+        ('2', 'NGO'),
         ('3', 'Sponsor'),
-        ('4', 'Autre')
+        ('4', 'Other')
     ]
     
     typeclientid = forms.ChoiceField(
@@ -31,21 +31,21 @@ class ClientForm(forms.ModelForm):
                  'typeclientid', 'personne_contact', 'fonction_contact', 'email_contact', 
                  'telephone_contact']
         labels = {
-            'nom_entite': 'Nom de l\'entité',
-            'sigle': 'Sigle/Acronyme',
-            'secteur_activite': 'Secteur d\'activité',
+            'nom_entite': 'Entity name',
+            'sigle': 'Acronym',
+            'secteur_activite': 'Business sector',
             'email': 'Email',
-            'localite': 'Localité',
-            'ville': 'Ville',
-            'numero_immatriculation': 'Numéro d\'immatriculation',
-            'adresse_siege': 'Adresse du siège',
-            'telephone': 'Téléphone',
-            'site_web': 'Site web',
-            'typeclientid': 'Type de client',
-            'personne_contact': 'Personne de contact',
-            'fonction_contact': 'Fonction',
-            'email_contact': 'Email de contact',
-            'telephone_contact': 'Téléphone de contact',
+            'localite': 'Location',
+            'ville': 'City',
+            'numero_immatriculation': 'Registration number',
+            'adresse_siege': 'Headquarters address',
+            'telephone': 'Phone',
+            'site_web': 'Website',
+            'typeclientid': 'Client type',
+            'personne_contact': 'Contact person',
+            'fonction_contact': 'Role',
+            'email_contact': 'Contact email',
+            'telephone_contact': 'Contact phone',
         }
         widgets = {
             'nom_entite': forms.TextInput(attrs={'class': 'form-control'}),
@@ -64,12 +64,12 @@ class ClientForm(forms.ModelForm):
         }
         
     def clean_email(self):
-        """Valider que l'email est au bon format"""
+        """Validate email format"""
         email = self.cleaned_data.get('email')
         if email:
-            # Vérification simple du format email
+            # Simple email format check
             if '@' not in email or '.' not in email:
-                raise forms.ValidationError("Veuillez entrer une adresse email valide.")
+                raise forms.ValidationError("Please enter a valid email address.")
         return email
 
     def clean_typeclientid(self):

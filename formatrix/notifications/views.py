@@ -9,13 +9,13 @@ from .models import Notification
 
 @login_required
 def notification_list(request):
-    """Affiche toutes les notifications de l'utilisateur"""
+    """Displays all notifications for the user"""
     notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
     return render(request, 'notifications/list.html', {'notifications': notifications})
 
 @login_required
 def mark_notification_read(request, notification_id):
-    """Marque une notification comme lue"""
+    """Marks a notification as read"""
     notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
     notification.is_read = True
     notification.save()
@@ -27,7 +27,7 @@ def mark_notification_read(request, notification_id):
 
 @login_required
 def mark_all_read(request):
-    """Marque toutes les notifications comme lues"""
+    """Marks all notifications as read"""
     Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -37,12 +37,12 @@ def mark_all_read(request):
 
 @login_required
 def get_unread_count(request):
-    """Retourne le nombre de notifications non lues pour l'utilisateur actuel"""
+    """Returns the count of unread notifications for the current user"""
     count = Notification.objects.filter(recipient=request.user, is_read=False).count()
     return JsonResponse({'count': count})
 
 def create_notification(message, notification_type, related_id):
-    """Crée des notifications pour tous les administrateurs"""
+    """Creates notifications for all administrators"""
     admin_users = User.objects.filter(is_staff=True)
     
     for user in admin_users:

@@ -57,7 +57,7 @@ class ClientListView(LoginRequiredMixin, ListView):
             'ville_filter': self.request.GET.get('ville', ''),
             'show_create_button': True,
             'create_url': '/clients/creer/',
-            'create_button_text': 'Créer un client',
+            'create_button_text': 'Create a client',
             'form_action': self.request.path,
             'reset_url': self.request.path,
             'has_active_filters': bool(
@@ -79,10 +79,10 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         try:
             client = form.save()
-            messages.success(self.request, f'Le client "{client.nom_entite}" a été créé avec succès!')
+            messages.success(self.request, f'Client "{client.nom_entite}" has been created successfully!')
             return redirect(reverse_lazy('clients:client-detail', kwargs={'pk': client.clientid}))
         except Exception as e:
-            messages.error(self.request, f'Erreur lors de la création du client: {str(e)}')
+            messages.error(self.request, f'Error creating client: {str(e)}')
             return self.form_invalid(form)
 
     def form_invalid(self, form):
@@ -112,10 +112,10 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         try:
             client = form.save()
-            messages.success(self.request, f'Le client "{client.nom_entite}" a été mis à jour avec succès!')
+            messages.success(self.request, f'Client "{client.nom_entite}" has been updated successfully!')
             return redirect(reverse_lazy('clients:client-detail', kwargs={'pk': client.clientid}))
         except Exception as e:
-            messages.error(self.request, f'Erreur lors de la mise à jour du client: {str(e)}')
+            messages.error(self.request, f'Error updating client: {str(e)}')
             return self.form_invalid(form)
 
     def form_invalid(self, form):

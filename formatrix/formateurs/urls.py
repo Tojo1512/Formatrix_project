@@ -10,4 +10,6 @@ urlpatterns = [
     path('<int:pk>/update/', views.FormateurUpdateView.as_view(), name='formateur-update'),
     path('<int:pk>/delete/', views.FormateurDeleteView.as_view(), name='formateur-delete'),
     path('register/', views.formateur_register, name='formateur-register'),
+    path('mes-cours/', views.FormateurCoursListView.as_view(), name='formateur-cours'),
+    path('<int:pk>/cours/', views.FormateurCoursListView.as_view(), name='formateur-cours-detail'),
 ] 

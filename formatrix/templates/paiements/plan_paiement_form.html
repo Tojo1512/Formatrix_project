@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if form.instance.plan_id %}Modifier{% else %}Nouveau{% endif %} plan de paiement - Formatrix{% endblock %}
+{% block title %}{% if form.instance.plan_id %}Edit{% else %}New{% endif %} Payment Plan - Formatrix{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -60,10 +60,10 @@
   <div class="form-header">
     <h1 class="form-title">
       <i class="fas {% if form.instance.plan_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
-      {% if form.instance.plan_id %}Modifier{% else %}Nouveau{% endif %} plan de paiement
+      {% if form.instance.plan_id %}Edit{% else %}New{% endif %} Payment Plan
     </h1>
     <a href="{% url 'paiements:plan-list' %}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left"></i> Retour à la liste
+      <i class="fas fa-arrow-left"></i> Back to list
     </a>
   </div>
 
@@ -78,7 +78,7 @@
   </div>
   {% endif %}
 
-  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+  <p class="text-muted">Fill in all required fields marked with <span class="text-danger">*</span></p>
 
   {% if form.non_field_errors %}
   <div class="alert alert-danger">
@@ -91,40 +91,40 @@
   <form method="post" novalidate>
     {% csrf_token %}
     
-    <!-- Informations principales -->
+    <!-- Main Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-info-circle"></i>
-        Informations principales
+        Main Information
       </h3>
       <div class="row">
         {% if not form.instance.plan_id %}
         <div class="col-md-12 mb-3">
-          <label for="{{ form.inscription.id_for_label }}" class="form-label">Inscription <span class="text-danger">*</span></label>
+          <label for="{{ form.inscription.id_for_label }}" class="form-label">Registration <span class="text-danger">*</span></label>
           {{ form.inscription }}
           {% if form.inscription.errors %}
           <div class="invalid-feedback d-block">
             {{ form.inscription.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Sélectionnez l'inscription associée à ce plan de paiement</div>
+          <div class="form-text">Select the registration associated with this payment plan</div>
         </div>
         {% endif %}
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.montant_total.id_for_label }}" class="form-label">Montant total (€) <span class="text-danger">*</span></label>
+          <label for="{{ form.montant_total.id_for_label }}" class="form-label">Total Amount (€) <span class="text-danger">*</span></label>
           {{ form.montant_total }}
           {% if form.montant_total.errors %}
           <div class="invalid-feedback d-block">
             {{ form.montant_total.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Montant total à payer pour cette inscription</div>
+          <div class="form-text">Total amount to pay for this registration</div>
         </div>
         
         {% if form.instance.plan_id %}
         <div class="col-md-6 mb-3">
-          <label for="{{ form.statut.id_for_label }}" class="form-label">Statut <span class="text-danger">*</span></label>
+          <label for="{{ form.statut.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
           {{ form.statut }}
           {% if form.statut.errors %}
           <div class="invalid-feedback d-block">
@@ -136,15 +136,15 @@
       </div>
     </div>
     
-    <!-- Configuration du plan -->
+    <!-- Plan Configuration -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-cog"></i>
-        Configuration du plan
+        Plan Configuration
       </h3>
       <div class="row">
         <div class="col-md-4 mb-3">
-          <label for="{{ form.nombre_versements.id_for_label }}" class="form-label">Nombre de versements <span class="text-danger">*</span></label>
+          <label for="{{ form.nombre_versements.id_for_label }}" class="form-label">Number of Installments <span class="text-danger">*</span></label>
           {{ form.nombre_versements }}
           {% if form.nombre_versements.errors %}
           <div class="invalid-feedback d-block">
@@ -154,7 +154,7 @@
         </div>
         
         <div class="col-md-4 mb-3">
-          <label for="{{ form.date_debut.id_for_label }}" class="form-label">Date du premier versement <span class="text-danger">*</span></label>
+          <label for="{{ form.date_debut.id_for_label }}" class="form-label">First Installment Date <span class="text-danger">*</span></label>
           {{ form.date_debut }}
           {% if form.date_debut.errors %}
           <div class="invalid-feedback d-block">
@@ -164,18 +164,18 @@
         </div>
         
         <div class="col-md-4 mb-3">
-          <label for="{{ form.intervalle_jours.id_for_label }}" class="form-label">Intervalle (jours) <span class="text-danger">*</span></label>
+          <label for="{{ form.intervalle_jours.id_for_label }}" class="form-label">Interval (days) <span class="text-danger">*</span></label>
           {{ form.intervalle_jours }}
           {% if form.intervalle_jours.errors %}
           <div class="invalid-feedback d-block">
             {{ form.intervalle_jours.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Nombre de jours entre chaque versement</div>
+          <div class="form-text">Number of days between each installment</div>
         </div>
         
         <div class="col-md-12 mb-3">
-          <label for="{{ form.commentaires.id_for_label }}" class="form-label">Commentaires</label>
+          <label for="{{ form.commentaires.id_for_label }}" class="form-label">Comments</label>
           {{ form.commentaires }}
           {% if form.commentaires.errors %}
           <div class="invalid-feedback d-block">
@@ -186,30 +186,30 @@
       </div>
     </div>
     
-    <!-- Échéancier généré -->
+    <!-- Generated Schedule -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-calculator"></i>
-        Calcul des versements
+        Installment Calculation
       </h3>
       <div class="alert alert-info">
         <i class="fas fa-info-circle me-2"></i>
-        L'échéancier ci-dessous est généré automatiquement en fonction des paramètres saisis. Il vous permet de visualiser les dates et montants des versements avant d'enregistrer le plan.
+        The schedule below is automatically generated based on the parameters entered. It allows you to preview the dates and amounts of the installments before saving the plan.
       </div>
       
       <div id="echeancier-container" class="mt-3">
         <div class="text-center py-3">
           <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Chargement...</span>
+            <span class="visually-hidden">Loading...</span>
           </div>
-          <p class="mt-2">Calcul de l'échéancier en cours...</p>
+          <p class="mt-2">Calculating schedule...</p>
         </div>
       </div>
     </div>
     
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save me-1"></i> Enregistrer
+        <i class="fas fa-save me-1"></i> Save
       </button>
     </div>
   </form>
@@ -219,7 +219,7 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Appliquer des classes Bootstrap aux champs du formulaire
+    // Apply Bootstrap classes to form fields
     const formControls = document.querySelectorAll('input, select, textarea');
     formControls.forEach(function(element) {
       if (element.tagName === 'SELECT') {
@@ -232,25 +232,25 @@
       }
     });
     
-    // Récupérer les éléments du formulaire
+    // Get form elements
     const montantTotalInput = document.getElementById('{{ form.montant_total.id_for_label }}');
     const nombreVersementsInput = document.getElementById('{{ form.nombre_versements.id_for_label }}');
     const dateDebutInput = document.getElementById('{{ form.date_debut.id_for_label }}');
     const intervalleJoursInput = document.getElementById('{{ form.intervalle_jours.id_for_label }}');
     const echeancierContainer = document.getElementById('echeancier-container');
     
-    // Fonction pour formater une date en français
+    // Function to format a date
     function formatDate(date) {
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return date.toLocaleDateString('fr-FR', options);
+      return date.toLocaleDateString('en-US', options);
     }
     
-    // Fonction pour formater un montant en euros
+    // Function to format an amount in euros
     function formatMontant(montant) {
-      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(montant);
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR' }).format(montant);
     }
     
-    // Fonction pour mettre à jour l'échéancier
+    // Function to update the schedule
     function updateEcheancier() {
       const montantTotal = parseFloat(montantTotalInput.value) || 0;
       const nombreVersements = parseInt(nombreVersementsInput.value) || 1;
@@ -258,7 +258,7 @@
       const intervalleJours = parseInt(intervalleJoursInput.value) || 30;
       
       if (isNaN(dateDebut.getTime()) || montantTotal <= 0 || nombreVersements <= 0) {
-        echeancierContainer.innerHTML = '<div class="alert alert-warning">Veuillez remplir tous les champs pour générer l\'échéancier.</div>';
+        echeancierContainer.innerHTML = '<div class="alert alert-warning">Please fill in all fields to generate the schedule.</div>';
         return;
       }
       
@@ -273,13 +273,13 @@
           <div class="echeancier-item">
             <div class="row align-items-center">
               <div class="col-md-2">
-                <span class="badge bg-primary">Versement ${i + 1}/${nombreVersements}</span>
+                <span class="badge bg-primary">Installment ${i + 1}/${nombreVersements}</span>
               </div>
               <div class="col-md-5">
                 <i class="fas fa-calendar-day me-1"></i> <strong>Date:</strong> ${formatDate(dateVersement)}
               </div>
               <div class="col-md-5">
-                <i class="fas fa-money-bill-wave me-1"></i> <strong>Montant:</strong> ${formatMontant(montantParVersement)}
+                <i class="fas fa-money-bill-wave me-1"></i> <strong>Amount:</strong> ${formatMontant(montantParVersement)}
               </div>
             </div>
           </div>
@@ -289,10 +289,10 @@
       echeancierContainer.innerHTML = html;
     }
     
-    // Mettre à jour l'échéancier au chargement de la page
+    // Update the schedule when the page loads
     updateEcheancier();
     
-    // Mettre à jour l'échéancier lorsque les valeurs changent
+    // Update the schedule when values change
     montantTotalInput.addEventListener('input', updateEcheancier);
     nombreVersementsInput.addEventListener('input', updateEcheancier);
     dateDebutInput.addEventListener('input', updateEcheancier);

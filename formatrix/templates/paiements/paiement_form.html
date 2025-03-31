@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{% if form.instance.paiement_id %}Modifier{% else %}Nouveau{% endif %} paiement - Formatrix{% endblock %}
+{% block title %}{% if form.instance.paiement_id %}Edit{% else %}New{% endif %} Payment - Formatrix{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -52,10 +52,10 @@
   <div class="form-header">
     <h1 class="form-title">
       <i class="fas {% if form.instance.paiement_id %}fa-edit{% else %}fa-plus-circle{% endif %}"></i>
-      {% if form.instance.paiement_id %}Modifier{% else %}Nouveau{% endif %} paiement
+      {% if form.instance.paiement_id %}Edit{% else %}New{% endif %} Payment
     </h1>
     <a href="{% url 'paiements:paiement-list' %}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left"></i> Retour à la liste
+      <i class="fas fa-arrow-left"></i> Back to list
     </a>
   </div>
 
@@ -73,16 +73,16 @@
   {% if inscriptions_count == 0 %}
   <div class="alert alert-warning">
     <i class="fas fa-exclamation-triangle me-2"></i>
-    <strong>Attention :</strong> Aucune inscription n'est disponible dans le système. Vous devez d'abord créer une inscription avant de pouvoir enregistrer un paiement.
+    <strong>Warning:</strong> No registrations available in the system. You must first create a registration before recording a payment.
     <div class="mt-3">
       <a href="{% url 'inscriptions:inscription-create' %}" class="btn btn-primary">
-        <i class="fas fa-plus-circle me-1"></i> Créer une inscription
+        <i class="fas fa-plus-circle me-1"></i> Create Registration
       </a>
     </div>
   </div>
   {% else %}
 
-  <p class="text-muted">Remplissez tous les champs obligatoires marqués d'un <span class="text-danger">*</span></p>
+  <p class="text-muted">Fill in all required fields marked with <span class="text-danger">*</span></p>
 
   {% if form.non_field_errors %}
   <div class="alert alert-danger">
@@ -95,26 +95,26 @@
   <form method="post" novalidate>
     {% csrf_token %}
     
-    <!-- Informations principales -->
+    <!-- Main Information -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-info-circle"></i>
-        Informations principales
+        Main Information
       </h3>
       <div class="row">
         <div class="col-md-12 mb-3">
-          <label for="{{ form.inscription.id_for_label }}" class="form-label">Inscription <span class="text-danger">*</span></label>
+          <label for="{{ form.inscription.id_for_label }}" class="form-label">Registration <span class="text-danger">*</span></label>
           {{ form.inscription }}
           {% if form.inscription.errors %}
           <div class="invalid-feedback d-block">
             {{ form.inscription.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Sélectionnez l'inscription associée à ce paiement</div>
+          <div class="form-text">Select the registration associated with this payment</div>
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.montant.id_for_label }}" class="form-label">Montant (€) <span class="text-danger">*</span></label>
+          <label for="{{ form.montant.id_for_label }}" class="form-label">Amount (€) <span class="text-danger">*</span></label>
           {{ form.montant }}
           {% if form.montant.errors %}
           <div class="invalid-feedback d-block">
@@ -124,7 +124,7 @@
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.statut.id_for_label }}" class="form-label">Statut <span class="text-danger">*</span></label>
+          <label for="{{ form.statut.id_for_label }}" class="form-label">Status <span class="text-danger">*</span></label>
           {{ form.statut }}
           {% if form.statut.errors %}
           <div class="invalid-feedback d-block">
@@ -135,15 +135,15 @@
       </div>
     </div>
     
-    <!-- Dates et échéances -->
+    <!-- Dates and Deadlines -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-calendar-alt"></i>
-        Dates et échéances
+        Dates and Deadlines
       </h3>
       <div class="row">
         <div class="col-md-6 mb-3">
-          <label for="{{ form.date_paiement.id_for_label }}" class="form-label">Date de paiement <span class="text-danger">*</span></label>
+          <label for="{{ form.date_paiement.id_for_label }}" class="form-label">Payment date <span class="text-danger">*</span></label>
           {{ form.date_paiement }}
           {% if form.date_paiement.errors %}
           <div class="invalid-feedback d-block">
@@ -153,27 +153,27 @@
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.date_echeance.id_for_label }}" class="form-label">Date d'échéance</label>
+          <label for="{{ form.date_echeance.id_for_label }}" class="form-label">Due date</label>
           {{ form.date_echeance }}
           {% if form.date_echeance.errors %}
           <div class="invalid-feedback d-block">
             {{ form.date_echeance.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Date limite à laquelle le paiement doit être reçu</div>
+          <div class="form-text">Deadline by which the payment must be received</div>
         </div>
       </div>
     </div>
     
-    <!-- Détails du paiement -->
+    <!-- Payment Details -->
     <div class="form-section">
       <h3 class="section-title">
         <i class="fas fa-money-bill-wave"></i>
-        Détails du paiement
+        Payment Details
       </h3>
       <div class="row">
         <div class="col-md-6 mb-3">
-          <label for="{{ form.mode_paiement.id_for_label }}" class="form-label">Mode de paiement</label>
+          <label for="{{ form.mode_paiement.id_for_label }}" class="form-label">Payment method</label>
           {{ form.mode_paiement }}
           {% if form.mode_paiement.errors %}
           <div class="invalid-feedback d-block">
@@ -183,18 +183,18 @@
         </div>
         
         <div class="col-md-6 mb-3">
-          <label for="{{ form.reference.id_for_label }}" class="form-label">Référence</label>
+          <label for="{{ form.reference.id_for_label }}" class="form-label">Reference</label>
           {{ form.reference }}
           {% if form.reference.errors %}
           <div class="invalid-feedback d-block">
             {{ form.reference.errors }}
           </div>
           {% endif %}
-          <div class="form-text">Numéro de référence du paiement (ex: numéro de chèque)</div>
+          <div class="form-text">Payment reference number (e.g., check number)</div>
         </div>
         
         <div class="col-md-12 mb-3">
-          <label for="{{ form.commentaires.id_for_label }}" class="form-label">Commentaires</label>
+          <label for="{{ form.commentaires.id_for_label }}" class="form-label">Comments</label>
           {{ form.commentaires }}
           {% if form.commentaires.errors %}
           <div class="invalid-feedback d-block">
@@ -207,7 +207,7 @@
     
     <div class="form-actions">
       <button type="submit" class="btn btn-primary">
-        <i class="fas fa-save me-1"></i> Enregistrer
+        <i class="fas fa-save me-1"></i> Save
       </button>
     </div>
   </form>
@@ -218,9 +218,9 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('Formulaire de paiement chargé');
+    console.log('Payment form loaded');
     
-    // Initialiser les champs de date
+    // Initialize date fields
     const dateInputs = document.querySelectorAll('input[type="date"]');
     dateInputs.forEach(input => {
       if (!input.value) {
@@ -232,12 +232,12 @@
       }
     });
     
-    // Ajouter la validation côté client et le débogage
+    // Add client-side validation and debugging
     const form = document.querySelector('form');
     if (form) {
-      console.log('Formulaire trouvé:', form);
+      console.log('Form found:', form);
       
-      // Appliquer des classes Bootstrap aux champs du formulaire
+      // Apply Bootstrap classes to form fields
       const formControls = document.querySelectorAll('input, select, textarea');
       formControls.forEach(function(element) {
         if (element.tagName === 'SELECT') {
@@ -250,29 +250,29 @@
         }
       });
       
-      // Ajouter un gestionnaire d'événements pour le bouton de soumission
+      // Add event handler for submit button
       const submitButton = form.querySelector('button[type="submit"]');
       if (submitButton) {
-        console.log('Bouton de soumission trouvé:', submitButton);
+        console.log('Submit button found:', submitButton);
         submitButton.addEventListener('click', function(event) {
-          console.log('Bouton de soumission cliqué');
+          console.log('Submit button clicked');
         });
       } else {
-        console.error('Bouton de soumission non trouvé');
+        console.error('Submit button not found');
       }
       
       form.addEventListener('submit', function(event) {
-        console.log('Événement de soumission du formulaire déclenché');
+        console.log('Form submit event triggered');
         let isValid = true;
         
-        // Valider les champs requis
+        // Validate required fields
         const requiredInputs = form.querySelectorAll('input[required], select[required]');
         requiredInputs.forEach(input => {
-          console.log('Validation du champ:', input.name, 'Valeur:', input.value);
+          console.log('Validating field:', input.name, 'Value:', input.value);
           if (!input.value) {
             isValid = false;
             input.classList.add('is-invalid');
-            console.error('Champ invalide:', input.name);
+            console.error('Invalid field:', input.name);
           } else {
             input.classList.remove('is-invalid');
           }
@@ -280,14 +280,14 @@
         
         if (!isValid) {
           event.preventDefault();
-          console.error('Formulaire invalide, soumission annulée');
-          alert('Veuillez remplir tous les champs obligatoires.');
+          console.error('Form invalid, submission cancelled');
+          alert('Please fill in all required fields.');
         } else {
-          console.log('Formulaire valide, soumission en cours...');
+          console.log('Form valid, submitting...');
         }
       });
     } else {
-      console.error('Formulaire non trouvé');
+      console.error('Form not found');
     }
   });
 </script>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Supprimer le cours {{ object.nom_cours }} - Formatrix{% endblock %}
+{% block title %}Delete Course {{ object.nom_cours }} - Formatrix{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/apprenants/delete.css' %}">
@@ -10,10 +10,10 @@
 {% block content %}
 <div class="page-inner">
   <div class="page-header mb-4">
-    <h1 class="page-title">Confirmation de suppression</h1>
+    <h1 class="page-title">Delete Confirmation</h1>
     <div class="ms-auto">
       <a href="{% url 'cours:cours-list' %}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left me-2"></i>Retour
+        <i class="fas fa-arrow-left me-2"></i>Back
       </a>
     </div>
   </div>
@@ -25,20 +25,20 @@
           <i class="fas fa-exclamation-triangle fa-2x"></i>
         </div>
         <div>
-          <h4 class="mb-2">Attention !</h4>
-          <p class="mb-0">Êtes-vous sûr de vouloir supprimer le cours <strong>{{ object.nom_cours }}</strong> ? Cette action est irréversible.</p>
+          <h4 class="mb-2">Warning!</h4>
+          <p class="mb-0">Are you sure you want to delete the course <strong>{{ object.nom_cours }}</strong>? This action cannot be undone.</p>
         </div>
       </div>
       
-      <h5 class="mb-3">Informations du cours</h5>
+      <h5 class="mb-3">Course Information</h5>
       <table class="info-table mb-4">
         <tbody>
           <tr>
-            <th>Nom du cours :</th>
+            <th>Course Name:</th>
             <td>{{ object.nom_cours }}</td>
           </tr>
           <tr>
-            <th>Type de cours :</th>
+            <th>Course Type:</th>
             <td>
               <span class="badge {% if object.type_cours == 'presentiel' %}bg-primary{% elif object.type_cours == 'en_ligne' %}bg-info{% else %}bg-secondary{% endif %}">
                 {{ object.get_type_cours_display }}
@@ -46,11 +46,11 @@
             </td>
           </tr>
           <tr>
-            <th>Durée :</th>
-            <td>{{ object.duree_heures }} heures</td>
+            <th>Duration:</th>
+            <td>{{ object.duree_heures }} hours</td>
           </tr>
           <tr>
-            <th>Niveau :</th>
+            <th>Level:</th>
             <td>
               <span class="badge bg-success">
                 {{ object.get_niveau_display }}
@@ -58,7 +58,7 @@
             </td>
           </tr>
           <tr>
-            <th>Statut :</th>
+            <th>Status:</th>
             <td>
               <span class="badge {% if object.statut_approbation == 'approuve' %}bg-success{% elif object.statut_approbation == 'en_attente' %}bg-warning{% elif object.statut_approbation == 'refuse' %}bg-danger{% else %}bg-secondary{% endif %}">
                 {{ object.get_statut_approbation_display }}
@@ -72,10 +72,10 @@
         {% csrf_token %}
         <div class="d-flex justify-content-between">
           <a href="{% url 'cours:cours-detail' object.pk %}" class="btn btn-secondary">
-            <i class="fas fa-times me-2"></i>Annuler
+            <i class="fas fa-times me-2"></i>Cancel
           </a>
           <button type="submit" class="btn btn-danger">
-            <i class="fas fa-trash me-2"></i>Confirmer la suppression
+            <i class="fas fa-trash me-2"></i>Confirm Deletion
           </button>
         </div>
       </form>
