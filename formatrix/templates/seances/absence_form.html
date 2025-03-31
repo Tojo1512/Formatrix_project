@@ -1,198 +1,305 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}
-  {% if absence %}
-    Modifier l'absence - Séance du {{ seance.date|date:"d/m/Y" }}
-  {% else %}
-    Signaler une absence - Séance du {{ seance.date|date:"d/m/Y" }}
-  {% endif %}
-  - Formatrix
+{% if form.instance.absence_id %}
+Edit Absence - Formatrix
+{% else %}
+Record Absence - Formatrix
+{% endif %}
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 <style>
-  .card-container {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-  
-  .form-header {
-    margin-bottom: 30px;
-  }
-  
   .form-section {
-    margin-bottom: 30px;
-    border: 1px solid #e9ecef;
+    background-color: #fff;
     border-radius: 8px;
     padding: 20px;
-    background-color: #f8f9fa;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   }
   
-  .section-title {
+  .form-section-title {
     margin-bottom: 20px;
-    color: #495057;
-    font-weight: 600;
-    border-bottom: 1px solid #e9ecef;
     padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 600;
   }
   
-  .notes {
-    margin-top: 20px;
-    padding: 15px;
+  .info-box {
     background-color: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #3498db;
+    padding: 15px;
+    margin-bottom: 20px;
   }
   
-  .notes-title {
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #3498db;
+  .required-field::after {
+    content: "*";
+    color: #dc3545;
+    margin-left: 4px;
   }
   
-  .notes-content {
+  .help-text {
+    font-size: 0.875rem;
     color: #6c757d;
+    margin-top: 5px;
+  }
+  
+  .preview-box {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="card-container">
-  <div class="form-header">
-    <h2>
-      <i class="fas {% if absence %}fa-edit{% else %}fa-user-clock{% endif %}"></i>
-      {% if absence %}
-        Modifier l'absence
-      {% else %}
-        Signaler une absence
-      {% endif %}
-    </h2>
-    <a href="{% url 'seances:absence_list' seance.seance_id %}" class="btn btn-outline">
-      <i class="fas fa-arrow-left"></i>
-      Retour à la liste des absences
-    </a>
-  </div>
-
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  {% if form.non_field_errors %}
-    <div class="alert alert-danger">
-      {% for error in form.non_field_errors %}
-        {{ error }}
-      {% endfor %}
-    </div>
-  {% endif %}
-
-  <form method="post" novalidate>
-    {% csrf_token %}
-    
-    <div class="form-section">
-      <h3 class="section-title">
-        <i class="fas fa-info-circle"></i>
-        Informations sur la séance
-      </h3>
-      
-      <div class="info-item">
-        <span class="info-label">Cours:</span>
-        <span class="info-value">{{ seance.cours.nom_cours }}</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Date:</span>
-        <span class="info-value">{{ seance.date|date:"d/m/Y" }}</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Lieu:</span>
-        <span class="info-value">{{ seance.lieu.lieu }}</span>
-      </div>
-    </div>
-    
-    <div class="form-section">
-      <h3 class="section-title">
-        <i class="fas fa-user-times"></i>
-        Détails de l'absence
-      </h3>
-      
-      <div class="form-group {% if form.formateur_absent.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.formateur_absent.id_for_label }}">
-          <i class="fas fa-user"></i>
-          Formateur absent <span class="text-danger">*</span>
-        </label>
-        {{ form.formateur_absent }}
-        {% include "includes/field_errors.html" with field=form.formateur_absent %}
-      </div>
-      
-      <div class="form-group {% if form.date_absence.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.date_absence.id_for_label }}">
-          <i class="fas fa-calendar"></i>
-          Date d'absence <span class="text-danger">*</span>
-        </label>
-        {{ form.date_absence }}
-        {% include "includes/field_errors.html" with field=form.date_absence %}
-      </div>
-      
-      <div class="form-group {% if form.raison.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.raison.id_for_label }}">
-          <i class="fas fa-clipboard-list"></i>
-          Raison <span class="text-danger">*</span>
-        </label>
-        {{ form.raison }}
-        {% include "includes/field_errors.html" with field=form.raison %}
-      </div>
-      
-      <div class="form-group {% if form.details.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.details.id_for_label }}">
-          <i class="fas fa-clipboard"></i>
-          Détails
-        </label>
-        {{ form.details }}
-        {% include "includes/field_errors.html" with field=form.details %}
-      </div>
-    </div>
-    
-    <div class="form-section">
-      <h3 class="section-title">
-        <i class="fas fa-user-plus"></i>
-        Formateur remplaçant
-      </h3>
-      
-      <div class="form-group {% if form.formateur_remplacant.errors %}has-error{% endif %}">
-        <label class="form-label" for="{{ form.formateur_remplacant.id_for_label }}">
-          <i class="fas fa-user-check"></i>
-          Remplaçant
-        </label>
-        {{ form.formateur_remplacant }}
-        {% include "includes/field_errors.html" with field=form.formateur_remplacant %}
-      </div>
-      
-      <div class="notes">
-        <div class="notes-title">
-          <i class="fas fa-info-circle"></i> Note importante
-        </div>
-        <div class="notes-content">
-          <p>Un remplacement est nécessaire si l'absence a lieu pendant la session. Si aucun formateur n'est disponible pour remplacer, veuillez contacter l'administration dans les plus brefs délais.</p>
-          <p>Le remplaçant doit avoir les compétences appropriées pour assurer la continuité de la formation.</p>
-        </div>
-      </div>
-    </div>
-    
-    <div class="form-actions">
-      <a href="{% url 'seances:absence_list' seance.seance_id %}" class="btn btn-outline">
-        <i class="fas fa-times"></i>
-        Annuler
+<div class="page-inner py-4">
+  <div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="page-title">
+        {% if form.instance.absence_id %}
+        Edit Absence
+        {% else %}
+        Record Absence
+        {% endif %}
+      </h1>
+      <a href="{% url 'seances:absence-list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Back to list
       </a>
-      <button type="submit" class="btn btn-primary">
-        <i class="fas {% if absence %}fa-save{% else %}fa-plus{% endif %}"></i>
-        {% if absence %}Enregistrer les modifications{% else %}Signaler l'absence{% endif %}
-      </button>
     </div>
-  </form>
+  </div>
+  
+  {% if messages %}
+  <div class="mb-4">
+    {% for message in messages %}
+    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  
+  <div class="row">
+    <div class="col-md-8">
+      <form method="post" enctype="multipart/form-data" id="absenceForm" novalidate>
+        {% csrf_token %}
+        
+        <!-- Trainer & Session Information -->
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <i class="fas fa-user-tie me-2"></i> Trainer & Session Information
+          </h3>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              {{ form.formateur|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+              {{ form.seance|as_crispy_field }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Absence Details -->
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <i class="fas fa-calendar-times me-2"></i> Absence Details
+          </h3>
+          
+          <div class="row mb-3">
+            <div class="col-md-6">
+              {{ form.date_absence|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+              {{ form.raison|as_crispy_field }}
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            {{ form.justification|as_crispy_field }}
+          </div>
+          
+          <div class="mb-3">
+            {{ form.document_justificatif|as_crispy_field }}
+            {% if form.instance.document_justificatif %}
+            <div class="mt-2">
+              <p class="mb-1">Current document:</p>
+              <a href="{{ form.instance.document_justificatif.url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                <i class="fas fa-file me-1"></i> View document
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Replacement Information -->
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <i class="fas fa-user-plus me-2"></i> Replacement Information
+          </h3>
+          
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="hasReplacement" name="has_replacement" {% if form.instance.formateur_remplacant %}checked{% endif %}>
+            <label class="form-check-label" for="hasReplacement">
+              This absence has a replacement trainer
+            </label>
+          </div>
+          
+          <div id="replacementFields" class="{% if not form.instance.formateur_remplacant %}d-none{% endif %}">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                {{ form.formateur_remplacant|as_crispy_field }}
+              </div>
+              <div class="col-md-6">
+                {{ form.statut|as_crispy_field }}
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              {{ form.notes|as_crispy_field }}
+            </div>
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between mt-4">
+          <a href="{% url 'seances:absence-list' %}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i>
+            {% if form.instance.absence_id %}
+            Save Changes
+            {% else %}
+            Record Absence
+            {% endif %}
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Right Sidebar -->
+    <div class="col-md-4">
+      <!-- Help Card -->
+      <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">Help & Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6><i class="fas fa-info-circle me-2"></i> About Absences</h6>
+            <p class="text-muted small">When a trainer cannot attend a session, you need to record their absence. If possible, assign a replacement trainer.</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6><i class="fas fa-question-circle me-2"></i> Absence Reasons</h6>
+            <ul class="small text-muted ps-4">
+              <li><strong>Medical:</strong> Health issues, medical appointments</li>
+              <li><strong>Personal:</strong> Family events, emergencies</li>
+              <li><strong>Professional:</strong> Other work commitments</li>
+              <li><strong>Other:</strong> Any reason not in the above categories</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h6><i class="fas fa-exclamation-circle me-2"></i> Important Notes</h6>
+            <ul class="small text-muted ps-4">
+              <li>For planned absences, record them as soon as possible</li>
+              <li>A justification document is recommended for medical absences</li>
+              <li>Always try to find a replacement trainer when possible</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Status Card -->
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Replacement Status</h5>
+        </div>
+        <div class="card-body">
+          <p class="small text-muted mb-3">The absence status is determined by whether a replacement trainer has been assigned:</p>
+          
+          <div class="d-flex mb-2 align-items-center">
+            <span class="badge bg-success me-2">Approved</span>
+            <span class="small">A replacement trainer has been assigned and confirmed</span>
+          </div>
+          
+          <div class="d-flex mb-2 align-items-center">
+            <span class="badge bg-warning me-2">Pending</span>
+            <span class="small">Waiting for confirmation or looking for a replacement</span>
+          </div>
+          
+          <div class="d-flex align-items-center">
+            <span class="badge bg-danger me-2">Rejected</span>
+            <span class="small">No replacement could be found, or request was denied</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toggle replacement fields visibility
+    const hasReplacementCheckbox = document.getElementById('hasReplacement');
+    const replacementFields = document.getElementById('replacementFields');
+    
+    hasReplacementCheckbox.addEventListener('change', function() {
+      if (this.checked) {
+        replacementFields.classList.remove('d-none');
+      } else {
+        replacementFields.classList.add('d-none');
+        // Reset values when unchecked
+        const replacementSelect = document.getElementById('id_formateur_remplacant');
+        if (replacementSelect) {
+          replacementSelect.value = '';
+        }
+      }
+    });
+    
+    // Form validation
+    const absenceForm = document.getElementById('absenceForm');
+    absenceForm.addEventListener('submit', function(event) {
+      let isValid = true;
+      
+      // Check if replacement is checked but no trainer selected
+      if (hasReplacementCheckbox.checked) {
+        const replacementSelect = document.getElementById('id_formateur_remplacant');
+        if (replacementSelect && !replacementSelect.value) {
+          isValid = false;
+          alert('Please select a replacement trainer');
+        }
+      }
+      
+      if (!isValid) {
+        event.preventDefault();
+      }
+    });
+    
+    // Show document filename
+    const fileInput = document.getElementById('id_document_justificatif');
+    if (fileInput) {
+      fileInput.addEventListener('change', function() {
+        const fileName = this.files[0] ? this.files[0].name : '';
+        const fileNameDisplay = document.createElement('div');
+        fileNameDisplay.classList.add('mt-2', 'small', 'text-muted');
+        fileNameDisplay.innerText = fileName ? `Selected file: ${fileName}` : '';
+        
+        // Remove previous display if exists
+        const previousDisplay = this.parentElement.querySelector('.text-muted');
+        if (previousDisplay) {
+          previousDisplay.remove();
+        }
+        
+        if (fileName) {
+          this.parentElement.appendChild(fileNameDisplay);
+        }
+      });
+    }
+  });
+</script>
 {% endblock %} 

@@ -1,238 +1,382 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Absences - Séance du {{ seance.date|date:"d/m/Y" }} - Formatrix{% endblock %}
+{% block title %}Absences - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/table.css' %}">
 <style>
   .absence-card {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: none;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-    overflow: hidden;
+    margin-bottom: 15px;
   }
   
-  .absence-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
+  .absence-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
   }
   
-  .absence-body {
-    padding: 15px;
+  .absence-card .card-header {
+    border-radius: 8px 8px 0 0;
+    padding: 12px 20px;
   }
   
-  .absence-content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+  .absence-card .card-body {
+    padding: 20px;
   }
   
-  .absence-section {
-    flex: 1;
-    min-width: 250px;
-  }
-  
-  .absence-status {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-weight: 600;
+  .badge-reason {
     font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 30px;
   }
   
-  .status-remplace {
-    background-color: #28a745;
-    color: white;
+  .filters-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
   }
   
-  .status-non-remplace {
-    background-color: #dc3545;
-    color: white;
+  .absence-timeline {
+    position: relative;
+    padding-left: 20px;
   }
   
-  .absence-formateur {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
+  .absence-timeline:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 0;
+    width: 2px;
+    background-color: #e0e0e0;
   }
   
-  .formateur-avatar-sm {
-    width: 40px;
-    height: 40px;
+  .absence-timeline-item {
+    position: relative;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .absence-timeline-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  .absence-timeline-item:before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    margin-right: 12px;
-    object-fit: cover;
-    border: 2px solid #3498db;
-  }
-  
-  .formateur-initials-sm {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 12px;
     background-color: #3498db;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 1rem;
-  }
-  
-  .absence-actions {
-    margin-top: 15px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  
-  .empty-state {
-    text-align: center;
-    padding: 50px 20px;
-  }
-  
-  .empty-state i {
-    font-size: 3rem;
-    color: #adb5bd;
-    margin-bottom: 20px;
-  }
-  
-  .empty-state p {
-    font-size: 1.2rem;
-    color: #6c757d;
-    margin-bottom: 20px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #3498db;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="page-header">
-    <h2>
-      <i class="fas fa-user-clock"></i> 
-      Gestion des absences - Séance du {{ seance.date|date:"d/m/Y" }}
-    </h2>
-    <div class="header-actions">
-      <a href="{% url 'seances:seance-detail' seance.seance_id %}" class="btn btn-outline">
-        <i class="fas fa-arrow-left"></i> 
-        Retour au détail de la séance
-      </a>
-      <a href="{% url 'seances:absence_create' seance.seance_id %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> 
-        Signaler une absence
-      </a>
+<div class="page-inner py-4">
+  <div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="page-title">Absence Management</h4>
+      <div>
+        <a href="{% url 'seances:absence-create' %}" class="btn btn-primary">
+          <i class="fas fa-plus me-1"></i> Record Absence
+        </a>
+      </div>
     </div>
   </div>
   
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
+  <!-- Filters -->
+  <div class="filters-section mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Filters</h5>
+      <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilters">
+        <i class="fas fa-filter me-1"></i> Show/Hide Filters
+      </button>
+    </div>
+    
+    <div class="collapse show" id="collapseFilters">
+      <form method="get" action="{% url 'seances:absence-list' %}" class="row g-3">
+        <div class="col-md-4">
+          <label for="formateur" class="form-label">Trainer</label>
+          <select name="formateur" id="formateur" class="form-select">
+            <option value="">All trainers</option>
+            {% for formateur in formateurs %}
+            <option value="{{ formateur.formateur_id }}" {% if request.GET.formateur == formateur.formateur_id|slugify %}selected{% endif %}>
+              {{ formateur.nom_formateur }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="col-md-4">
+          <label for="statut" class="form-label">Status</label>
+          <select name="statut" id="statut" class="form-select">
+            <option value="">All statuses</option>
+            <option value="pending" {% if request.GET.statut == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="approved" {% if request.GET.statut == 'approved' %}selected{% endif %}>Approved</option>
+            <option value="rejected" {% if request.GET.statut == 'rejected' %}selected{% endif %}>Rejected</option>
+          </select>
+        </div>
+        
+        <div class="col-md-4">
+          <label for="date_min" class="form-label">From Date</label>
+          <input type="date" name="date_min" id="date_min" class="form-control" value="{{ request.GET.date_min }}">
+        </div>
+        
+        <div class="col-md-4">
+          <label for="date_max" class="form-label">To Date</label>
+          <input type="date" name="date_max" id="date_max" class="form-control" value="{{ request.GET.date_max }}">
+        </div>
+        
+        <div class="col-md-4">
+          <label for="raison" class="form-label">Reason</label>
+          <select name="raison" id="raison" class="form-select">
+            <option value="">All reasons</option>
+            <option value="medical" {% if request.GET.raison == 'medical' %}selected{% endif %}>Medical</option>
+            <option value="personal" {% if request.GET.raison == 'personal' %}selected{% endif %}>Personal</option>
+            <option value="professional" {% if request.GET.raison == 'professional' %}selected{% endif %}>Professional</option>
+            <option value="other" {% if request.GET.raison == 'other' %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+        
+        <div class="col-md-4">
+          <label for="remplacant" class="form-label">Replacement</label>
+          <select name="remplacant" id="remplacant" class="form-select">
+            <option value="">All</option>
+            <option value="with" {% if request.GET.remplacant == 'with' %}selected{% endif %}>With replacement</option>
+            <option value="without" {% if request.GET.remplacant == 'without' %}selected{% endif %}>Without replacement</option>
+          </select>
+        </div>
+        
+        <div class="col-12 mt-3">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search me-1"></i> Filter
+          </button>
+          <a href="{% url 'seances:absence-list' %}" class="btn btn-outline-secondary ms-2">
+            <i class="fas fa-times me-1"></i> Reset
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
   
-  <div class="section-info mb-4">
-    <div class="info-box">
-      <div class="info-icon">
-        <i class="fas fa-info-circle"></i>
+  <!-- Statistics -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-white-50">Total Absences</h6>
+              <h2 class="mb-0">{{ absences.count }}</h2>
+            </div>
+            <i class="fas fa-calendar-times fa-2x text-white-50"></i>
+          </div>
+        </div>
       </div>
-      <div class="info-content">
-        <h4>Informations sur la séance</h4>
-        <div class="info-details">
-          <span><strong>Cours:</strong> {{ seance.cours.nom_cours }}</span>
-          <span><strong>Lieu:</strong> {{ seance.lieu.lieu }}</span>
-          <span><strong>Nombre de formateurs assignés:</strong> {{ seance.formateurs.count }}</span>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-white-50">Replacements</h6>
+              <h2 class="mb-0">{{ replacements_count }}</h2>
+            </div>
+            <i class="fas fa-user-check fa-2x text-white-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card bg-warning text-dark">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-dark-50">Pending</h6>
+              <h2 class="mb-0">{{ pending_count }}</h2>
+            </div>
+            <i class="fas fa-clock fa-2x text-dark-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card bg-danger text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-white-50">Without Replacement</h6>
+              <h2 class="mb-0">{{ without_replacement_count }}</h2>
+            </div>
+            <i class="fas fa-user-times fa-2x text-white-50"></i>
+          </div>
         </div>
       </div>
     </div>
   </div>
   
-  {% if absences %}
-    <div class="absence-list">
-      {% for absence in absences %}
-        <div class="absence-card">
-          <div class="absence-header">
-            <h3>Absence du {{ absence.date_absence|date:"d/m/Y" }}</h3>
-            <span class="absence-status {% if absence.est_remplace %}status-remplace{% else %}status-non-remplace{% endif %}">
-              {% if absence.est_remplace %}Remplacé{% else %}Non remplacé{% endif %}
-            </span>
+  <!-- Absences List -->
+  <div class="row">
+    <div class="col-12">
+      {% if absences %}
+      <div class="absence-list">
+        {% for absence in absences %}
+        <div class="absence-card card">
+          <div class="card-header d-flex justify-content-between align-items-center 
+                      {% if absence.statut == 'pending' %}bg-warning text-dark{% elif absence.statut == 'approved' %}bg-success text-white{% elif absence.statut == 'rejected' %}bg-danger text-white{% endif %}">
+            <h5 class="mb-0">Absence #{{ absence.absence_id }}</h5>
+            <div>
+              <span class="badge badge-reason bg-light text-dark">
+                <i class="fas fa-tag me-1"></i> {{ absence.get_raison_display }}
+              </span>
+            </div>
           </div>
-          <div class="absence-body">
-            <div class="absence-content">
-              <div class="absence-section">
-                <h4>Formateur absent</h4>
-                <div class="absence-formateur">
-                  {% if absence.formateur_absent.photo %}
-                    <img src="{{ absence.formateur_absent.photo.url }}" alt="{{ absence.formateur_absent.get_full_name }}" class="formateur-avatar-sm">
-                  {% else %}
-                    <div class="formateur-initials-sm">
-                      {{ absence.formateur_absent.prenom.0 }}{{ absence.formateur_absent.nom.0 }}
-                    </div>
-                  {% endif %}
-                  <div>
-                    <strong>{{ absence.formateur_absent.get_full_name }}</strong>
-                    <div class="formateur-type">{{ absence.formateur_absent.get_type_formateur_display }}</div>
-                  </div>
-                </div>
-                <p>
-                  <strong>Raison:</strong> {{ absence.get_raison_display }}
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <p class="mb-2">
+                  <i class="fas fa-user-tie text-primary me-2"></i>
+                  <strong>Trainer:</strong> {{ absence.formateur.nom_formateur }}
                 </p>
-                {% if absence.details %}
-                  <p>
-                    <strong>Détails:</strong> {{ absence.details }}
-                  </p>
-                {% endif %}
+                <p class="mb-2">
+                  <i class="fas fa-calendar-alt text-danger me-2"></i>
+                  <strong>Absence Date:</strong> {{ absence.date_absence|date:"l, F j, Y" }}
+                </p>
+                <p class="mb-2">
+                  <i class="fas fa-chalkboard text-success me-2"></i>
+                  <strong>Session:</strong> 
+                  {% if absence.seance %}
+                  <a href="{% url 'seances:seance-detail' absence.seance.seance_id %}">
+                    {{ absence.seance.cours.nom_cours }} ({{ absence.seance.date_debut|date:"d/m/Y" }})
+                  </a>
+                  {% else %}
+                  <span class="text-muted">No session linked</span>
+                  {% endif %}
+                </p>
+                <p class="mb-2">
+                  <i class="fas fa-clock text-warning me-2"></i>
+                  <strong>Status:</strong>
+                  <span class="badge {% if absence.statut == 'pending' %}bg-warning{% elif absence.statut == 'approved' %}bg-success{% elif absence.statut == 'rejected' %}bg-danger{% endif %}">
+                    {{ absence.get_statut_display }}
+                  </span>
+                </p>
               </div>
-              <div class="absence-section">
-                <h4>Formateur remplaçant</h4>
-                {% if absence.formateur_remplacant %}
-                  <div class="absence-formateur">
-                    {% if absence.formateur_remplacant.photo %}
-                      <img src="{{ absence.formateur_remplacant.photo.url }}" alt="{{ absence.formateur_remplacant.get_full_name }}" class="formateur-avatar-sm">
-                    {% else %}
-                      <div class="formateur-initials-sm">
-                        {{ absence.formateur_remplacant.prenom.0 }}{{ absence.formateur_remplacant.nom.0 }}
-                      </div>
-                    {% endif %}
-                    <div>
-                      <strong>{{ absence.formateur_remplacant.get_full_name }}</strong>
-                      <div class="formateur-type">{{ absence.formateur_remplacant.get_type_formateur_display }}</div>
-                    </div>
-                  </div>
-                {% else %}
-                  <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i> 
-                    Aucun remplaçant n'a été désigné
-                  </div>
-                {% endif %}
+              <div class="col-md-6">
+                <p class="mb-2">
+                  <i class="fas fa-user-plus text-info me-2"></i>
+                  <strong>Replacement:</strong>
+                  {% if absence.formateur_remplacant %}
+                  {{ absence.formateur_remplacant.nom_formateur }}
+                  {% else %}
+                  <span class="text-muted">No replacement</span>
+                  {% endif %}
+                </p>
+                <p class="mb-2">
+                  <i class="fas fa-comment-alt text-secondary me-2"></i>
+                  <strong>Justification:</strong>
+                  {% if absence.justification %}
+                  {{ absence.justification|truncatechars:100 }}
+                  {% else %}
+                  <span class="text-muted">No justification provided</span>
+                  {% endif %}
+                </p>
+                <p class="mb-2">
+                  <i class="fas fa-file-alt text-primary me-2"></i>
+                  <strong>Documentation:</strong>
+                  {% if absence.document_justificatif %}
+                  <a href="{{ absence.document_justificatif.url }}" target="_blank">View document</a>
+                  {% else %}
+                  <span class="text-muted">No document provided</span>
+                  {% endif %}
+                </p>
               </div>
             </div>
-            <div class="absence-actions">
-              <a href="{% url 'seances:absence_update' absence.absence_id %}" class="btn btn-warning">
-                <i class="fas fa-edit"></i> Modifier
+            
+            <div class="d-flex justify-content-end mt-3">
+              <a href="{% url 'seances:absence-detail' absence.absence_id %}" class="btn btn-sm btn-outline-primary me-2">
+                <i class="fas fa-eye me-1"></i> View
               </a>
-              <a href="{% url 'seances:absence_delete' absence.absence_id %}" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Supprimer
+              <a href="{% url 'seances:absence-update' absence.absence_id %}" class="btn btn-sm btn-outline-warning me-2">
+                <i class="fas fa-edit me-1"></i> Edit
+              </a>
+              <a href="{% url 'seances:absence-delete' absence.absence_id %}" class="btn btn-sm btn-outline-danger">
+                <i class="fas fa-trash me-1"></i> Delete
               </a>
             </div>
           </div>
         </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
+      
+      <!-- Pagination -->
+      {% if is_paginated %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% endif %}
+          
+          {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+          </li>
+          {% endif %}
+          {% endfor %}
+          
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+      
+      {% else %}
+      <div class="text-center py-5">
+        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+        <h5>No absences found matching the filters.</h5>
+        <p class="text-muted">Try changing the filters or add a new absence record.</p>
+        <a href="{% url 'seances:absence-create' %}" class="btn btn-primary mt-3">
+          <i class="fas fa-plus me-1"></i> Record New Absence
+        </a>
+      </div>
+      {% endif %}
     </div>
-  {% else %}
-    <div class="empty-state">
-      <i class="fas fa-calendar-check"></i>
-      <p>Aucune absence n'a été signalée pour cette séance.</p>
-      <a href="{% url 'seances:absence_create' seance.seance_id %}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Signaler une absence
-      </a>
-    </div>
-  {% endif %}
+  </div>
 </div>
 {% endblock %} 

@@ -1,329 +1,325 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ page_title }} - Formatrix{% endblock %}
+{% block title %}Sessions - Formatrix{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/apprenants/list.css' %}">
-{% endblock %}
-
-{% block extra_js %}
-<script>
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-function updateSeanceStatus(seanceId, action) {
-    if (!confirm(`Êtes-vous sûr de vouloir ${action === 'start' ? 'commencer' : action === 'complete' ? 'terminer' : 'annuler'} cette séance ?`)) {
-        return;
-    }
-
-    const csrftoken = getCookie('csrftoken');
-    
-    fetch(`/seances/${seanceId}/${action}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erreur lors de la mise à jour du statut');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            // Mettre à jour l'affichage du statut
-            const statusCell = document.querySelector(`tr[data-seance-id="${seanceId}"] .status-cell`);
-            if (statusCell) {
-                // Supprimer les anciennes classes
-                statusCell.querySelector('.badge').classList.remove('bg-warning', 'bg-success', 'bg-primary', 'bg-danger');
-                
-                // Ajouter la nouvelle classe
-                let newClass = '';
-                let newText = '';
-                
-                switch (data.new_status) {
-                    case 'pas_commence':
-                        newClass = 'bg-warning';
-                        newText = 'Pas encore commencé';
-                        break;
-                    case 'en_cours':
-                        newClass = 'bg-success';
-                        newText = 'En cours';
-                        break;
-                    case 'termine':
-                        newClass = 'bg-primary';
-                        newText = 'Terminé';
-                        break;
-                    case 'annule':
-                        newClass = 'bg-danger';
-                        newText = 'Annulé';
-                        break;
-                }
-                
-                statusCell.querySelector('.badge').classList.add(newClass);
-                statusCell.querySelector('.badge').textContent = newText;
-                
-                // Mettre à jour les boutons d'action
-                const actionsCell = document.querySelector(`tr[data-seance-id="${seanceId}"] .actions-cell`);
-                if (actionsCell) {
-                    // Mettre à jour les boutons en fonction du nouveau statut
-                    updateActionButtons(actionsCell, data.new_status);
-                }
-            }
-            
-            // Afficher un message de succès
-            alert('Statut mis à jour avec succès !');
-        } else {
-            alert('Erreur: ' + data.error);
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-        alert('Une erreur est survenue lors de la mise à jour du statut.');
-    });
-}
-
-function updateActionButtons(actionsCell, status) {
-    // Supprimer tous les boutons d'action existants
-    const actionButtons = actionsCell.querySelectorAll('.status-action');
-    actionButtons.forEach(button => button.remove());
-    
-    // Ajouter les nouveaux boutons en fonction du statut
-    const buttonContainer = actionsCell.querySelector('.btn-group');
-    
-    if (status === 'pas_commence') {
-        const startButton = document.createElement('button');
-        startButton.className = 'btn btn-sm btn-success status-action';
-        startButton.innerHTML = '<i class="fas fa-play"></i>';
-        startButton.title = 'Commencer la séance';
-        startButton.onclick = function() { updateSeanceStatus(this.closest('tr').dataset.seanceId, 'start'); };
-        buttonContainer.appendChild(startButton);
-        
-        const cancelButton = document.createElement('button');
-        cancelButton.className = 'btn btn-sm btn-danger status-action';
-        cancelButton.innerHTML = '<i class="fas fa-times"></i>';
-        cancelButton.title = 'Annuler la séance';
-        cancelButton.onclick = function() { updateSeanceStatus(this.closest('tr').dataset.seanceId, 'cancel'); };
-        buttonContainer.appendChild(cancelButton);
-    } else if (status === 'en_cours') {
-        const completeButton = document.createElement('button');
-        completeButton.className = 'btn btn-sm btn-primary status-action';
-        completeButton.innerHTML = '<i class="fas fa-check"></i>';
-        completeButton.title = 'Terminer la séance';
-        completeButton.onclick = function() { updateSeanceStatus(this.closest('tr').dataset.seanceId, 'complete'); };
-        buttonContainer.appendChild(completeButton);
-    }
-}
-</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+  .session-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+  }
+  
+  .session-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  
+  .session-card.upcoming {
+    border-left-color: #3498db;
+  }
+  
+  .session-card.in-progress {
+    border-left-color: #2ecc71;
+  }
+  
+  .session-card.completed {
+    border-left-color: #95a5a6;
+  }
+  
+  .session-card.cancelled {
+    border-left-color: #e74c3c;
+  }
+  
+  .form-control {
+    height: calc(2.25rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  
+  .input-group-text {
+    display: flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    margin-bottom: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="page-inner">
+<div class="page-inner py-4">
   <div class="page-header mb-4">
-    <h1 class="page-title">{{ page_title }}</h1>
-    <div class="ms-auto">
-      <a href="{% url 'seances:seance-create' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Ajouter une séance
-      </a>
-    </div>
-  </div>
-
-  <!-- Filtres -->
-  <div class="filter-card">
-    <form method="get" class="row g-3">
-      <div class="col-md-4">
-        <div class="input-group">
-          <span class="input-group-text"><i class="fas fa-search"></i></span>
-          <input type="text" name="search" class="form-control" placeholder="Rechercher une séance..." value="{{ search_query }}">
-        </div>
-      </div>
-      <div class="col-md-3">
-        <select name="statut" class="form-select">
-          <option value="">Tous les statuts</option>
-          {% for code, label in STATUS_CHOICES %}
-          <option value="{{ code }}" {% if statut_filter == code %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-md-3 d-flex">
-        <button type="submit" class="btn btn-primary me-2">
-          <i class="fas fa-filter me-1"></i>Filtrer
-        </button>
-        {% if has_active_filters %}
-        <a href="{{ reset_url }}" class="btn btn-outline-secondary">
-          <i class="fas fa-times me-1"></i>Réinitialiser
-        </a>
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="page-title">
+        {% if absence_mode %}
+          Absence Management
+        {% else %}
+          Sessions
+        {% endif %}
+      </h4>
+      <div>
+        {% if not absence_mode %}
+          <a href="{% url 'seances:seance-create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Add a session
+          </a>
         {% endif %}
       </div>
-    </form>
-  </div>
-
-  <!-- Tableau des séances -->
-  <div class="table-container">
-    {% if seance_list %}
-    <div class="table-responsive">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>
-              <a href="?{% if ordering == 'cours__nom_cours' %}-{% endif %}cours__nom_cours{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Cours
-                <i class="fas fa-sort{% if ordering == 'cours__nom_cours' %}-up{% elif ordering == '-cours__nom_cours' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th>
-              <a href="?{% if ordering == 'lieu__lieu' %}-{% endif %}lieu__lieu{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Lieu
-                <i class="fas fa-sort{% if ordering == 'lieu__lieu' %}-up{% elif ordering == '-lieu__lieu' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th>
-              <a href="?{% if ordering == 'date' %}-{% endif %}date{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Date
-                <i class="fas fa-sort{% if ordering == 'date' %}-up{% elif ordering == '-date' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th>Places</th>
-            <th>
-              <a href="?{% if ordering == 'statut' %}-{% endif %}statut{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}" class="text-decoration-none text-dark">
-                Statut
-                <i class="fas fa-sort{% if ordering == 'statut' %}-up{% elif ordering == '-statut' %}-down{% endif %}"></i>
-              </a>
-            </th>
-            <th class="text-end">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for seance in seance_list %}
-          <tr data-seance-id="{{ seance.seance_id }}">
-            <td>{{ seance.cours.nom_cours }}</td>
-            <td>{{ seance.lieu.lieu }}</td>
-            <td>{{ seance.date|date:"d/m/Y" }}</td>
-            <td>{{ seance.places_reservees }} / {{ seance.nombre_places }}</td>
-            <td class="status-cell">
-              <span class="badge {% if seance.statut == 'pas_commence' %}bg-warning{% elif seance.statut == 'en_cours' %}bg-success{% elif seance.statut == 'termine' %}bg-primary{% elif seance.statut == 'annule' %}bg-danger{% endif %}">
-                {% for code, label in STATUS_CHOICES %}
-                  {% if code == seance.statut %}{{ label }}{% endif %}
-                {% endfor %}
-              </span>
-            </td>
-            <td class="text-end actions-cell">
-              <div class="btn-group">
-                <a href="{% url 'seances:seance-detail' seance.seance_id %}" class="btn btn-sm btn-info btn-action" title="Voir">
-                  <i class="fas fa-eye"></i>
-                </a>
-                <a href="{% url 'seances:seance-update' seance.seance_id %}" class="btn btn-sm btn-warning btn-action" title="Modifier">
-                  <i class="fas fa-edit"></i>
-                </a>
-                <a href="{% url 'seances:seance-delete' seance.seance_id %}" class="btn btn-sm btn-danger btn-action" title="Supprimer">
-                  <i class="fas fa-trash"></i>
-                </a>
-                
-                {% if seance.statut == 'pas_commence' %}
-                <button type="button" class="btn btn-sm btn-success status-action" onclick="updateSeanceStatus('{{ seance.seance_id }}', 'start')" title="Commencer la séance">
-                  <i class="fas fa-play"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-danger status-action" onclick="updateSeanceStatus('{{ seance.seance_id }}', 'cancel')" title="Annuler la séance">
-                  <i class="fas fa-times"></i>
-                </button>
-                {% elif seance.statut == 'en_cours' %}
-                <button type="button" class="btn btn-sm btn-primary status-action" onclick="updateSeanceStatus('{{ seance.seance_id }}', 'complete')" title="Terminer la séance">
-                  <i class="fas fa-check"></i>
-                </button>
-                {% endif %}
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
     </div>
-    
-    {% if is_paginated %}
-    <div class="d-flex justify-content-between align-items-center p-3">
-      <p class="mb-0">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</p>
-      <nav aria-label="Navigation de pagination">
-        <ul class="pagination mb-0">
-          {% if page_obj.has_previous %}
+  </div>
+  
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          {% if absence_mode %}
+            Sessions with absences
+          {% else %}
+            Filters
+          {% endif %}
+        </h5>
+        {% if not absence_mode %}
+          <a href="{% url 'seances:seance-list' %}?filtre=absences" class="btn btn-sm btn-warning">
+            <i class="fas fa-exclamation-triangle me-1"></i> Absence management
+          </a>
+        {% else %}
+          <a href="{% url 'seances:seance-list' %}" class="btn btn-sm btn-secondary">
+            <i class="fas fa-list me-1"></i> All sessions
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card-body">
+      <form method="get" action="{% if absence_mode %}{% url 'seances:seance-list' %}?filtre=absences{% else %}{% url 'seances:seance-list' %}{% endif %}">
+        {% if absence_mode %}
+          <input type="hidden" name="filtre" value="absences">
+        {% endif %}
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label for="cours" class="form-label">Course</label>
+            <select name="cours" id="cours" class="form-select">
+              <option value="">All courses</option>
+              {% for c in cours_list %}
+                <option value="{{ c.cours_id }}" {% if request.GET.cours == c.cours_id|stringformat:"s" %}selected{% endif %}>{{ c.nom_cours }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="col-md-3 mb-3">
+            <label for="formateur" class="form-label">Trainer</label>
+            <select name="formateur" id="formateur" class="form-select">
+              <option value="">All trainers</option>
+              {% for f in formateurs_list %}
+                <option value="{{ f.formateur_id }}" {% if request.GET.formateur == f.formateur_id|stringformat:"s" %}selected{% endif %}>{{ f.nom_formateur }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="col-md-3 mb-3">
+            <label for="statut" class="form-label">Status</label>
+            <select name="statut" id="statut" class="form-select">
+              <option value="">All statuses</option>
+              <option value="programmee" {% if request.GET.statut == 'programmee' %}selected{% endif %}>Scheduled</option>
+              <option value="en_cours" {% if request.GET.statut == 'en_cours' %}selected{% endif %}>In progress</option>
+              <option value="terminee" {% if request.GET.statut == 'terminee' %}selected{% endif %}>Completed</option>
+              <option value="annulee" {% if request.GET.statut == 'annulee' %}selected{% endif %}>Cancelled</option>
+            </select>
+          </div>
+          
+          <div class="col-md-3 mb-3">
+            <label for="lieu" class="form-label">Location</label>
+            <select name="lieu" id="lieu" class="form-select">
+              <option value="">All locations</option>
+              {% for l in lieux_list %}
+                <option value="{{ l.lieu_id }}" {% if request.GET.lieu == l.lieu_id|stringformat:"s" %}selected{% endif %}>{{ l.nom_lieu }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="col-md-3 mb-3">
+            <label for="date_debut" class="form-label">Start date</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+              <input type="text" class="form-control datepicker" id="date_debut" name="date_debut" placeholder="From date" value="{{ request.GET.date_debut }}">
+            </div>
+          </div>
+          
+          <div class="col-md-3 mb-3">
+            <label for="date_fin" class="form-label">End date</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+              <input type="text" class="form-control datepicker" id="date_fin" name="date_fin" placeholder="To date" value="{{ request.GET.date_fin }}">
+            </div>
+          </div>
+          
+          <div class="col-md-3 mb-3">
+            <label for="absences" class="form-label">Absences</label>
+            <select name="absences" id="absences" class="form-select">
+              <option value="">All sessions</option>
+              <option value="with_absences" {% if request.GET.absences == 'with_absences' %}selected{% endif %}>With absences</option>
+              <option value="without_absences" {% if request.GET.absences == 'without_absences' %}selected{% endif %}>Without absences</option>
+            </select>
+          </div>
+          
+          <div class="col-md-3 d-flex align-items-end mb-3">
+            <button type="submit" class="btn btn-primary me-2">
+              <i class="fas fa-filter me-1"></i> Filter
+            </button>
+            <a href="{% if absence_mode %}{% url 'seances:seance-list' %}?filtre=absences{% else %}{% url 'seances:seance-list' %}{% endif %}" class="btn btn-outline-secondary">
+              <i class="fas fa-undo me-1"></i> Reset
+            </a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div class="row mt-4">
+    {% for seance in seances %}
+      <div class="col-md-12 mb-3">
+        <div class="card session-card {{ seance.statut_css_class }}">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-7">
+                <h5 class="mb-1">
+                  <a href="{% url 'seances:seance-detail' seance.seance_id %}" class="text-dark">
+                    {{ seance.cours.nom_cours }}
+                  </a>
+                  
+                  {% if seance.has_absences %}
+                    <span class="badge bg-danger ms-2">Absences</span>
+                  {% endif %}
+                </h5>
+                <div class="d-flex mb-2">
+                  <span class="badge {% if seance.statut == 'programmee' %}bg-primary{% elif seance.statut == 'en_cours' %}bg-success{% elif seance.statut == 'terminee' %}bg-secondary{% elif seance.statut == 'annulee' %}bg-danger{% endif %} me-2">
+                    {{ seance.get_statut_display }}
+                  </span>
+                  <small class="text-muted">
+                    <i class="fas fa-chalkboard-teacher me-1"></i> {{ seance.formateur.nom_formateur }}
+                  </small>
+                  <small class="text-muted ms-3">
+                    <i class="fas fa-map-marker-alt me-1"></i> {{ seance.lieu.nom_lieu }}
+                  </small>
+                </div>
+                <p class="small text-muted mb-0">
+                  <i class="fas fa-clock me-1"></i> 
+                  {{ seance.date_debut|date:"j F Y" }} {{ seance.heure_debut }} - 
+                  {% if seance.date_debut != seance.date_fin %}
+                    {{ seance.date_fin|date:"j F Y" }} 
+                  {% endif %}
+                  {{ seance.heure_fin }}
+                </p>
+              </div>
+              
+              <div class="col-md-3">
+                <div class="d-flex align-items-center">
+                  <div class="me-3">
+                    <span class="text-muted small">Registrations</span>
+                    <div class="d-flex align-items-center">
+                      <h5 class="mb-0">{{ seance.total_inscriptions }}</h5>
+                      {% if seance.has_absences %}
+                        <span class="ms-2 text-danger small">{{ seance.total_absences }} absence(s)</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-md-2 text-end">
+                <div class="btn-group">
+                  <a href="{% url 'seances:seance-detail' seance.seance_id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a href="{% url 'seances:seance-update' seance.seance_id %}" class="btn btn-sm btn-warning">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <a href="{% url 'presences:presence-list' seance.seance_id %}" class="btn btn-sm btn-info" title="Attendance">
+                    <i class="fas fa-clipboard-list"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-md-12">
+        <div class="alert alert-info" role="alert">
+          <i class="fas fa-info-circle me-2"></i>
+          {% if absence_mode %}
+            No sessions with absences found.
+          {% else %}
+            No sessions found matching the filters.
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  
+  <!-- Pagination -->
+  {% if is_paginated %}
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Première">
+            <a class="page-link" href="?page=1{{ query_params }}" aria-label="First">
               <span aria-hidden="true">&laquo;&laquo;</span>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Précédente">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{{ query_params }}" aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
-          {% else %}
-          <li class="page-item disabled">
-            <span class="page-link">&laquo;&laquo;</span>
-          </li>
-          <li class="page-item disabled">
-            <span class="page-link">&laquo;</span>
-          </li>
+        {% endif %}
+        
+        {% for i in paginator.page_range %}
+          {% if page_obj.number == i %}
+            <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+          {% elif i > page_obj.number|add:"-3" and i < page_obj.number|add:"3" %}
+            <li class="page-item"><a class="page-link" href="?page={{ i }}{{ query_params }}">{{ i }}</a></li>
           {% endif %}
-          
-          {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}">{{ num }}</a>
-              </li>
-            {% endif %}
-          {% endfor %}
-          
-          {% if page_obj.has_next %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Suivante">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{{ query_params }}" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if statut_filter %}&statut={{ statut_filter }}{% endif %}{% if ordering %}&ordering={{ ordering }}{% endif %}" aria-label="Dernière">
+            <a class="page-link" href="?page={{ paginator.num_pages }}{{ query_params }}" aria-label="Last">
               <span aria-hidden="true">&raquo;&raquo;</span>
             </a>
           </li>
-          {% else %}
-          <li class="page-item disabled">
-            <span class="page-link">&raquo;</span>
-          </li>
-          <li class="page-item disabled">
-            <span class="page-link">&raquo;&raquo;</span>
-          </li>
-          {% endif %}
-        </ul>
-      </nav>
-    </div>
-    {% endif %}
-    {% else %}
-    <div class="empty-state">
-      <div class="empty-icon">
-        <i class="fas fa-calendar-alt"></i>
-      </div>
-      <h3>Aucune séance trouvée</h3>
-      <p>Il n'y a pas de séances correspondant à vos critères de recherche.</p>
-      <a href="{% url 'seances:seance-create' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Ajouter une séance
-      </a>
-    </div>
-    {% endif %}
-  </div>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Initialize date pickers
+    flatpickr(".datepicker", {
+      dateFormat: "Y-m-d",
+      allowInput: true
+    });
+  });
+</script>
 {% endblock %}
