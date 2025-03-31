@@ -24,6 +24,8 @@ from django.conf.urls.static import static
 from formateurs import urls as formateurs_urls
 
 urlpatterns = [
+    # L'administration Django doit rester active pour le fonctionnement du site,
+    # mais nous avons masqué le lien dans la barre latérale
     path('formatrix/admin/', admin.site.urls),
     
     # URLs pour les templates de formateurs - déplacé en haut pour priorité
