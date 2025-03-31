@@ -132,6 +132,22 @@ def home_view(request):
     context['session_status_labels'] = json.dumps(session_status_labels)
     context['session_status_counts'] = json.dumps(session_status_counts)
     
+    # Ajout: statistiques avancées pour le donut chart
+    # Récupérer le nombre de sessions par lieu
+    lieu_stats = {}
+    for seance in Seance.objects.all():
+        lieu_name = seance.lieu.lieu if hasattr(seance, 'lieu') and seance.lieu else "Lieu non spécifié"
+        if lieu_name in lieu_stats:
+            lieu_stats[lieu_name] += 1
+        else:
+            lieu_stats[lieu_name] = 1
+    
+    lieu_names = list(lieu_stats.keys())
+    lieu_counts = list(lieu_stats.values())
+    
+    context['lieu_names'] = json.dumps(lieu_names)
+    context['lieu_counts'] = json.dumps(lieu_counts)
+    
     # AMÉLIORATION 2: Données pour le bar chart des heures de formation par formateur
     # Get top 10 formateurs by total training hours
     formateurs_with_hours = Formateur.objects.annotate(
@@ -140,19 +156,64 @@ def home_view(request):
     
     formateur_names = []
     formateur_heures = []
+    formateur_data = []
     
     for formateur in formateurs_with_hours:
         formateur_names.append(formateur.get_full_name())
         # Calculate total duration in months (as defined in the model)
         total_duree = 0
+        cours_count = {}
+        
         for seance in formateur.seances_assignees.all():
             if hasattr(seance, 'duree') and seance.duree:
                 # La durée est en mois, on la convertit en heures (approx 160h/mois)
-                total_duree += seance.duree * 160
+                heures = seance.duree * 160
+                total_duree += heures
+                
+                # Compter les types de cours
+                if hasattr(seance, 'cours') and seance.cours:
+                    cours_name = seance.cours.nom_cours[:20] + "..." if len(seance.cours.nom_cours) > 20 else seance.cours.nom_cours
+                    if cours_name in cours_count:
+                        cours_count[cours_name] += heures
+                    else:
+                        cours_count[cours_name] = heures
+        
         formateur_heures.append(round(total_duree, 1))
+        
+        # Ajout de données détaillées sur les cours de chaque formateur
+        formateur_data.append({
+            'nom': formateur.get_full_name(),
+            'heures_totales': round(total_duree, 1),
+            'courses': cours_count
+        })
     
     context['formateur_names'] = json.dumps(formateur_names)
     context['formateur_heures'] = json.dumps(formateur_heures)
+    context['formateur_data'] = json.dumps(formateur_data)
+    
+    # Ajout: Évolution des sessions dans le temps (6 derniers mois)
+    months_labels = []
+    session_counts_by_month = []
+    
+    for i in range(5, -1, -1):  # Des 6 derniers mois jusqu'au mois actuel
+        current_month = timezone.now().replace(day=1) - timedelta(days=i*30)
+        month_name = current_month.strftime('%B %Y')
+        month_start = current_month.replace(day=1)
+        
+        # Mois suivant ou aujourd'hui si c'est le mois actuel
+        if i > 0:
+            next_month = (current_month.replace(day=28) + timedelta(days=4)).replace(day=1)
+            month_end = next_month - timedelta(days=1)
+        else:
+            month_end = timezone.now()
+        
+        session_count = Seance.objects.filter(date__gte=month_start, date__lte=month_end).count()
+        
+        months_labels.append(month_name)
+        session_counts_by_month.append(session_count)
+    
+    context['months_labels'] = json.dumps(months_labels)
+    context['session_counts_by_month'] = json.dumps(session_counts_by_month)
     
     # Dernières inscriptions
     latest_inscriptions = Inscription.objects.all().order_by('-date_inscription')[:5]
