@@ -67,6 +67,12 @@ class FormateurCreateView(LoginRequiredMixin, CreateView):
     template_name = 'formateurs/formateur_form.html'
     success_url = reverse_lazy('formateurs:formateur-list')
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            messages.error(request, "Vous n'avez pas l'autorisation de créer de nouveaux formateurs.")
+            return redirect('formateurs:formateur-list')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         try:
             formateur = form.save()
@@ -159,49 +165,9 @@ def formateur_register(request):
     Cette fonction gère à la fois la création d'un utilisateur dans auth.User
     et d'un profil dans le modèle Formateur.
     """
-    if request.method == 'POST':
-        form = FormateurRegistrationForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                # Créer l'utilisateur auth.User
-                user = form.save()
-                
-                # Créer un formateur associé à cet utilisateur
-                formateur = Formateur(
-                    # Ne pas utiliser user=user car la colonne user_id n'existe pas encore
-                    nom=form.cleaned_data.get('nom', ''),
-                    prenom=form.cleaned_data.get('prenom', ''),
-                    email=user.email,
-                    telephone=form.cleaned_data.get('telephone', ''),
-                    date_naissance=form.cleaned_data.get('date_naissance'),
-                    adresse=form.cleaned_data.get('adresse', ''),
-                    ville=form.cleaned_data.get('ville', ''),
-                    specialites=form.cleaned_data.get('specialites', ''),
-                    niveau_expertise=form.cleaned_data.get('niveau_expertise', ''),
-                    type_formateur=form.cleaned_data.get('type_formateur', ''),
-                    disponibilite=form.cleaned_data.get('disponibilite', ''),
-                    cv=form.cleaned_data.get('cv'),
-                    photo=form.cleaned_data.get('photo'),
-                    notes=form.cleaned_data.get('notes', ''),
-                    statut='active',
-                    date_embauche=timezone.now().date()
-                )
-                formateur.save()
-                
-                # Connecter l'utilisateur
-                login(request, user)
-                messages.success(request, "Registration successful! Welcome to Formatrix.")
-                
-                # Rediriger vers le dashboard formateur ou la page d'accueil
-                return redirect('formateurs:formateur-detail', pk=formateur.formateurid)
-            except Exception as e:
-                messages.error(request, f"An error occurred during registration: {str(e)}")
-        else:
-            print(f"Form errors: {form.errors}")
-    else:
-        form = FormateurRegistrationForm()
-    
-    return render(request, 'formateurs/formateur_register.html', {'form': form})
+    # Interdire les nouvelles inscriptions
+    messages.error(request, "Les inscriptions de nouveaux formateurs sont temporairement désactivées. Veuillez contacter l'administrateur.")
+    return redirect('login')
 
 class FormateurCoursListView(LoginRequiredMixin, ListView):
     model = Cours

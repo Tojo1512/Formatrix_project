@@ -8,20 +8,20 @@ from seances.models import Seance
 # Create your models here.
 
 class Inscription(models.Model):
-    """Modèle pour les inscriptions des apprenants aux séances de formation"""
+    """Model for learner registrations to training sessions"""
     
-    STATUT_CHOICES = [
-        ('en_cours', 'En cours'),
-        ('validee', 'Validée'),
-        ('annulee', 'Annulée'),
+    STATUS_CHOICES = [
+        ('en_cours', 'In progress'),
+        ('validee', 'Validated'),
+        ('annulee', 'Cancelled'),
     ]
     
-    TYPE_INSCRIPTION_CHOICES = [
-        ('individuelle', 'Individuelle'),
-        ('groupe', 'Groupe'),
-        ('entreprise', 'Entreprise'),
-        ('rse', 'RSE'),
-        ('ong', 'ONG'),
+    REGISTRATION_TYPE_CHOICES = [
+        ('individuelle', 'Individual'),
+        ('groupe', 'Group'),
+        ('entreprise', 'Company'),
+        ('rse', 'CSR'),
+        ('ong', 'NGO'),
     ]
     
     inscription_id = models.AutoField(primary_key=True)
@@ -29,8 +29,8 @@ class Inscription(models.Model):
     seance = models.ForeignKey(Seance, on_delete=models.CASCADE, related_name='inscriptions')
     apprenant = models.ForeignKey(Apprenant, on_delete=models.CASCADE, related_name='inscriptions')
     date_inscription = models.DateTimeField(default=timezone.now)
-    type_inscription = models.CharField(max_length=20, choices=TYPE_INSCRIPTION_CHOICES, default='individuelle')
-    statut_inscription = models.CharField(max_length=20, choices=STATUT_CHOICES, default='en_cours')
+    type_inscription = models.CharField(max_length=20, choices=REGISTRATION_TYPE_CHOICES, default='individuelle')
+    statut_inscription = models.CharField(max_length=20, choices=STATUS_CHOICES, default='en_cours')
     sponsor = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True, related_name='inscriptions_sponsorisees')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
@@ -39,40 +39,40 @@ class Inscription(models.Model):
         db_table = 'inscription'
         
     def __str__(self):
-        """Représentation textuelle de l'inscription"""
-        # Accéder aux noms via les relations au lieu d'utiliser directement les attributs
+        """Text representation of the registration"""
+        # Access names through relations instead of using attributes directly
         apprenant_nom = f"{self.apprenant.nom_apprenant} {self.apprenant.autres_nom or ''}"
-        cours_nom = self.seance.cours.nom_cours if hasattr(self.seance, 'cours') else "Cours inconnu"
-        return f"Inscription de {apprenant_nom} pour {cours_nom}"
+        cours_nom = self.seance.cours.nom_cours if hasattr(self.seance, 'cours') else "Unknown course"
+        return f"Registration of {apprenant_nom} for {cours_nom}"
     
     @classmethod
-    def inscrire_apprenants(cls, client_id, seance_id, apprenants_ids, type_inscription='groupe', sponsor_id=None):
+    def register_learners(cls, client_id, seance_id, apprenants_ids, type_inscription='groupe', sponsor_id=None):
         """
-        Inscrit plusieurs apprenants à une séance
+        Register multiple learners to a session
         
         Args:
-            client_id: ID du client qui fait l'inscription
-            seance_id: ID de la séance
-            apprenants_ids: Liste des IDs des apprenants à inscrire
-            type_inscription: Type d'inscription (par défaut: 'groupe')
-            sponsor_id: ID du sponsor (optionnel)
+            client_id: ID of the client making the registration
+            seance_id: ID of the session
+            apprenants_ids: List of learner IDs to register
+            type_inscription: Registration type (default: 'groupe')
+            sponsor_id: Sponsor ID (optional)
             
         Returns:
-            Liste des inscriptions créées
+            List of created registrations
             
         Raises:
-            ValueError: Si le nombre d'apprenants dépasse les places disponibles
+            ValueError: If the number of learners exceeds available seats
         """
-        # Récupérer les objets
+        # Get objects
         client = Client.objects.get(pk=client_id)
         seance = Seance.objects.get(pk=seance_id)
         
-        # Vérifier les places disponibles
+        # Check available seats
         places_disponibles = seance.nombre_places - seance.places_reservees
         if len(apprenants_ids) > places_disponibles:
-            raise ValueError(f"Pas assez de places disponibles. Demandé: {len(apprenants_ids)}, Disponible: {places_disponibles}")
+            raise ValueError(f"Not enough available seats. Requested: {len(apprenants_ids)}, Available: {places_disponibles}")
         
-        # Créer les inscriptions
+        # Create registrations
         inscriptions = []
         for apprenant_id in apprenants_ids:
             apprenant = Apprenant.objects.get(pk=apprenant_id)
@@ -87,7 +87,7 @@ class Inscription(models.Model):
             )
             inscriptions.append(inscription)
         
-        # Mettre à jour le nombre de places réservées
+        # Update number of reserved seats
         seance.places_reservees = F('places_reservees') + len(apprenants_ids)
         seance.save()
         

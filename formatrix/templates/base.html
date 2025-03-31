@@ -249,7 +249,6 @@
               </div>
             </li>
             
-            {% if user.is_staff %}
             <li class="nav-item {% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#inscriptionsMenu" {% if 'inscription' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'inscription' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-clipboard-list"></i>
@@ -277,6 +276,7 @@
               </div>
             </li>
             
+            {% if user.is_staff %}
             <li class="nav-item {% if 'paiement' in request.resolver_match.url_name %}active{% endif %}">
               <a data-bs-toggle="collapse" href="#paiementsMenu" {% if 'paiement' in request.resolver_match.url_name %}aria-expanded="true"{% else %}aria-expanded="false"{% endif %} class="{% if 'paiement' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-money-bill-wave"></i>
@@ -449,6 +449,15 @@
               </div>
             </li>
             {% endif %}
+            
+            <!-- Debug Admin Status -->
+            <li class="nav-item">
+              <div class="p-3 bg-light">
+                <p class="mb-0"><strong>Debug Info:</strong></p>
+                <p class="mb-0">Is Staff: {% if user.is_staff %}Yes - Admin{% else %}No - Regular User{% endif %}</p>
+                <p class="mb-0">Username: {{ user.username }}</p>
+              </div>
+            </li>
             
             {% if user.is_staff %}
               <li class="nav-item">
@@ -639,6 +648,9 @@
   {% block extra_js %}
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // Debug information for sidebar
+      console.log("Debug: Initializing sidebar...");
+      
       // Managing sidebar in mobile mode
       const sidenavTogglers = document.querySelectorAll('.sidenav-toggler');
       sidenavTogglers.forEach(function(toggler) {
@@ -649,9 +661,12 @@
       
       // Initialize dropdown menus
       var navItems = document.querySelectorAll('.nav-item');
+      console.log("Debug: Found " + navItems.length + " navigation items");
+      
       navItems.forEach(function (item) {
         var link = item.querySelector('[data-bs-toggle="collapse"]');
         if (link) {
+          console.log("Debug: Processing menu item: " + (link.textContent || link.innerText).trim());
           var menu = document.querySelector(link.getAttribute('href'));
           if (menu) {
             // Check if menu should be open
@@ -660,6 +675,7 @@
               window.location.pathname.includes(link.getAttribute('href').substring(1));
 
             if (shouldBeActive) {
+              console.log("Debug: Activating menu: " + (link.textContent || link.innerText).trim());
               item.classList.add('active');
               menu.classList.add('show');
             }
