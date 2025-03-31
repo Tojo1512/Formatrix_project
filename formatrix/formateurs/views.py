@@ -2,7 +2,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DetailView, D
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from .models import Formateur
 from .forms import FormateurForm
 from django.db import models
@@ -12,6 +12,8 @@ from django.conf import settings
 from django import forms
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.http import HttpResponseForbidden
+from cours.models import Cours
 
 class FormateurListView(LoginRequiredMixin, ListView):
     model = Formateur
@@ -199,4 +201,60 @@ def formateur_register(request):
     else:
         form = FormateurRegistrationForm()
     
-    return render(request, 'formateurs/formateur_register.html', {'form': form}) 
+    return render(request, 'formateurs/formateur_register.html', {'form': form})
+
+class FormateurCoursListView(LoginRequiredMixin, ListView):
+    model = Cours
+    template_name = 'formateurs/formateur_cours_list.html'
+    context_object_name = 'cours_list'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        # Vérifier si l'utilisateur est un formateur
+        try:
+            formateur = None
+            if self.kwargs.get('pk'):
+                # S'il y a un ID de formateur spécifié dans l'URL
+                formateur = get_object_or_404(Formateur, formateurid=self.kwargs.get('pk'))
+            elif hasattr(self.request.user, 'formateur_profile'):
+                # Si l'utilisateur connecté est un formateur
+                formateur = self.request.user.formateur_profile
+            
+            if formateur:
+                # Récupérer tous les cours assignés à ce formateur
+                return Cours.objects.filter(formateurs=formateur).order_by('-created_at')
+            else:
+                return Cours.objects.none()
+        except Formateur.DoesNotExist:
+            return Cours.objects.none()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Obtenir le formateur pour le titre de la page
+        try:
+            formateur = None
+            if self.kwargs.get('pk'):
+                formateur = get_object_or_404(Formateur, formateurid=self.kwargs.get('pk'))
+            elif hasattr(self.request.user, 'formateur_profile'):
+                formateur = self.request.user.formateur_profile
+            
+            if formateur:
+                context['formateur'] = formateur
+                context['page_title'] = f"Cours assignés à {formateur.prenom} {formateur.nom}"
+            else:
+                context['page_title'] = "Vos cours"
+        except Formateur.DoesNotExist:
+            context['page_title'] = "Vos cours"
+        
+        # Ajout de filtres
+        status_filter = self.request.GET.get('status', '')
+        search = self.request.GET.get('search', '')
+        
+        if status_filter:
+            context['status_filter'] = status_filter
+        
+        if search:
+            context['search_query'] = search
+            
+        return context 

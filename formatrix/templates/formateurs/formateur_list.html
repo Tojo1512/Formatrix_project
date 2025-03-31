@@ -5,6 +5,30 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/apprenants/list.css' %}">
+<style>
+  .avatar-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 500;
+  }
+  
+  /* Couleurs pour les avatars selon l'initiale */
+  .avatar-color-1 { background-color: #F44336; }
+  .avatar-color-2 { background-color: #E91E63; }
+  .avatar-color-3 { background-color: #9C27B0; }
+  .avatar-color-4 { background-color: #673AB7; }
+  .avatar-color-5 { background-color: #3F51B5; }
+  .avatar-color-6 { background-color: #2196F3; }
+  .avatar-color-7 { background-color: #03A9F4; }
+  .avatar-color-8 { background-color: #00BCD4; }
+  .avatar-color-9 { background-color: #009688; }
+  .avatar-color-0 { background-color: #4CAF50; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -13,7 +37,7 @@
     <h1 class="page-title">Liste des Formateurs</h1>
     <div class="ms-auto">
       {% if show_create_button %}
-      <a href="{{ create_url }}" class="btn btn-primary">
+      <a href="{{ create_url }}" class="btn btn-primary d-none">
         <i class="fas fa-plus me-2"></i>Ajouter un formateur
       </a>
       {% endif %}
@@ -95,9 +119,13 @@
             <td>
               <div class="d-flex align-items-center">
                 {% if formateur.photo %}
-                  <img src="{{ formateur.photo.url }}" alt="{{ formateur.nom }}" class="avatar-sm me-2">
+                  <img src="{{ MEDIA_URL }}{{ formateur.photo.url }}" alt="{{ formateur.nom }}" class="avatar-sm me-2" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
                 {% else %}
-                  <div class="avatar-sm avatar-initials me-2">{{ formateur.prenom.0 }}{{ formateur.nom.0 }}</div>
+                  {% with initials=formateur.prenom.0|add:formateur.nom.0 color_index=formateur.formateurid|stringformat:"s"|slice:"-1" %}
+                    <div class="avatar-initials me-2 avatar-color-{{ color_index|default:'0' }}">
+                      {{ initials|upper }}
+                    </div>
+                  {% endwith %}
                 {% endif %}
                 <span>{{ formateur.prenom }} {{ formateur.nom }}</span>
               </div>
@@ -187,7 +215,7 @@
       <h3>Aucun formateur trouvé</h3>
       <p>Aucun formateur ne correspond à vos critères de recherche.</p>
       {% if show_create_button %}
-      <a href="{{ create_url }}" class="btn btn-primary">
+      <a href="{{ create_url }}" class="btn btn-primary d-none">
         <i class="fas fa-plus me-2"></i>Ajouter un formateur
       </a>
       {% endif %}

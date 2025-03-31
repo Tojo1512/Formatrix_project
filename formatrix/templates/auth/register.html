@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Inscription - Formatrix{% endblock %}
+{% block title %}Trainer Registration - Formatrix{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -257,18 +257,18 @@
 {% block guest_content %}
 <div class="registration-container">
   <div class="registration-header">
-    <h2>Inscription Formateur</h2>
-    <p>Rejoignez notre communauté de formateurs et partagez votre expertise</p>
+    <h2>Trainer Registration</h2>
+    <p>Join our community of trainers and share your expertise</p>
   </div>
 
   <div class="registration-progress">
     <div class="progress-step active" id="step-1-indicator">
       <div class="step-number">1</div>
-      <div class="step-label">Compte</div>
+      <div class="step-label">Account</div>
     </div>
     <div class="progress-step" id="step-2-indicator">
       <div class="step-number">2</div>
-      <div class="step-label">Profil</div>
+      <div class="step-label">Profile</div>
     </div>
     <div class="progress-step" id="step-3-indicator">
       <div class="step-number">3</div>
@@ -276,7 +276,7 @@
     </div>
     <div class="progress-step" id="step-4-indicator">
       <div class="step-number">4</div>
-      <div class="step-label">Finalisation</div>
+      <div class="step-label">Finalization</div>
     </div>
   </div>
 
@@ -284,124 +284,124 @@
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
 
-      <!-- Étape 1: Informations du compte -->
+      <!-- Step 1: Account Information -->
       <div class="form-step active" id="step-1">
-        <h3 class="mb-4">Créez votre compte</h3>
+        <h3 class="mb-4">Create your account</h3>
         
         <div class="form-group">
-          <label class="form-label">Nom d'utilisateur</label>
+          <label class="form-label">Username</label>
           <input type="text" class="form-control" name="username" required>
-          <small class="form-text">Choisissez un nom d'utilisateur unique</small>
+          <small class="form-text">Choose a unique username</small>
         </div>
 
         <div class="form-group">
           <label class="form-label">Email</label>
           <input type="email" class="form-control" name="email" required>
-          <small class="form-text">Nous ne partagerons jamais votre email</small>
+          <small class="form-text">We will never share your email</small>
         </div>
 
         <div class="form-row">
           <div class="form-col">
-            <label class="form-label">Mot de passe</label>
+            <label class="form-label">Password</label>
             <input type="password" class="form-control" name="password1" required>
           </div>
           <div class="form-col">
-            <label class="form-label">Confirmer le mot de passe</label>
+            <label class="form-label">Confirm password</label>
             <input type="password" class="form-control" name="password2" required>
           </div>
         </div>
 
         <div class="form-buttons">
-          <button type="button" class="btn btn-next" onclick="nextStep(1, 2)">Suivant</button>
+          <button type="button" class="btn btn-next" onclick="nextStep(1, 2)">Next</button>
         </div>
       </div>
 
-      <!-- Étape 2: Informations personnelles -->
+      <!-- Step 2: Personal Information -->
       <div class="form-step" id="step-2">
-        <h3 class="mb-4">Informations personnelles</h3>
+        <h3 class="mb-4">Personal Information</h3>
         
         <div class="form-row">
           <div class="form-col">
-            <label class="form-label">Prénom</label>
+            <label class="form-label">First Name</label>
             <input type="text" class="form-control" name="first_name" required>
           </div>
           <div class="form-col">
-            <label class="form-label">Nom</label>
+            <label class="form-label">Last Name</label>
             <input type="text" class="form-control" name="last_name" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Date de naissance</label>
+          <label class="form-label">Date of Birth</label>
           <input type="date" class="form-control" name="date_naissance" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Téléphone</label>
+          <label class="form-label">Phone</label>
           <input type="tel" class="form-control" name="telephone" required>
         </div>
 
         <div class="form-buttons">
-          <button type="button" class="btn btn-prev" onclick="prevStep(2, 1)">Précédent</button>
-          <button type="button" class="btn btn-next" onclick="nextStep(2, 3)">Suivant</button>
+          <button type="button" class="btn btn-prev" onclick="prevStep(2, 1)">Previous</button>
+          <button type="button" class="btn btn-next" onclick="nextStep(2, 3)">Next</button>
         </div>
       </div>
 
-      <!-- Étape 3: Profil formateur -->
+      <!-- Step 3: Trainer Profile -->
       <div class="form-step" id="step-3">
-        <h3 class="mb-4">Profil formateur</h3>
+        <h3 class="mb-4">Trainer Profile</h3>
 
         <div class="form-group">
-          <label class="form-label">Spécialités</label>
+          <label class="form-label">Specialties</label>
           <select class="form-control" name="specialites" multiple required>
-            <option value="informatique">Informatique</option>
-            <option value="langues">Langues</option>
+            <option value="informatique">Computing</option>
+            <option value="langues">Languages</option>
             <option value="management">Management</option>
             <option value="marketing">Marketing</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Niveau d'expertise</label>
+          <label class="form-label">Expertise Level</label>
           <select class="form-control" name="niveau_expertise" required>
-            <option value="junior">Junior (1-3 ans)</option>
-            <option value="intermediaire">Intermédiaire (4-7 ans)</option>
-            <option value="senior">Senior (8+ ans)</option>
+            <option value="junior">Junior (1-3 years)</option>
+            <option value="intermediaire">Intermediate (4-7 years)</option>
+            <option value="senior">Senior (8+ years)</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">CV</label>
+          <label class="form-label">Resume/CV</label>
           <input type="file" class="form-control" name="cv" accept=".pdf,.doc,.docx">
-          <small class="form-text">Format accepté : PDF, DOC, DOCX</small>
+          <small class="form-text">Accepted formats: PDF, DOC, DOCX</small>
         </div>
 
         <div class="form-buttons">
-          <button type="button" class="btn btn-prev" onclick="prevStep(3, 2)">Précédent</button>
-          <button type="button" class="btn btn-next" onclick="nextStep(3, 4)">Suivant</button>
+          <button type="button" class="btn btn-prev" onclick="prevStep(3, 2)">Previous</button>
+          <button type="button" class="btn btn-next" onclick="nextStep(3, 4)">Next</button>
         </div>
       </div>
 
-      <!-- Étape 4: Récapitulatif -->
+      <!-- Step 4: Summary -->
       <div class="form-step" id="step-4">
-        <h3 class="mb-4">Récapitulatif</h3>
+        <h3 class="mb-4">Summary</h3>
         
         <div id="recap-content" class="mb-4">
-          <!-- Le contenu sera rempli dynamiquement par JavaScript -->
+          <!-- Content will be filled dynamically by JavaScript -->
         </div>
 
         <div class="form-group">
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="terms" required>
             <label class="form-check-label" for="terms">
-              J'accepte les conditions d'utilisation et la politique de confidentialité
+              I accept the terms of use and privacy policy
             </label>
           </div>
         </div>
 
         <div class="form-buttons">
-          <button type="button" class="btn btn-prev" onclick="prevStep(4, 3)">Précédent</button>
-          <button type="submit" class="btn btn-submit">Finaliser l'inscription</button>
+          <button type="button" class="btn btn-prev" onclick="prevStep(4, 3)">Previous</button>
+          <button type="submit" class="btn btn-submit">Complete Registration</button>
         </div>
       </div>
     </form>
@@ -412,16 +412,16 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialisation des étapes
+  // Initialize steps
   updateProgressBar(1);
   
-  // Validation des mots de passe
+  // Password validation
   const password1 = document.querySelector('input[name="password1"]');
   const password2 = document.querySelector('input[name="password2"]');
   
   password2.addEventListener('input', function() {
     if (password1.value !== password2.value) {
-      password2.setCustomValidity('Les mots de passe ne correspondent pas');
+      password2.setCustomValidity('Passwords do not match');
     } else {
       password2.setCustomValidity('');
     }

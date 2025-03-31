@@ -314,6 +314,27 @@
       <div class="col-12">
         <h5 class="section-title">Platform Management</h5>
       </div>
+      
+      {% if not user.is_staff %}
+      <!-- My Courses (Formateur) -->
+      <div class="col-md-4 mb-4">
+        <div class="card dashboard-card h-100">
+          <div class="card-body text-center p-4">
+            <div class="dashboard-icon text-danger">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h5 class="card-title">Mes cours</h5>
+            <p class="card-text">Voir tous les cours qui vous sont assignés et gérer vos séances.</p>
+            <div class="mt-4">
+              <a href="{% url 'formateurs:formateur-cours' %}" class="btn btn-danger">
+                <i class="fas fa-list me-1"></i> Liste de mes cours
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
       <!-- Course Management -->
       <div class="col-md-4 mb-4">
         <div class="card dashboard-card h-100">
@@ -464,7 +485,7 @@
         <div class="card-body p-5">
           <div class="text-center mb-5">
             <h1 class="h3 mb-3">Formatrix</h1>
-            <p class="text-muted">Plateforme de gestion de formations professionnelles</p>
+            <p class="text-muted">Professional Training Management Platform</p>
           </div>
           <div class="row">
             <div class="col-md-6">
@@ -473,9 +494,9 @@
                   <div class="mb-3">
                     <i class="fas fa-user-shield fa-3x text-primary"></i>
                   </div>
-                  <h5 class="card-title">Administrateur</h5>
-                  <p class="card-text">Accédez à toutes les fonctionnalités d'administration de la plateforme.</p>
-                  <a href="{% url 'login' %}" class="btn btn-primary">Connexion</a>
+                  <h5 class="card-title">Administrator</h5>
+                  <p class="card-text">Access all administration features of the platform.</p>
+                  <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
                 </div>
               </div>
             </div>
@@ -485,9 +506,9 @@
                   <div class="mb-3">
                     <i class="fas fa-chalkboard-teacher fa-3x text-success"></i>
                   </div>
-                  <h5 class="card-title">Formateur</h5>
-                  <p class="card-text">Gérez vos cours et suivez vos apprenants.</p>
-                  <a href="{% url 'login' %}" class="btn btn-success">Connexion</a>
+                  <h5 class="card-title">Trainer</h5>
+                  <p class="card-text">Manage your courses and monitor your learners.</p>
+                  <a href="{% url 'login' %}" class="btn btn-success">Login</a>
                 </div>
               </div>
             </div>
@@ -504,14 +525,14 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     {% if user.is_authenticated %}
-    // Graphique des séances à venir
+    // Chart for upcoming sessions
     var upcomingCtx = document.getElementById('upcomingSessionsChart').getContext('2d');
     var upcomingChart = new Chart(upcomingCtx, {
       type: 'bar',
       data: {
         labels: {{ upcoming_days|safe }},
         datasets: [{
-          label: 'Séances programmées',
+          label: 'Scheduled sessions',
           data: {{ upcoming_counts|safe }},
           backgroundColor: 'rgba(54, 162, 235, 0.5)',
           borderColor: 'rgba(54, 162, 235, 1)',
@@ -537,14 +558,14 @@
       }
     });
     
-    // Graphique d'activité des formateurs
+    // Chart for trainer activity
     var formateursCtx = document.getElementById('formateursActivityChart').getContext('2d');
     var formateursChart = new Chart(formateursCtx, {
       type: 'line',
       data: {
-        labels: ['2 semaines', '10 jours', '1 semaine', '5 jours', '4 jours', '3 jours', '2 jours', 'Hier', 'Aujourd\'hui'],
+        labels: ['2 weeks', '10 days', '1 week', '5 days', '4 days', '3 days', '2 days', 'Yesterday', 'Today'],
         datasets: [{
-          label: 'Activité des formateurs',
+          label: 'Trainer activity',
           data: {{ activite_formateurs|default:"[1, 3, 2, 5, 4, 6, 3, 4, 5]"|safe }},
           backgroundColor: 'rgba(75, 192, 192, 0.2)',
           borderColor: 'rgba(75, 192, 192, 1)',

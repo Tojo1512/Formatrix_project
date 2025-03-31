@@ -41,13 +41,54 @@
   <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
+  <!-- Global variables -->
+  <script>
+    const MEDIA_URL = "{{ MEDIA_URL }}";
+  </script>
+  
   <style>
+    /* Avatar styles for profile pictures and initials */
+    .avatar-sm {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-sm img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-initials {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    /* Avatar background colors based on ID last digit */
+    .avatar-color-1 { background-color: #F44336; }
+    .avatar-color-2 { background-color: #E91E63; }
+    .avatar-color-3 { background-color: #9C27B0; }
+    .avatar-color-4 { background-color: #673AB7; }
+    .avatar-color-5 { background-color: #3F51B5; }
+    .avatar-color-6 { background-color: #2196F3; }
+    .avatar-color-7 { background-color: #03A9F4; }
+    .avatar-color-8 { background-color: #00BCD4; }
+    .avatar-color-9 { background-color: #009688; }
+    .avatar-color-0 { background-color: #4CAF50; }
+    
     /* Custom sidebar styles */
     .sidebar {
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
     }
-    
- 
     
     .sidebar-wrapper {
       padding: 10px 0;
@@ -361,6 +402,13 @@
                       <span class="sub-item">Add a trainer</span>
                     </a>
                   </li>
+                  {% if user.formateur_profile %}
+                  <li>
+                    <a href="{% url 'formateurs:formateur-cours' %}" class="{% if request.resolver_match.url_name == 'formateur-cours' %}active{% endif %}">
+                      <span class="sub-item">My courses</span>
+                    </a>
+                  </li>
+                  {% endif %}
                 </ul>
               </div>
             </li>
